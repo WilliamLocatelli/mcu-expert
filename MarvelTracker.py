@@ -3,6 +3,9 @@ import csv
 
 root = []
 
+BEST_COLOR = color_rgb(39, 155, 209)
+HOVER_COLOR = color_rgb(143, 207, 236)
+SELECTED_COLOR = color_rgb(31, 222, 34)
 SQUARE_SIZE = 5
 RECT_HEIGHT = 7
 RECT_WIDTH = 20
@@ -16,9 +19,9 @@ def motion(event):
     BIG_X, BIG_Y = event.x, event.y
     for movie in Movie.open:
         if movie.p1.getX() < BIG_X/5 < movie.p2.getX() and movie.p1.getY() < 140 - (BIG_Y/5) < movie.p2.getY():
-            movie.my_square.setFill("blue")
+            movie.my_square.setFill(HOVER_COLOR)
         elif movie is Movie.first:
-            movie.my_square.setFill("green")
+            movie.my_square.setFill(BEST_COLOR)
         else:
             movie.my_square.setFill("white")
     #print('{}, {}'.format(BIG_X, BIG_Y))
@@ -125,7 +128,7 @@ def color_best_movie(movies):
             max_movie = open_movie
     if max_movie:
         Movie.first = max_movie
-        max_movie.my_square.setFill("green")
+        max_movie.my_square.setFill(BEST_COLOR)
 
 
 # recursively marks all of the passed movie's children as unwatchable
@@ -142,7 +145,7 @@ def clear_nexts(movie):
 def select_movie(movie):
     Movie.open.remove(movie)
     movie.selected = True
-    movie.my_square.setFill(color_rgb(160, 17, 27))
+    movie.my_square.setFill(SELECTED_COLOR)
     for seq in movie.seqs:
         prevs_selected = True
         for prev in seq.prevs:
