@@ -18,14 +18,14 @@ def import_movies_from_csv(file="AdjacencyList.csv"):
     layer = 0
     # iterate through the list of movies, creating an object for each
     for movie in movies_list:
-        this_movie = Movie(movie[0])
-        result[movie[0]] = this_movie  # add the movie to a dictionary with the name as the key
+        this_movie = Movie(movie[1], int(movie[0]))
+        result[movie[1]] = this_movie  # add the movie to a dictionary with the name as the key
         # generate adjacency list of previous movies
         prevs = []
         # keep track of layers
         previous_layer = []
         for prev in movie:
-            if not prev == movie[0] and len(prev) > 1:
+            if not prev == movie[0] and not prev == movie[1] and len(prev) > 1:
                 prevs.append(result.get(prev))
                 previous_layer.append(result.get(prev).layer)
         this_movie.prevs = prevs
@@ -45,6 +45,7 @@ def import_movies_from_csv(file="AdjacencyList.csv"):
     return result
 
 
+# set screen positions for movies, based on layers
 def handle_positions(movies):
     layers = {}
     for movie in movies.values():
@@ -52,7 +53,7 @@ def handle_positions(movies):
             layers[movie.layer].append(movie)
         else:
             layers[movie.layer] = [movie]
-    y = 150
+    y = 110
     for layer in layers.values():
         size = len(layer)
         pos = 100 / (size + 1)
@@ -60,7 +61,7 @@ def handle_positions(movies):
         for movie in layer:
             movie.set_point(Point(x - SQUARE_SIZE/2, y))
             x = x + pos
-        y = y - 10
+        y = y - 1.5*SQUARE_SIZE
 
 
 # test
@@ -80,15 +81,31 @@ def make_window(movies):
                 if movie.prevs_selected is True:  # proceed only if the prevs of this movie have been selected
                     if movie.selected is False:
                         select_movie(movie)
+                        color_best_movie(movies)
                     else:
                         movie.my_square.setFill("white")
                         movie.selected = False
                         clear_nexts(movie)
+                        Movie.open.append(movie)
+                        color_best_movie(movies)
+
+
+def color_best_movie(movies):
+    max_rank = len(movies)
+    max_movie = None
+    for open_movie in Movie.open:
+        open_movie.my_square.setFill("white")
+        r = open_movie.rank
+        if r <= max_rank:
+            max_rank = r
+            max_movie = open_movie
+    if max_movie: max_movie.my_square.setFill("green")
 
 
 # recursively marks all of the passed movie's children as unwatchable
 def clear_nexts(movie):
     for seq in movie.seqs:
+        if seq in Movie.open: Movie.open.remove(seq)
         seq.selected = False
         seq.prevs_selected = False
         seq.my_square.setFill("gray")
@@ -97,6 +114,7 @@ def clear_nexts(movie):
 
 # marks a movie as watched and updates its children as watchable, if permissible
 def select_movie(movie):
+    Movie.open.remove(movie)
     movie.selected = True
     movie.my_square.setFill(color_rgb(125, 25, 32))
     for seq in movie.seqs:
@@ -106,16 +124,18 @@ def select_movie(movie):
                 prevs_selected = False
         if prevs_selected:
             seq.prevs_selected = True
+            Movie.open.append(seq)
             seq.my_square.setFill("white")
 
 
 # create a class for movies. each movie will be at a certain point and have a name. clicking on the movie will make it
 # do stuff.
 class Movie:
-    win = GraphWin(width=500, height=800, title="MCU Tracker", autoflush=False)
-    win.setCoords(0, 0, 100, 160)
+    open = []
+    win = GraphWin(width=500, height=600, title="MCU Tracker", autoflush=False)
+    win.setCoords(0, 0, 100, 120)
 
-    def __init__(self, name):
+    def __init__(self, name, rank=0):
         self.selected = False  # whether or not this movie has been marked as watched
         self.prevs = []  # the parents of this movie
         self.seqs = []  # the children of this movie
@@ -124,11 +144,14 @@ class Movie:
         self.my_square = None
         self.name = name  # the name of the movie
         self.prevs_selected = False  # whether or not all of this movies parents have been marked as watched
+        self.rank = rank
 
     def draw(self):
         self.my_square.draw(self.win)  # draw it to the window
         if not self.prevs_selected:
             self.my_square.setFill("gray")
+        else:
+            Movie.open.append(self)
         title = Text(self.my_square.getCenter(), self.name)
         title.draw(self.win)
 
