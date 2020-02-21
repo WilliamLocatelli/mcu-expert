@@ -4,6 +4,22 @@ import csv
 root = []
 
 SQUARE_SIZE = 5
+BIG_X = 0
+BIG_Y = 0
+
+
+# handles hover response
+def motion(event):
+    global BIG_X, BIG_Y
+    BIG_X, BIG_Y = event.x, event.y
+    for movie in Movie.open:
+        if movie.p1.getX() < BIG_X/5 < movie.p2.getX() and movie.p1.getY() < 120 - (BIG_Y/5) < movie.p2.getY():
+            movie.my_square.setFill("blue")
+        elif movie is Movie.first:
+            movie.my_square.setFill("green")
+        else:
+            movie.my_square.setFill("white")
+    #print('{}, {}'.format(BIG_X, BIG_Y))
 
 
 def import_movies_from_csv(file="AdjacencyList.csv"):
@@ -66,6 +82,7 @@ def handle_positions(movies):
 
 # test
 def make_window(movies):
+    Movie.win.bind('<Motion>', motion)
     for movie in movies.values():
         movie.draw()
         # draw lines connecting movies
@@ -73,6 +90,7 @@ def make_window(movies):
             for prev in movie.prevs:
                 line = Line(movie.p2, prev.p1)
                 line.draw(Movie.win)'''
+    color_best_movie(movies)
     update()
     while True:
         p = Movie.win.getMouse()
@@ -99,7 +117,9 @@ def color_best_movie(movies):
         if r <= max_rank:
             max_rank = r
             max_movie = open_movie
-    if max_movie: max_movie.my_square.setFill("green")
+    if max_movie:
+        Movie.first = max_movie
+        max_movie.my_square.setFill("green")
 
 
 # recursively marks all of the passed movie's children as unwatchable
@@ -131,6 +151,7 @@ def select_movie(movie):
 # create a class for movies. each movie will be at a certain point and have a name. clicking on the movie will make it
 # do stuff.
 class Movie:
+    first = None
     open = []
     win = GraphWin(width=500, height=600, title="MCU Tracker", autoflush=False)
     win.setCoords(0, 0, 100, 120)
