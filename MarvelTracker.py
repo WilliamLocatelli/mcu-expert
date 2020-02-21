@@ -3,10 +3,13 @@ import csv
 
 root = []
 
-BEST_COLOR = color_rgb(39, 155, 209)
-HOVER_COLOR = color_rgb(143, 207, 236)
+BEST_COLOR = color_rgb(163, 216, 241)
+HOVER_COLOR = color_rgb(76, 237, 78)
 SELECTED_COLOR = color_rgb(31, 222, 34)
-SQUARE_SIZE = 5
+PROHIBIT_SELECTED_COLOR = color_rgb(156, 194, 147)
+PROHIBIT_OPEN_COLOR = color_rgb(196, 196, 196)
+DESELECT_COLOR = color_rgb(76, 237, 78)
+POTENTIAL_COLOR = color_rgb(234, 234, 234)
 RECT_HEIGHT = 7
 RECT_WIDTH = 20
 BIG_X = 0
@@ -17,14 +20,45 @@ BIG_Y = 0
 def motion(event):
     global BIG_X, BIG_Y
     BIG_X, BIG_Y = event.x, event.y
+    potentials = []
     for movie in Movie.open:
+        potentials = movie.seqs
         if movie.p1.getX() < BIG_X/5 < movie.p2.getX() and movie.p1.getY() < 140 - (BIG_Y/5) < movie.p2.getY():
             movie.my_square.setFill(HOVER_COLOR)
-        elif movie is Movie.first:
-            movie.my_square.setFill(BEST_COLOR)
+            parents_selected = 0
+            for seq in potentials:
+                for prev in seq.prevs:
+                    if prev.selected:
+                        parents_selected += 1
+                if parents_selected >= len(seq.prevs) - 1:
+                    seq.my_square.setFill(POTENTIAL_COLOR)
+            break
         else:
-            movie.my_square.setFill("white")
+            for seq in potentials:
+                seq.my_square.setFill("gray")
+            if movie is Movie.first:
+                movie.my_square.setFill(BEST_COLOR)
+            else:
+                movie.my_square.setFill("white")
+    # iterate through the selected movies:
+    for movie in Movie.selected:
+        if movie.p1.getX() < BIG_X/5 < movie.p2.getX() and movie.p1.getY() < 140 - (BIG_Y/5) < movie.p2.getY():
+            movie.my_square.setFill(DESELECT_COLOR)
+            prohibit_children(movie)
+            break
+        else:
+            movie.my_square.setFill(SELECTED_COLOR)
     #print('{}, {}'.format(BIG_X, BIG_Y))
+
+
+def prohibit_children(movie):
+    for seq in movie.seqs:
+        if seq.prevs_selected:
+            if seq in Movie.selected:
+                seq.my_square.setFill(PROHIBIT_SELECTED_COLOR)
+            else:
+                seq.my_square.setFill(PROHIBIT_OPEN_COLOR)
+            prohibit_children(seq)
 
 
 def import_movies_from_csv(file="AdjacencyList.csv"):
@@ -85,9 +119,9 @@ def handle_positions(movies):
         y = y - 1.5*RECT_HEIGHT
 
 
-# test
 def make_window(movies):
     Movie.win.bind('<Motion>', motion)
+    #draw movies
     for movie in movies.values():
         movie.draw()
         # draw lines connecting movies
@@ -97,6 +131,7 @@ def make_window(movies):
                 line.draw(Movie.win)'''
     color_best_movie(movies)
     update()
+    # respond to clicks
     while True:
         p = Movie.win.getMouse()
         for movie in movies.values():
@@ -106,13 +141,16 @@ def make_window(movies):
                         select_movie(movie)
                         color_best_movie(movies)
                     else:
-                        movie.my_square.setFill("white")
+                        movie.my_square.setFill(HOVER_COLOR)
+                        Movie.selected.remove(movie)
                         movie.selected = False
                         clear_nexts(movie)
                         Movie.open.append(movie)
                         color_best_movie(movies)
+                #else, do something special.
 
 
+# update rank list swapping to be generalizable
 def color_best_movie(movies):
     max_rank = len(movies)
     max_movie = None
@@ -135,6 +173,7 @@ def color_best_movie(movies):
 def clear_nexts(movie):
     for seq in movie.seqs:
         if seq in Movie.open: Movie.open.remove(seq)
+        if seq in Movie.selected: Movie.selected.remove(seq)
         seq.selected = False
         seq.prevs_selected = False
         seq.my_square.setFill("gray")
@@ -144,6 +183,7 @@ def clear_nexts(movie):
 # marks a movie as watched and updates its children as watchable, if permissible
 def select_movie(movie):
     Movie.open.remove(movie)
+    Movie.selected.append(movie)
     movie.selected = True
     movie.my_square.setFill(SELECTED_COLOR)
     for seq in movie.seqs:
@@ -155,6 +195,8 @@ def select_movie(movie):
             seq.prevs_selected = True
             Movie.open.append(seq)
             seq.my_square.setFill("white")
+        else:
+            seq.my_square.setFill("gray")
 
 
 # create a class for movies. each movie will be at a certain point and have a name. clicking on the movie will make it
@@ -162,6 +204,7 @@ def select_movie(movie):
 class Movie:
     first = None
     open = []
+    selected = []
     win = GraphWin(width=500, height=700, title="MCU Tracker", autoflush=False)
     win.setCoords(0, 0, 100, 140)
 
