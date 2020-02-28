@@ -1,3 +1,8 @@
+""" Creates a GUI in which users can walk through an interactive
+MCU watch-through, following strict rules with regards to when you
+are allowed to watch certain movies.
+"""
+
 from graphics import *
 import csv
 
@@ -15,14 +20,14 @@ RECT_WIDTH = 20
 BIG_X = 0
 BIG_Y = 0
 
-
 # handles hover response
 def motion(event):
     global BIG_X, BIG_Y
     BIG_X, BIG_Y = event.x, event.y
-    potentials = []
+    # if we hover over an open movie, show which movies will be unlocked if we watch this movie.
     for movie in Movie.open:
         potentials = movie.seqs
+        # if we are hovering over this movie, show which movies will be unlocked
         if movie.p1.getX() < BIG_X/5 < movie.p2.getX() and movie.p1.getY() < 140 - (BIG_Y/5) < movie.p2.getY():
             movie.my_square.setFill(HOVER_COLOR)
             parents_selected = 0
@@ -33,6 +38,7 @@ def motion(event):
                 if parents_selected >= len(seq.prevs) - 1:
                     seq.my_square.setFill(POTENTIAL_COLOR)
             break
+        # if we are not hovering over this movie, reset the colors back to normal
         else:
             for seq in potentials:
                 seq.my_square.setFill("gray")
@@ -40,7 +46,7 @@ def motion(event):
                 movie.my_square.setFill(BEST_COLOR)
             else:
                 movie.my_square.setFill("white")
-    # iterate through the selected movies:
+    # if we hovered over a selected movie, change color of it and its children to indicate consequence of deselecting
     for movie in Movie.selected:
         if movie.p1.getX() < BIG_X/5 < movie.p2.getX() and movie.p1.getY() < 140 - (BIG_Y/5) < movie.p2.getY():
             movie.my_square.setFill(DESELECT_COLOR)
@@ -51,6 +57,8 @@ def motion(event):
     #print('{}, {}'.format(BIG_X, BIG_Y))
 
 
+# when we hover over a selected movie, call this to recursively indicate the movies which will be deselected if we
+# deselect this one.
 def prohibit_children(movie):
     for seq in movie.seqs:
         if seq.prevs_selected:
@@ -61,6 +69,7 @@ def prohibit_children(movie):
             prohibit_children(seq)
 
 
+#import the graph from a csv file
 def import_movies_from_csv(file="AdjacencyList.csv"):
     # put all the rows of the csv file into a list
     movies_list = []
@@ -88,7 +97,7 @@ def import_movies_from_csv(file="AdjacencyList.csv"):
         if len(previous_layer) > 0 and layer <= max(previous_layer):
             layer = layer + 1
         this_movie.layer = layer
-    # add nexts
+    # generate adjacency lists of seqs
     for movie in result.values():
         if len(movie.prevs) > 0:
             for prev in movie.prevs:
@@ -119,6 +128,7 @@ def handle_positions(movies):
         y = y - 1.5*RECT_HEIGHT
 
 
+# draw the window for the movies, and respond to user clicks.
 def make_window(movies):
     Movie.win.bind('<Motion>', motion)
     #draw movies
@@ -152,21 +162,25 @@ def make_window(movies):
 
 # update rank list swapping to be generalizable
 def color_best_movie(movies):
+    global PRIORITY_LIST
     max_rank = len(movies)
     max_movie = None
     for open_movie in Movie.open:
         open_movie.my_square.setFill("white")
         if not movies.get("The Avengers").selected:
-            r = open_movie.rank1
+            r = open_movie.rank[0]
         elif not movies.get("Avengers: Age of Ultron").selected:
-            r = open_movie.rank2
-        else: r = open_movie.rank3
+            r = open_movie.rank[1]
+        else:
+            r = open_movie.rank[2]
         if r <= max_rank:
             max_rank = r
             max_movie = open_movie
+        open_movie.my_square.setWidth(1)
     if max_movie:
         Movie.first = max_movie
         max_movie.my_square.setFill(BEST_COLOR)
+        max_movie.my_square.setWidth(3)
 
 
 # recursively marks all of the passed movie's children as unwatchable
@@ -177,11 +191,13 @@ def clear_nexts(movie):
         seq.selected = False
         seq.prevs_selected = False
         seq.my_square.setFill("gray")
+        seq.my_square.setWidth(1)
         clear_nexts(seq)
 
 
 # marks a movie as watched and updates its children as watchable, if permissible
 def select_movie(movie):
+    movie.my_square.setWidth(1)
     Movie.open.remove(movie)
     Movie.selected.append(movie)
     movie.selected = True
@@ -217,9 +233,7 @@ class Movie:
         self.my_square = None
         self.name = name  # the name of the movie
         self.prevs_selected = False  # whether or not all of this movies parents have been marked as watched
-        self.rank1 = rank1
-        self.rank2 = rank2
-        self.rank3 = rank3
+        self.rank = [rank1, rank2, rank3]
 
     def draw(self):
         self.my_square.draw(self.win)  # draw it to the window
