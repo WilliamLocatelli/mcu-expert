@@ -70,7 +70,7 @@ def prohibit_children(movie):
 
 
 #import the graph from a csv file
-def import_movies_from_csv(file="AdjacencyList.csv"):
+def import_adj_list_from_csv(file="AdjacencyList.csv"):
     # put all the rows of the csv file into a list
     movies_list = []
     with open(file, newline='', encoding='utf-8-sig') as csvfile:
@@ -221,10 +221,12 @@ class Movie:
     first = None
     open = []
     selected = []
-    win = GraphWin(width=500, height=700, title="MCU Tracker", autoflush=False)
-    win.setCoords(0, 0, 100, 140)
+    # if this is the main program, create the window
+    if __name__ == '__main__':
+        win = GraphWin(width=500, height=700, title="MCU Tracker", autoflush=False)
+        win.setCoords(0, 0, 100, 140)
 
-    def __init__(self, name, rank1=0, rank2=0, rank3=0):
+    def __init__(self, name, rank1=0, rank2=0, rank3=0, series=""):
         self.selected = False  # whether or not this movie has been marked as watched
         self.prevs = []  # the parents of this movie
         self.seqs = []  # the children of this movie
@@ -234,6 +236,7 @@ class Movie:
         self.name = name  # the name of the movie
         self.prevs_selected = False  # whether or not all of this movies parents have been marked as watched
         self.rank = [rank1, rank2, rank3]
+        self.series = series
 
     def draw(self):
         self.my_square.draw(self.win)  # draw it to the window
@@ -259,5 +262,5 @@ class Movie:
 
 
 if __name__ == '__main__':
-    all_movies = import_movies_from_csv()
+    all_movies = import_adj_list_from_csv()
     make_window(all_movies)
