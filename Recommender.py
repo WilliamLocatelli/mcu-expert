@@ -124,11 +124,7 @@ def find_best_subgraph_prev_tree(parents, children, n):
     edges = []
     included = parents + children
     nodes = children.copy()
-    prev_tree(nodes, edges)  # create the tree which contains this
-    # if the edge ends at a parent
-    for edge in EDGES:  # iterate through OTHER list so we don't mess up our iteration
-        if MOVIES[edge.v2] in parents and edge in edges:
-            edges.remove(edge)
+    prev_tree(nodes, edges)  # fill nodes and edges with all parents of nodes and edges between those nodes
     for parent in parents:
         if parent not in nodes:
             nodes.append(parent)
@@ -140,10 +136,14 @@ def find_best_subgraph_prev_tree(parents, children, n):
         for movie in MOVIES.values():
             if movie not in included:
                 excluded.append(movie)
+        edges = EDGES.copy()  # include all edges, overriding the work done by prev_tree
     else:
         for movie in nodes:
             if movie not in included:
                 excluded.append(movie)
+    for edge in EDGES:  # iterate through OTHER list so we don't mess up our iteration
+        if MOVIES[edge.v2] in parents and edge in edges:
+            edges.remove(edge)
     return brute_force_subgraph_helper(excluded, included, edges, n)
 
 
