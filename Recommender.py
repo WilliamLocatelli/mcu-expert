@@ -15,6 +15,9 @@ SELECTED_COLOR = color_rgb(31, 222, 34)
 CHOSEN_COLOR = color_rgb(18, 173, 206)
 PARENTS_COLOR = color_rgb(83, 116, 81)
 CHILDREN_COLOR = color_rgb(206, 191, 18)
+BUTTON_COLOR = color_rgb(210, 222, 31)
+INSTRUCTION_TEXT = None
+BUTTONS = []
 
 # takes in a CSV file, outputs a tuple containing a list of movies and a list of edges
 def import_weighted_from_csv(file="MCUphase1to3-weighted.csv"):
@@ -121,6 +124,8 @@ def brute_force_subgraph_helper(excluded, included, edges, n):
 
 # find the n best other movies to watch if you've watched the parents and want to watch the children
 def find_best_subgraph_prev_tree(parents, children, n):
+    if n > len(MOVIES.values()):  # edge case
+        return MOVIES.values()
     edges = []
     included = parents + children
     nodes = children.copy()
@@ -194,9 +199,16 @@ def draw_window():
     win.bind('<Motion>', motion)
     for movie in MOVIES.values():
         movie.draw(win)
-    next_button = Rectangle(Point(180, 0), Point(175, 5))
-    next_button.setFill("red")
+    next_button = Rectangle(Point(80, 60), Point(90, 65))
+    next_button.setFill(BUTTON_COLOR)
+    next_text = Text(next_button.getCenter(), text="Next")
     next_button.draw(win)
+    BUTTONS.append(next_button)
+    next_text.draw(win)
+    global INSTRUCTION_TEXT
+    INSTRUCTION_TEXT = Text(Point(50, 70), text="Select the movies you have already seen.")
+    INSTRUCTION_TEXT.setSize(20)
+    INSTRUCTION_TEXT.draw(win)
     update()
     return win
 
@@ -206,32 +218,32 @@ def run_program(win):
     parents = []
     selected = parents
     children = []
-    input_box = Entry(Point(WIDTH/8, HEIGHT/8), 10)
+    input_box = Entry(Point(INSTRUCTION_TEXT.getAnchor().getX() + 50, INSTRUCTION_TEXT.getAnchor().getY()), 10)
+    input_box.setFill("white")
     input_box.setText("1")
     while True:
         p = win.getMouse()
-        if p.getX() > 175 and p.getY() < 5:
+        if 80 < p.getX() < 90 and 60 < p.getY() < 65:
             if selected == parents:
                 selected = children
                 for movie in parents:
                     Movie.open.remove(movie)
                     movie.my_square.setFill("gray")
+                INSTRUCTION_TEXT.setText("Select the movies you would like to see.")
             elif len(Movie.open) > 0:
                 Movie.open.clear()
+                for movie in children:
+                    movie.my_square.setFill(CHILDREN_COLOR)
+                INSTRUCTION_TEXT.setText("How many additional movies are you willing to watch?")
                 input_box.draw(win)
-                update()
             else:
                 subgraph = find_best_subgraph_prev_tree(parents, children, int(input_box.getText()))
                 input_box.undraw()
+                INSTRUCTION_TEXT.setText("Here are your recommendations!")
                 print("graphs checked: " + str(GRAPHS_CHECKED))
                 for movie in MOVIES.values():
-                    if movie in subgraph:
-                        if movie in children:
-                            movie.my_square.setFill(CHILDREN_COLOR)
-                        elif movie not in parents:
+                    if movie in subgraph and movie not in parents and movie not in children:
                             movie.my_square.setFill(CHOSEN_COLOR)
-                        #else:
-                            #movie.my_square.setFill(PARENTS_COLOR)
         for movie in Movie.open:
             if movie.p1.getX() < p.getX() < movie.p2.getX() and movie.p1.getY() < p.getY() < movie.p2.getY():
                 if not movie.selected:
@@ -258,6 +270,12 @@ def motion(event):
                 movie.my_square.setFill(SELECTED_COLOR)
             else:
                 movie.my_square.setFill("white")
+    for button in BUTTONS:
+        if button.p1.getX() < x < button.p2.getX() and button.p1.getY() < y < button.p2.getY():
+            button.setFill(HOVER_COLOR)
+        # if we are not hovering over this movie, reset the colors back to normal
+        else:
+            button.setFill(BUTTON_COLOR)
 
 
 # class for edges of graph
