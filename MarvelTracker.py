@@ -123,7 +123,7 @@ def handle_positions(movies):
         pos = 100 / (size + 1)
         x = pos
         for movie in layer:
-            movie.set_point(Point(x - RECT_WIDTH/2, y))
+            movie.set_point(Point(x - RECT_WIDTH/2, y), RECT_WIDTH, RECT_HEIGHT)
             x = x + pos
         y = y - 1.5*RECT_HEIGHT
 
@@ -133,7 +133,7 @@ def make_window(movies):
     Movie.win.bind('<Motion>', motion)
     #draw movies
     for movie in movies.values():
-        movie.draw()
+        movie.draw(Movie.win)
         # draw lines connecting movies
         '''if len(movie.prevs) > 0:
             for prev in movie.prevs:
@@ -238,8 +238,8 @@ class Movie:
         self.rank = [rank1, rank2, rank3]
         self.series = series
 
-    def draw(self):
-        self.my_square.draw(self.win)  # draw it to the window
+    def draw(self, window):
+        self.my_square.draw(window)  # draw it to the window
         if not self.prevs_selected:
             self.my_square.setFill("gray")
         else:
@@ -253,11 +253,11 @@ class Movie:
                 k = self.name[n]
             self.name = self.name[:n] + "\n" + self.name[n:]
         title = Text(self.my_square.getCenter(), self.name)
-        title.draw(self.win)
+        title.draw(window)
 
-    def set_point(self, point):
+    def set_point(self, point, width, height):
         self.p1 = Point(point.getX(), point.getY())
-        self.p2 = Point(point.getX() + RECT_WIDTH, point.getY() + RECT_HEIGHT)
+        self.p2 = Point(point.getX() + width, point.getY() + height)
         self.my_square = Rectangle(self.p1, self.p2)
 
 
