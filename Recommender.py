@@ -75,7 +75,7 @@ def find_best_subgraph(parents, children, n):
 
 
 # this version doesn't consider all possibilities, but is fast.
-def greedy_subgraph_helper(excluded, included, edges, n):
+def naive_subgraph_helper(excluded, included, edges, n):
     if n == 0:
         subgraph = included.copy()
         return subgraph
@@ -90,7 +90,7 @@ def greedy_subgraph_helper(excluded, included, edges, n):
             max_movie = movie
     excluded.remove(max_movie)
     included.append(max_movie)
-    return greedy_subgraph_helper(excluded, included, edges, n-1)
+    return naive_subgraph_helper(excluded, included, edges, n-1)
 
 
 # this version considers every option, but is slow.
@@ -119,6 +119,46 @@ def brute_force_subgraph_helper(excluded, included, edges, n):
     return best_graph
 
 
+# find the n best other movies to watch if you've watched the parents and want to watch the children
+def find_best_subgraph_prev_tree(parents, children, n):
+    edges = []
+    included = parents + children
+    nodes = children.copy()
+    prev_tree(nodes, edges)  # create the tree which contains this
+    # if the edge ends at a parent
+    for edge in EDGES:  # iterate through OTHER list so we don't mess up our iteration
+        if MOVIES[edge.v2] in parents and edge in edges:
+            edges.remove(edge)
+    for parent in parents:
+        if parent not in nodes:
+            nodes.append(parent)
+    most_nodes = len(nodes) - len(children) - len(parents)
+    excluded = []
+    if most_nodes < n:  # if most_nodes is less than n, include all parents plus n
+        included = nodes
+        n = n - most_nodes
+        for movie in MOVIES.values():
+            if movie not in included:
+                excluded.append(movie)
+    else:
+        for movie in nodes:
+            if movie not in included:
+                excluded.append(movie)
+    return brute_force_subgraph_helper(excluded, included, edges, n)
+
+
+def prev_tree(nodes, edges):
+    for edge in EDGES:
+        for movie in nodes:
+            if MOVIES[edge.v2] == movie:
+                if edge not in edges:
+                    edges.append(edge)
+                movie1 = MOVIES[edge.v1]
+                if movie1 not in nodes:
+                    nodes.append(movie1)
+                    prev_tree(nodes, edges)
+
+
 # computes and returns the weight of the subgraph
 def subgraph_weight(subgraph, edges):
     weight = 0
@@ -126,6 +166,7 @@ def subgraph_weight(subgraph, edges):
         if MOVIES[edge.v1] in subgraph and MOVIES[edge.v2] in subgraph:
             weight += edge.weight
     return weight
+
 
 # draws the window
 def draw_window():
@@ -159,6 +200,7 @@ def draw_window():
     update()
     return win
 
+
 # runs the main program
 def run_program(win):
     parents = []
@@ -179,7 +221,7 @@ def run_program(win):
                 input_box.draw(win)
                 update()
             else:
-                subgraph = find_best_subgraph(parents, children, int(input_box.getText()))
+                subgraph = find_best_subgraph_prev_tree(parents, children, int(input_box.getText()))
                 input_box.undraw()
                 print("graphs checked: " + str(GRAPHS_CHECKED))
                 for movie in MOVIES.values():
