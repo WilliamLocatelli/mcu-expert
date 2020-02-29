@@ -13,7 +13,7 @@ GRAPHS_CHECKED = 0
 HOVER_COLOR = color_rgb(76, 237, 78)
 SELECTED_COLOR = color_rgb(31, 222, 34)
 CHOSEN_COLOR = color_rgb(18, 173, 206)
-PARENTS_COLOR = color_rgb(18, 206, 18)
+PARENTS_COLOR = color_rgb(83, 116, 81)
 CHILDREN_COLOR = color_rgb(206, 191, 18)
 
 # takes in a CSV file, outputs a tuple containing a list of movies and a list of edges
@@ -76,7 +76,9 @@ def find_best_subgraph(parents, children, n):
 
 # this version doesn't consider all possibilities, but is fast.
 def greedy_subgraph_helper(excluded, included, edges, n):
-    if n == 0: return included
+    if n == 0:
+        subgraph = included.copy()
+        return subgraph
     max_weight = 0
     max_movie = None
     for movie in excluded:
@@ -102,7 +104,7 @@ def brute_force_subgraph_helper(excluded, included, edges, n):
     best_graph = included
     excluded_copy = excluded.copy()
     included_copy = included.copy()
-    while len(excluded_copy) > 0:
+    while len(excluded_copy) > n-1:
         movie = excluded_copy[0]
         included_copy.append(movie)
         excluded_copy.remove(movie)
@@ -169,10 +171,9 @@ def run_program(win):
         if p.getX() > 175 and p.getY() < 5:
             if selected == parents:
                 selected = children
-                for movie in Movie.open:
-                    if movie in parents:
-                        Movie.open.remove(movie)
-                        movie.my_square.setFill("gray")
+                for movie in parents:
+                    Movie.open.remove(movie)
+                    movie.my_square.setFill("gray")
             elif len(Movie.open) > 0:
                 Movie.open.clear()
                 input_box.draw(win)
@@ -183,14 +184,12 @@ def run_program(win):
                 print("graphs checked: " + str(GRAPHS_CHECKED))
                 for movie in MOVIES.values():
                     if movie in subgraph:
-                        if movie in parents:
-                            movie.my_square.setFill(PARENTS_COLOR)
-                        elif movie in children:
+                        if movie in children:
                             movie.my_square.setFill(CHILDREN_COLOR)
-                        else:
+                        elif movie not in parents:
                             movie.my_square.setFill(CHOSEN_COLOR)
-                    else:
-                        movie.my_square.setFill("gray")
+                        #else:
+                            #movie.my_square.setFill(PARENTS_COLOR)
         for movie in Movie.open:
             if movie.p1.getX() < p.getX() < movie.p2.getX() and movie.p1.getY() < p.getY() < movie.p2.getY():
                 if not movie.selected:
