@@ -9,7 +9,7 @@ EDGES = []
 MOVIES = {}
 WIDTH = 1200
 HEIGHT = 600
-
+GRAPHS_CHECKED = 0
 HOVER_COLOR = color_rgb(76, 237, 78)
 SELECTED_COLOR = color_rgb(31, 222, 34)
 CHOSEN_COLOR = color_rgb(18, 173, 206)
@@ -71,11 +71,11 @@ def find_best_subgraph(parents, children, n):
     for movie in MOVIES.values():
         if movie not in included:
             excluded.append(movie)
-    return subgraph_helper2(excluded, included, edges, n)
+    return brute_force_subgraph_helper(excluded, included, edges, n)
 
 
-# this version works, but is sometimes wrong.
-def subgraph_helper(excluded, included, edges, n):
+# this version doesn't consider all possibilities, but is fast.
+def greedy_subgraph_helper(excluded, included, edges, n):
     if n == 0: return included
     max_weight = 0
     max_movie = None
@@ -88,23 +88,32 @@ def subgraph_helper(excluded, included, edges, n):
             max_movie = movie
     excluded.remove(max_movie)
     included.append(max_movie)
-    return subgraph_helper(excluded, included, edges, n-1)
+    return greedy_subgraph_helper(excluded, included, edges, n-1)
 
-# this version doesn't work at all.
-def subgraph_helper2(excluded, included, edges, n):
-    if n == 0: return included
+
+# this version considers every option, but is slow.
+def brute_force_subgraph_helper(excluded, included, edges, n):
+    global GRAPHS_CHECKED
+    if n == 0:
+        GRAPHS_CHECKED += 1
+        subgraph = included.copy()
+        return subgraph
     max_weight = 0
-    best_graph = None
-    for movie in excluded:
-        included_copy = included.copy()
+    best_graph = included
+    excluded_copy = excluded.copy()
+    included_copy = included.copy()
+    while len(excluded_copy) > 0:
+        movie = excluded_copy[0]
         included_copy.append(movie)
-        excluded.remove(movie)
-        best_graph_next_level = subgraph_helper2(excluded, included_copy, edges, n-1)
+        excluded_copy.remove(movie)
+        best_graph_next_level = brute_force_subgraph_helper(excluded_copy, included_copy, edges, n-1)
         weight = subgraph_weight(best_graph_next_level, edges)
         if weight > max_weight:
             max_weight = weight
             best_graph = best_graph_next_level
-    print(str(max_weight))
+        #excluded_copy.append(movie)
+        included_copy.remove(movie)
+    #print(str(max_weight))
     return best_graph
 
 
@@ -171,6 +180,7 @@ def run_program(win):
             else:
                 subgraph = find_best_subgraph(parents, children, int(input_box.getText()))
                 input_box.undraw()
+                print("graphs checked: " + str(GRAPHS_CHECKED))
                 for movie in MOVIES.values():
                     if movie in subgraph:
                         if movie in parents:
