@@ -125,7 +125,7 @@ def brute_force_subgraph_helper(excluded, included, edges, n):
 
 # find the n best other movies to watch if you've watched the parents and want to watch the children
 def find_best_subgraph_prev_tree(parents, children, n):
-    if n > len(MOVIES.values()):  # edge case
+    if n + len(parents) + len(children) > len(MOVIES.values()):  # edge case
         return MOVIES.values()
     edges = []
     included = parents + children
@@ -217,6 +217,7 @@ def draw_window():
 
 # runs the main program
 def run_program(win):
+    global GRAPHS_CHECKED
     parents = []
     selected = parents
     children = []
@@ -226,7 +227,7 @@ def run_program(win):
     while True:
         p = win.getMouse()
         if 80 < p.getX() < 90 and 60 < p.getY() < 65:
-            if selected == parents:
+            if INSTRUCTION_TEXT.getText() == "Select the movies you have already seen.":
                 selected = children
                 for movie in parents:
                     Movie.open.remove(movie)
@@ -244,6 +245,7 @@ def run_program(win):
                 selected = parents
                 INSTRUCTION_TEXT.setText("Select the movies you have already seen.")
                 NEXT_TEXT.setText("Next")
+                GRAPHS_CHECKED = 0
                 for movie in MOVIES.values():
                     Movie.open.append(movie)
                     movie.selected = False
