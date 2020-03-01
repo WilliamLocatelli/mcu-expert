@@ -17,6 +17,7 @@ PARENTS_COLOR = color_rgb(83, 116, 81)
 CHILDREN_COLOR = color_rgb(206, 191, 18)
 BUTTON_COLOR = color_rgb(210, 222, 31)
 INSTRUCTION_TEXT = None
+NEXT_TEXT = None
 BUTTONS = []
 
 # takes in a CSV file, outputs a tuple containing a list of movies and a list of edges
@@ -201,10 +202,11 @@ def draw_window():
         movie.draw(win)
     next_button = Rectangle(Point(80, 60), Point(90, 65))
     next_button.setFill(BUTTON_COLOR)
-    next_text = Text(next_button.getCenter(), text="Next")
+    global NEXT_TEXT
+    NEXT_TEXT = Text(next_button.getCenter(), text="Next")
     next_button.draw(win)
     BUTTONS.append(next_button)
-    next_text.draw(win)
+    NEXT_TEXT.draw(win)
     global INSTRUCTION_TEXT
     INSTRUCTION_TEXT = Text(Point(50, 70), text="Select the movies you have already seen.")
     INSTRUCTION_TEXT.setSize(20)
@@ -236,6 +238,16 @@ def run_program(win):
                     movie.my_square.setFill(CHILDREN_COLOR)
                 INSTRUCTION_TEXT.setText("How many additional movies are you willing to watch?")
                 input_box.draw(win)
+            elif NEXT_TEXT.getText() == "Reset":
+                parents = []
+                children = []
+                selected = parents
+                INSTRUCTION_TEXT.setText("Select the movies you have already seen.")
+                NEXT_TEXT.setText("Next")
+                for movie in MOVIES.values():
+                    Movie.open.append(movie)
+                    movie.selected = False
+                    movie.my_square.setFill("white")
             else:
                 subgraph = find_best_subgraph_prev_tree(parents, children, int(input_box.getText()))
                 input_box.undraw()
@@ -244,6 +256,7 @@ def run_program(win):
                 for movie in MOVIES.values():
                     if movie in subgraph and movie not in parents and movie not in children:
                             movie.my_square.setFill(CHOSEN_COLOR)
+                NEXT_TEXT.setText("Reset")
         for movie in Movie.open:
             if movie.p1.getX() < p.getX() < movie.p2.getX() and movie.p1.getY() < p.getY() < movie.p2.getY():
                 if not movie.selected:
