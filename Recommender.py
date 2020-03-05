@@ -101,13 +101,13 @@ def naive_subgraph_helper(excluded, included, edges, n):
 # this version considers every option, but is slow.
 def brute_force_subgraph_helper(excluded, included, edges, n):
     global GRAPHS_CHECKED
-    global NUM_TIES
+    best_graphs = []
     if n == 0:
         GRAPHS_CHECKED += 1
         subgraph = included.copy()
         return subgraph
     max_weight = 0
-    best_graph = included
+    #best_graph = included
     excluded_copy = excluded.copy()
     included_copy = included.copy()
     while len(excluded_copy) > n-1:
@@ -118,26 +118,42 @@ def brute_force_subgraph_helper(excluded, included, edges, n):
         weight = subgraph_weight(best_graph_next_level, edges)
         if weight > max_weight:
             max_weight = weight
-            best_graph = best_graph_next_level
-            NUM_TIES = 0
-        # break ties
+            best_graphs = [best_graph_next_level]
         elif weight == max_weight:
-            NUM_TIES += 1
-            # get the movie that was added to best_graph_next_level and remove it
-            #best_graph_next = brute_force_subgraph_helper(excluded_copy, best_graph, edges, n)
-            # get the movie that was added to best_graph and remove it
-            #best_graph_next_2 = brute_force_subgraph_helper(excluded_copy, best_graph_next_level, edges, n)
-        # the following line is unnecessary because it will cause combinations to be repeated
+            best_graphs.append(best_graph_next_level)
         #excluded_copy.append(movie)
         included_copy.remove(movie)
     #print(str(max_weight))
-    return best_graph
+    return tie_breaker(best_graphs, excluded, edges)
+
+
+def tie_breaker(best_graphs, excluded, edges):
+    if len(best_graphs) == 1:
+        return best_graphs[0]
+    else:
+        print("number of equally good choices: " + str(len(best_graphs)))
+        best_graph = None
+        max_weight = 10000
+        # find best of bests
+        for graph in best_graphs:
+            # create new list of excluded movies
+            excluded_copy = excluded.copy()
+            for movie in graph:
+                if movie in excluded:
+                    excluded_copy.remove(movie)
+            best_plus_one = brute_force_subgraph_helper(excluded_copy, graph, edges, 1)
+            weight = subgraph_weight(best_plus_one, edges)
+            if weight < max_weight:
+                max_weight = weight
+                best_graph = graph
+        # choose the subgraph of highest weight
+        return best_graph
 
 
 # find the n best other movies to watch if you've watched the parents and want to watch the children
 def find_best_subgraph_prev_tree(parents, children, n):
-    #if n + len(parents) + len(children) > len(MOVIES.values()):  # edge case
-        #return MOVIES.values()
+    # if n + len(parents) + len(children) > len(MOVIES.values()):  # edge case
+        # return MOVIES.values()
     edges = []
     included = parents + children
     nodes = children.copy()
@@ -148,12 +164,6 @@ def find_best_subgraph_prev_tree(parents, children, n):
     excluded = []
     if most_nodes < n:  # if most_nodes is less than n, include all parents plus n
         return nodes # due to this rule, the next 4 lines are actually never used
-        included = nodes
-        n = n - most_nodes
-        for movie in MOVIES.values():
-            if movie not in included:
-                excluded.append(movie)
-        edges = EDGES.copy()  # include all edges, overriding the work done by prev_tree
     else:
         for movie in nodes:
             if movie not in included:
@@ -278,7 +288,6 @@ def run_program(win):
                     input_box.undraw()
                     INSTRUCTION_TEXT.setText("Here are your recommendations!")
                     print("graphs checked: " + str(GRAPHS_CHECKED))
-                    print("number of ties: " + str(NUM_TIES))
                     for movie in MOVIES.values():
                         if movie in subgraph and movie not in parents and movie not in children:
                                 movie.my_square.setFill(CHOSEN_COLOR)
