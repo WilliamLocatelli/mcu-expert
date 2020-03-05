@@ -17,6 +17,7 @@ PARENTS_COLOR = color_rgb(83, 116, 81)
 CHILDREN_COLOR = color_rgb(206, 191, 18)
 BUTTON_COLOR = color_rgb(210, 222, 31)
 INSTRUCTION_TEXT = None
+NUM_TIES = 0
 NEXT_TEXT = None
 BUTTONS = []
 
@@ -100,6 +101,7 @@ def naive_subgraph_helper(excluded, included, edges, n):
 # this version considers every option, but is slow.
 def brute_force_subgraph_helper(excluded, included, edges, n):
     global GRAPHS_CHECKED
+    global NUM_TIES
     if n == 0:
         GRAPHS_CHECKED += 1
         subgraph = included.copy()
@@ -117,6 +119,15 @@ def brute_force_subgraph_helper(excluded, included, edges, n):
         if weight > max_weight:
             max_weight = weight
             best_graph = best_graph_next_level
+            NUM_TIES = 0
+        # break ties
+        elif weight == max_weight:
+            NUM_TIES += 1
+            # get the movie that was added to best_graph_next_level and remove it
+            #best_graph_next = brute_force_subgraph_helper(excluded_copy, best_graph, edges, n)
+            # get the movie that was added to best_graph and remove it
+            #best_graph_next_2 = brute_force_subgraph_helper(excluded_copy, best_graph_next_level, edges, n)
+        # the following line is unnecessary because it will cause combinations to be repeated
         #excluded_copy.append(movie)
         included_copy.remove(movie)
     #print(str(max_weight))
@@ -125,18 +136,18 @@ def brute_force_subgraph_helper(excluded, included, edges, n):
 
 # find the n best other movies to watch if you've watched the parents and want to watch the children
 def find_best_subgraph_prev_tree(parents, children, n):
-    if n + len(parents) + len(children) > len(MOVIES.values()):  # edge case
-        return MOVIES.values()
+    #if n + len(parents) + len(children) > len(MOVIES.values()):  # edge case
+        #return MOVIES.values()
     edges = []
     included = parents + children
     nodes = children.copy()
-    prev_tree(nodes, edges)  # fill nodes and edges with all parents of nodes and edges between those nodes
+    prev_tree(nodes, parents, edges)  # fill nodes and edges with all parents of nodes and edges between those nodes
     for parent in parents:
-        if parent not in nodes:
-            nodes.append(parent)
+        nodes.append(parent)
     most_nodes = len(nodes) - len(children) - len(parents)
     excluded = []
     if most_nodes < n:  # if most_nodes is less than n, include all parents plus n
+        return nodes # due to this rule, the next 4 lines are actually never used
         included = nodes
         n = n - most_nodes
         for movie in MOVIES.values():
@@ -153,16 +164,18 @@ def find_best_subgraph_prev_tree(parents, children, n):
     return brute_force_subgraph_helper(excluded, included, edges, n)
 
 
-def prev_tree(nodes, edges):
+def prev_tree(nodes, parents, edges):
     for edge in EDGES:
         for movie in nodes:
             if MOVIES[edge.v2] == movie:
                 if edge not in edges:
                     edges.append(edge)
                 movie1 = MOVIES[edge.v1]
-                if movie1 not in nodes:
+                # if we already added this one, we don't need to do it again
+                # if we already watched this one, its prevs aren't relevant.
+                if movie1 not in nodes and movie1 not in parents:
                     nodes.append(movie1)
-                    prev_tree(nodes, edges)
+                    prev_tree(nodes, parents, edges)
 
 
 # computes and returns the weight of the subgraph
@@ -218,6 +231,7 @@ def draw_window():
 # runs the main program
 def run_program(win):
     global GRAPHS_CHECKED
+    global NUM_TIES
     parents = []
     selected = parents
     children = []
@@ -234,11 +248,14 @@ def run_program(win):
                     movie.my_square.setFill("gray")
                 INSTRUCTION_TEXT.setText("Select the movies you would like to see.")
             elif len(Movie.open) > 0:
-                Movie.open.clear()
-                for movie in children:
-                    movie.my_square.setFill(CHILDREN_COLOR)
-                INSTRUCTION_TEXT.setText("How many additional movies are you willing to watch?")
-                input_box.draw(win)
+                if len(children) == 0:
+                    INSTRUCTION_TEXT.setText("You must select at least 1 movie you would like to see.")
+                else:
+                    Movie.open.clear()
+                    for movie in children:
+                        movie.my_square.setFill(CHILDREN_COLOR)
+                    INSTRUCTION_TEXT.setText("How many additional movies are you willing to watch?")
+                    input_box.draw(win)
             elif NEXT_TEXT.getText() == "Reset":
                 parents = []
                 children = []
@@ -246,19 +263,26 @@ def run_program(win):
                 INSTRUCTION_TEXT.setText("Select the movies you have already seen.")
                 NEXT_TEXT.setText("Next")
                 GRAPHS_CHECKED = 0
+                NUM_TIES = 0
                 for movie in MOVIES.values():
                     Movie.open.append(movie)
                     movie.selected = False
                     movie.my_square.setFill("white")
             else:
-                subgraph = find_best_subgraph_prev_tree(parents, children, int(input_box.getText()))
-                input_box.undraw()
-                INSTRUCTION_TEXT.setText("Here are your recommendations!")
-                print("graphs checked: " + str(GRAPHS_CHECKED))
-                for movie in MOVIES.values():
-                    if movie in subgraph and movie not in parents and movie not in children:
-                            movie.my_square.setFill(CHOSEN_COLOR)
-                NEXT_TEXT.setText("Reset")
+                num_chosen = input_box.getText()
+                if not str.isdigit(num_chosen):
+                    input_box.setText("")
+                    INSTRUCTION_TEXT.setText("How many additional movies are you willing to watch?\nOnly numbers are allowed.")
+                else:
+                    subgraph = find_best_subgraph_prev_tree(parents, children, int(input_box.getText()))
+                    input_box.undraw()
+                    INSTRUCTION_TEXT.setText("Here are your recommendations!")
+                    print("graphs checked: " + str(GRAPHS_CHECKED))
+                    print("number of ties: " + str(NUM_TIES))
+                    for movie in MOVIES.values():
+                        if movie in subgraph and movie not in parents and movie not in children:
+                                movie.my_square.setFill(CHOSEN_COLOR)
+                    NEXT_TEXT.setText("Reset")
         for movie in Movie.open:
             if movie.p1.getX() < p.getX() < movie.p2.getX() and movie.p1.getY() < p.getY() < movie.p2.getY():
                 if not movie.selected:
