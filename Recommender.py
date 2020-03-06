@@ -19,6 +19,7 @@ BUTTON_COLOR = color_rgb(210, 222, 31)
 INSTRUCTION_TEXT = None
 NUM_TIES = 0
 NEXT_TEXT = None
+REC_TEXT = None
 BUTTONS = []
 
 # takes in a CSV file, outputs a tuple containing a list of movies and a list of edges
@@ -131,7 +132,7 @@ def tie_breaker(best_graphs, excluded, edges):
     if len(best_graphs) == 1:
         return best_graphs[0]
     else:
-        print("number of equally good choices: " + str(len(best_graphs)))
+        #print("number of equally good choices: " + str(len(best_graphs)))
         best_graph = None
         max_weight = 10000
         # find best of bests
@@ -197,6 +198,14 @@ def subgraph_weight(subgraph, edges):
     return weight
 
 
+def watch_order(parents, subgraph):
+    order = []
+    for movie in MOVIES:
+        if MOVIES[movie] in subgraph and not MOVIES[movie] in parents:
+            order.append(movie)
+    return order
+
+
 # draws the window
 def draw_window():
     # sort each movie by series
@@ -234,6 +243,8 @@ def draw_window():
     INSTRUCTION_TEXT = Text(Point(50, 70), text="Select the movies you have already seen.")
     INSTRUCTION_TEXT.setSize(20)
     INSTRUCTION_TEXT.draw(win)
+    global REC_TEXT
+    REC_TEXT = Text(Point(120, 50), text="")
     update()
     return win
 
@@ -242,6 +253,7 @@ def draw_window():
 def run_program(win):
     global GRAPHS_CHECKED
     global NUM_TIES
+    global REC_TEXT
     parents = []
     selected = parents
     children = []
@@ -272,6 +284,7 @@ def run_program(win):
                 selected = parents
                 INSTRUCTION_TEXT.setText("Select the movies you have already seen.")
                 NEXT_TEXT.setText("Next")
+                REC_TEXT.undraw()
                 GRAPHS_CHECKED = 0
                 NUM_TIES = 0
                 for movie in MOVIES.values():
@@ -286,6 +299,11 @@ def run_program(win):
                 else:
                     subgraph = find_best_subgraph_prev_tree(parents, children, int(input_box.getText()))
                     input_box.undraw()
+                    order = watch_order(parents, subgraph)
+                    watched_string = "Already Watched:\n" + "\n".join(t.name for t in parents)
+                    rec_string = "\nWatch Order:\n" + "\n\n".join(order)
+                    REC_TEXT.setText(rec_string)
+                    REC_TEXT.draw(win)
                     INSTRUCTION_TEXT.setText("Here are your recommendations!")
                     print("graphs checked: " + str(GRAPHS_CHECKED))
                     for movie in MOVIES.values():
