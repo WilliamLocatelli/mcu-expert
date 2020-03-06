@@ -106,7 +106,7 @@ def brute_force_subgraph_helper(excluded, included, edges, n):
     if n == 0:
         GRAPHS_CHECKED += 1
         subgraph = included.copy()
-        return subgraph
+        return [subgraph]
     max_weight = 0
     #best_graph = included
     excluded_copy = excluded.copy()
@@ -115,26 +115,27 @@ def brute_force_subgraph_helper(excluded, included, edges, n):
         movie = excluded_copy[0]
         included_copy.append(movie)
         excluded_copy.remove(movie)
-        best_graph_next_level = brute_force_subgraph_helper(excluded_copy, included_copy, edges, n-1)
-        weight = subgraph_weight(best_graph_next_level, edges)
+        best_graph_next_level = []
+        best_graph_next_level += brute_force_subgraph_helper(excluded_copy, included_copy, edges, n-1)
+        weight = subgraph_weight(best_graph_next_level[0], edges)
         if weight > max_weight:
             max_weight = weight
-            best_graphs = [best_graph_next_level]
+            best_graphs = best_graph_next_level.copy()
         elif weight == max_weight:
-            best_graphs.append(best_graph_next_level)
+            best_graphs += best_graph_next_level
         #excluded_copy.append(movie)
         included_copy.remove(movie)
     #print(str(max_weight))
-    return tie_breaker(best_graphs, excluded, edges)
+    return best_graphs
 
 
 def tie_breaker(best_graphs, excluded, edges):
     if len(best_graphs) == 1:
         return best_graphs[0]
     else:
-        #print("number of equally good choices: " + str(len(best_graphs)))
+        print("number of equally good choices: " + str(len(best_graphs)))
         best_graph = None
-        max_weight = 10000
+        max_weight = 0
         # find best of bests
         for graph in best_graphs:
             # create new list of excluded movies
@@ -142,9 +143,9 @@ def tie_breaker(best_graphs, excluded, edges):
             for movie in graph:
                 if movie in excluded:
                     excluded_copy.remove(movie)
-            best_plus_one = brute_force_subgraph_helper(excluded_copy, graph, edges, 1)
+            best_plus_one = tie_breaker(brute_force_subgraph_helper(excluded_copy, graph, edges, 1), excluded, edges)
             weight = subgraph_weight(best_plus_one, edges)
-            if weight < max_weight:
+            if weight > max_weight:
                 max_weight = weight
                 best_graph = graph
         # choose the subgraph of highest weight
@@ -172,7 +173,8 @@ def find_best_subgraph_prev_tree(parents, children, n):
     for edge in EDGES:  # iterate through OTHER list so we don't mess up our iteration
         if MOVIES[edge.v2] in parents and edge in edges:
             edges.remove(edge)
-    return brute_force_subgraph_helper(excluded, included, edges, n)
+    best_graphs = brute_force_subgraph_helper(excluded, included, edges, n)
+    return tie_breaker(best_graphs, excluded, edges)
 
 
 def prev_tree(nodes, parents, edges):
@@ -225,6 +227,16 @@ def draw_window():
             movie.set_point(point, height=8, width=14)
             y_pos = y_pos + 8*1.5
         x_pos = x_pos + 10*1.5
+    '''x_pos = 5
+    y_pos = 5
+    # set position of each movie
+    for movie in MOVIES.values():
+        point = Point(x_pos, y_pos)
+        movie.set_point(point, height=8, width=14)
+        x_pos = x_pos + 10 * 1.5
+        if x_pos > 160:
+            y_pos = y_pos + 8 * 1.5
+            x_pos = 5'''
 
     # draw window
     win = GraphWin(title="Recommender", width=WIDTH, height=HEIGHT, autoflush=False)
