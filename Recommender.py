@@ -10,6 +10,7 @@ MOVIES = {}
 WIDTH = 1200
 HEIGHT = 600
 GRAPHS_CHECKED = 0
+NUM_CHOSEN = 0
 HOVER_COLOR = color_rgb(76, 237, 78)
 SELECTED_COLOR = color_rgb(31, 222, 34)
 CHOSEN_COLOR = color_rgb(18, 173, 206)
@@ -17,6 +18,7 @@ PARENTS_COLOR = color_rgb(83, 116, 81)
 CHILDREN_COLOR = color_rgb(206, 191, 18)
 BUTTON_COLOR = color_rgb(210, 222, 31)
 INSTRUCTION_TEXT = None
+CHANGED = False
 NUM_TIES = 0
 NEXT_TEXT = None
 REC_TEXT = None
@@ -218,15 +220,15 @@ def draw_window():
         else:
             series[movie.series].append(movie)
 
-    x_pos = 5
+    x_pos = 3
     # set position of each movie
     for movie_series in series:
         y_pos = 5
         for movie in series[movie_series]:
             point = Point(x_pos, y_pos)
-            movie.set_point(point, height=8, width=14)
+            movie.set_point(point, height=8, width=14.5)
             y_pos = y_pos + 8*1.5
-        x_pos = x_pos + 10*1.5
+        x_pos = x_pos + 14.5*1.1
     '''x_pos = 5
     y_pos = 5
     # set position of each movie
@@ -244,13 +246,19 @@ def draw_window():
     win.bind('<Motion>', motion)
     for movie in MOVIES.values():
         movie.draw(win)
+
     next_button = Rectangle(Point(80, 60), Point(90, 65))
     next_button.setFill(BUTTON_COLOR)
-    global NEXT_TEXT
-    NEXT_TEXT = Text(next_button.getCenter(), text="Next")
+    next_text = Text(next_button.getCenter(), text="Next")
     next_button.draw(win)
-    BUTTONS.append(next_button)
-    NEXT_TEXT.draw(win)
+    BUTTONS.append([next_button, next_text])
+    next_text.draw(win)
+
+    prev_button = Rectangle(Point(60, 60), Point(70, 65))
+    prev_button.setFill(BUTTON_COLOR)
+    prev_text = Text(prev_button.getCenter(), text="Back")
+    BUTTONS.append([prev_button, prev_text])
+
     global INSTRUCTION_TEXT
     INSTRUCTION_TEXT = Text(Point(50, 70), text="Select the movies you have already seen.")
     INSTRUCTION_TEXT.setSize(20)
@@ -266,21 +274,28 @@ def run_program(win):
     global GRAPHS_CHECKED
     global NUM_TIES
     global REC_TEXT
+    global CHANGED
     parents = []
     selected = parents
     children = []
+    subgraph = []
     input_box = Entry(Point(INSTRUCTION_TEXT.getAnchor().getX() + 50, INSTRUCTION_TEXT.getAnchor().getY()), 10)
     input_box.setFill("white")
     input_box.setText("1")
     while True:
         p = win.getMouse()
+        # Next Button
         if 80 < p.getX() < 90 and 60 < p.getY() < 65:
+            # stage 1-> stage 2
             if INSTRUCTION_TEXT.getText() == "Select the movies you have already seen.":
                 selected = children
                 for movie in parents:
                     Movie.open.remove(movie)
                     movie.my_square.setFill("gray")
                 INSTRUCTION_TEXT.setText("Select the movies you would like to see.")
+                BUTTONS[1][0].draw(win) #draw the back button
+                BUTTONS[1][1].draw(win)
+            # stage 2-> stage 3
             elif len(Movie.open) > 0:
                 if len(children) == 0:
                     INSTRUCTION_TEXT.setText("You must select at least 1 movie you would like to see.")
@@ -290,40 +305,75 @@ def run_program(win):
                         movie.my_square.setFill(CHILDREN_COLOR)
                     INSTRUCTION_TEXT.setText("How many additional movies are you willing to watch?")
                     input_box.draw(win)
-            elif NEXT_TEXT.getText() == "Reset":
-                parents = []
-                children = []
-                selected = parents
-                INSTRUCTION_TEXT.setText("Select the movies you have already seen.")
-                NEXT_TEXT.setText("Next")
-                REC_TEXT.undraw()
-                GRAPHS_CHECKED = 0
-                NUM_TIES = 0
-                for movie in MOVIES.values():
-                    Movie.open.append(movie)
-                    movie.selected = False
-                    movie.my_square.setFill("white")
-            else:
-                num_chosen = input_box.getText()
-                if not str.isdigit(num_chosen):
+            #stage 3->stage 4
+            elif not INSTRUCTION_TEXT.getText() == "Here are your recommendations!":
+                global NUM_CHOSEN
+                if not str.isdigit(input_box.getText()):
                     input_box.setText("")
                     INSTRUCTION_TEXT.setText("How many additional movies are you willing to watch?\nOnly numbers are allowed.")
                 else:
-                    subgraph = find_best_subgraph_prev_tree(parents, children, int(input_box.getText()))
+                    if CHANGED or not NUM_CHOSEN == int(input_box.getText()):
+                        CHANGED = False
+                        NUM_CHOSEN = int(input_box.getText())
+                        subgraph = find_best_subgraph_prev_tree(parents, children, NUM_CHOSEN)
+                        order = watch_order(parents, subgraph)
+                        #watched_string = "Already Watched:\n" + "\n".join(t.name for t in parents)
+                        rec_string = "\nWatch Order:\n" + "\n\n".join(order)
+                        REC_TEXT.setText(rec_string)
+                        REC_TEXT.undraw()
+                        REC_TEXT.draw(win)
+                    for movie in MOVIES.values():
+                        if movie not in parents and movie not in children:
+                            if movie in subgraph:
+                                movie.my_square.setFill(CHOSEN_COLOR)
+                            else:
+                                movie.my_square.setFill("white")
                     input_box.undraw()
-                    order = watch_order(parents, subgraph)
-                    watched_string = "Already Watched:\n" + "\n".join(t.name for t in parents)
-                    rec_string = "\nWatch Order:\n" + "\n\n".join(order)
-                    REC_TEXT.setText(rec_string)
-                    REC_TEXT.draw(win)
                     INSTRUCTION_TEXT.setText("Here are your recommendations!")
                     print("graphs checked: " + str(GRAPHS_CHECKED))
-                    for movie in MOVIES.values():
-                        if movie in subgraph and movie not in parents and movie not in children:
-                                movie.my_square.setFill(CHOSEN_COLOR)
-                    NEXT_TEXT.setText("Reset")
+
+                    BUTTONS[0][0].undraw()
+                    BUTTONS[0][1].undraw()
+                    #NEXT_TEXT.setText("Reset")
+        #back button
+        if 60 < p.getX() < 70 and 60 < p.getY() < 65:
+            # stage 4-->stage 3
+            if INSTRUCTION_TEXT.getText() == "Here are your recommendations!":
+                GRAPHS_CHECKED = 0
+                INSTRUCTION_TEXT.setText("How many additional movies are you willing to watch?")
+                BUTTONS[0][0].draw(win)
+                BUTTONS[0][1].draw(win)
+                input_box.draw(win)
+            # stage 3--> stage 2
+            elif len(Movie.open) == 0:
+                INSTRUCTION_TEXT.setText("Select the movies you would like to see.")
+                input_box.undraw()
+                selected = children
+                for movie in MOVIES.values():
+                    if movie not in parents:
+                        Movie.open.append(movie)
+                        if movie not in children:
+                            movie.my_square.setFill("white")
+                        else:
+                            movie.my_square.setFill(SELECTED_COLOR)
+            # stage 2--> stage 1 (disallowing repetition)
+            elif len(children) > 0:
+                INSTRUCTION_TEXT.setText("Select the movies you have already seen.")
+                selected = parents
+                for movie in MOVIES.values():
+                    if movie not in Movie.open: Movie.open.append(movie)
+                    if movie in children:
+                        movie.selected = False
+                        movie.my_square.setFill("white")
+                    elif movie in parents:
+                        movie.selected = True
+                        movie.my_square.setFill(SELECTED_COLOR)
+                children = []
+                BUTTONS[1][0].undraw() #undraw the back button
+                BUTTONS[1][1].undraw()
         for movie in Movie.open:
             if movie.p1.getX() < p.getX() < movie.p2.getX() and movie.p1.getY() < p.getY() < movie.p2.getY():
+                CHANGED = True
                 if not movie.selected:
                     selected.append(movie)
                     movie.selected = True
@@ -349,6 +399,7 @@ def motion(event):
             else:
                 movie.my_square.setFill("white")
     for button in BUTTONS:
+        button = button[0]
         if button.p1.getX() < x < button.p2.getX() and button.p1.getY() < y < button.p2.getY():
             button.setFill(HOVER_COLOR)
         # if we are not hovering over this movie, reset the colors back to normal
