@@ -390,8 +390,8 @@ def run_program(win):
                     BUTTONS[1][1].undraw()
             # reset button
             elif level == 1:
-                parents = []
-                CHILDREN = []
+                parents.clear()
+                CHILDREN.clear()
                 for movie in MOVIES.values():
                     movie.selected = False
                     movie.my_square.setFill("white")
