@@ -5,6 +5,7 @@ from MarvelTracker import Movie
 from graphics import *
 import csv
 
+RULE = "Interconnected"
 EDGES = []
 MOVIES = {}
 WIDTH = 1200
@@ -14,17 +15,17 @@ NUM_CHOSEN = 0
 HOVER_COLOR = color_rgb(76, 237, 78)
 SELECTED_COLOR = color_rgb(31, 222, 34)
 CHOSEN_COLOR = color_rgb(18, 173, 206)
-PARENTS_COLOR = color_rgb(83, 116, 81)
+WATCHED_COLOR = color_rgb(83, 116, 81)
 CHILDREN_COLOR = color_rgb(206, 191, 18)
 BUTTON_COLOR = color_rgb(210, 222, 31)
 INSTRUCTION_TEXT = None
 CHILDREN = []
-PARENTS = []
+WATCHED = []
 CHANGED = False
 NUM_TIES = 0
 NEXT_TEXT = None
 REC_TEXT = None
-BUTTONS = []
+BUTTONS = {}
 
 # takes in a CSV file, outputs a tuple containing a list of movies and a list of edges
 def import_weighted_from_csv(file="MCUphase1to3-weighted.csv"):
@@ -67,14 +68,14 @@ def import_weighted_from_csv(file="MCUphase1to3-weighted.csv"):
     MOVIES = all_movies
 
 
-# find the n best other movies to watch if you've watched the parents and want to watch the children
-def find_best_subgraph(parents, children, n):
+# find the n best other movies to watch if you've watched the watched and want to watch the children
+def find_best_subgraph(watched, children, n):
     edges = EDGES.copy()
     # if the edge ends at a parent or starts at a child, don't include it
     for edge in EDGES: # iterate through OTHER list so we don't mess up our iteration
-        if MOVIES[edge.v2] in parents or MOVIES[edge.v1] in children:
+        if MOVIES[edge.v2] in watched or MOVIES[edge.v1] in children:
             edges.remove(edge)
-    included = parents + children
+    included = watched + children
     excluded = []
     for movie in MOVIES.values():
         if movie not in included:
@@ -155,32 +156,35 @@ def tie_breaker(best_graphs, excluded, edges):
         return best_graph
 
 
-# find the n best other movies to watch if you've watched the parents and want to watch the children
-def find_best_subgraph_prev_tree(parents, children, n):
-    # if n + len(parents) + len(children) > len(MOVIES.values()):  # edge case
-        # return MOVIES.values()
+# find the n best other movies to watch if you've watched the watched and want to watch the children
+def find_best_subgraph_prev_tree(watched, children, n):
+    included = watched + children
     edges = []
-    included = parents + children
     nodes = children.copy()
-    prev_tree(nodes, parents, edges)  # fill nodes and edges with all parents of nodes and edges between those nodes
-    for parent in parents:
+    if RULE == "Recent":
+        limited_prev_tree(edges, nodes, children, n)
+    else:
+        prev_tree(nodes, watched, edges)  # fill nodes and edges with all watched of nodes and edges between those nodes
+    for parent in watched:
         nodes.append(parent)
-    most_nodes = len(nodes) - len(children) - len(parents)
+    most_nodes = len(nodes) - len(children) - len(watched)
     excluded = []
-    if most_nodes < n:  # if most_nodes is less than n, include all parents plus n
-        return nodes # due to this rule, the next 4 lines are actually never used
+    if most_nodes <= n:  # if most_nodes is less than n, include all watched plus n
+        return nodes
     else:
         for movie in nodes:
             if movie not in included:
                 excluded.append(movie)
     for edge in EDGES:  # iterate through OTHER list so we don't mess up our iteration
-        if MOVIES[edge.v2] in parents and edge in edges:
+        if MOVIES[edge.v2] in watched and edge in edges:
             edges.remove(edge)
     best_graphs = brute_force_subgraph_helper(excluded, included, edges, n)
     return tie_breaker(best_graphs, excluded, edges)
 
 
-def prev_tree(nodes, parents, edges):
+# generates subgraph containing all ancestors of every node in nodes
+# excludes edges which lead to the movies already watched
+def prev_tree(nodes, watched, edges):
     for edge in EDGES:
         for movie in nodes:
             if MOVIES[edge.v2] == movie:
@@ -189,9 +193,26 @@ def prev_tree(nodes, parents, edges):
                 movie1 = MOVIES[edge.v1]
                 # if we already added this one, we don't need to do it again
                 # if we already watched this one, its prevs aren't relevant.
-                if movie1 not in nodes and movie1 not in parents:
+                if movie1 not in nodes and movie1 not in watched:
                     nodes.append(movie1)
-                    prev_tree(nodes, parents, edges)
+                    prev_tree(nodes, watched, edges)
+
+
+# generates a limited ancestor tree, containing only more recent ancestors
+def limited_prev_tree(edges, nodes, children, n):
+    current_level_nodes = nodes.copy()
+    while len(nodes) - len(children) < n:
+        recently_added_nodes = []
+        for movie in current_level_nodes:
+            movie_nodes, movie_edges = most_recent(movie)
+            for prev in movie_nodes:
+                if prev not in recently_added_nodes and prev not in nodes:
+                    recently_added_nodes.append(prev)
+            for edge in movie_edges:
+                if edge not in edges:
+                    edges.append(edge)
+        current_level_nodes = recently_added_nodes
+        nodes.extend(recently_added_nodes)
 
 
 # computes and returns the weight of the subgraph
@@ -203,12 +224,30 @@ def subgraph_weight(subgraph, edges):
     return weight
 
 
-def watch_order(parents, subgraph):
+# generates a watch order, excluding movies which have already been watched
+def watch_order(watched, subgraph):
     order = []
     for movie in MOVIES:
-        if MOVIES[movie] in subgraph and not MOVIES[movie] in parents:
+        if MOVIES[movie] in subgraph and not MOVIES[movie] in watched:
             order.append(movie)
     return order
+
+
+# returns the most recent ancestors of a movie
+def most_recent(movie):
+    nodes = [movie]
+    edges = []
+    prev_tree(nodes, [], edges)
+    edges_copy = edges.copy()
+    for edge in edges_copy:
+        if not MOVIES[edge.v2] == movie and MOVIES[edge.v1] in nodes:
+            nodes.remove(MOVIES[edge.v1])
+            edges.remove(edge)
+    edges_copy = edges.copy()
+    for edge in edges_copy:
+        if MOVIES[edge.v1] not in nodes:
+            edges.remove(edge)
+    return nodes, edges
 
 
 # draws the window
@@ -252,13 +291,14 @@ def draw_window():
     next_button.setFill(BUTTON_COLOR)
     next_text = Text(next_button.getCenter(), text="Next")
     next_button.draw(win)
-    BUTTONS.append([next_button, next_text])
+
+    BUTTONS["Next"] = {"Button": next_button, "Text": next_text}
     next_text.draw(win)
 
     prev_button = Rectangle(Point(60, 60), Point(70, 65))
     prev_button.setFill(BUTTON_COLOR)
     prev_text = Text(prev_button.getCenter(), text="Back")
-    BUTTONS.append([prev_button, prev_text])
+    BUTTONS["Previous"] = {"Button": prev_button, "Text": prev_text}
 
     global INSTRUCTION_TEXT
     INSTRUCTION_TEXT = Text(Point(50, 70), text="Select the movies you have already seen.")
@@ -278,8 +318,8 @@ def run_program(win):
     global CHANGED
     global CHILDREN
     level = 1
-    parents = []
-    selected = parents
+    watched = []
+    selected = watched
     #children = []
     subgraph = []
     input_box = Entry(Point(INSTRUCTION_TEXT.getAnchor().getX() + 50, INSTRUCTION_TEXT.getAnchor().getY()), 10)
@@ -293,18 +333,18 @@ def run_program(win):
             if level == 1:
                 level = 2
                 selected = CHILDREN
-                for movie in parents:
+                for movie in watched:
                     Movie.open.remove(movie)
                     movie.my_square.setFill("gray")
                 for movie in CHILDREN:
                     movie.my_square.setFill(SELECTED_COLOR)
                     movie.selected = True
                 INSTRUCTION_TEXT.setText("Select the movies you would like to see.")
-                if BUTTONS[1][1].getText() == "Reset":
-                    BUTTONS[1][1].setText("Back")
+                if BUTTONS["Previous"]["Text"].getText() == "Reset":
+                    BUTTONS["Previous"]["Text"].setText("Back")
                 else:
-                    BUTTONS[1][0].draw(win) #draw the back button
-                    BUTTONS[1][1].draw(win)
+                    BUTTONS["Previous"]["Button"].draw(win) #draw the back button
+                    BUTTONS["Previous"]["Text"].draw(win)
             # stage 2-> stage 3
             elif level == 2:
                 if len(CHILDREN) == 0:
@@ -327,15 +367,15 @@ def run_program(win):
                     if CHANGED or not NUM_CHOSEN == int(input_box.getText()):
                         CHANGED = False
                         NUM_CHOSEN = int(input_box.getText())
-                        subgraph = find_best_subgraph_prev_tree(parents, CHILDREN, NUM_CHOSEN)
-                        order = watch_order(parents, subgraph)
-                        #watched_string = "Already Watched:\n" + "\n".join(t.name for t in parents)
-                        rec_string = "\nWatch Order:\n" + "\n\n".join(order)
+                        subgraph = find_best_subgraph_prev_tree(watched, CHILDREN, NUM_CHOSEN)
+                        order = watch_order(watched, subgraph)
+                        #watched_string = "Already Watched:\n" + "\n".join(t.name for t in watched)
+                        rec_string = "\nRecommended Watchlist:\n" + "\n\n".join(order)
                         REC_TEXT.setText(rec_string)
                         REC_TEXT.undraw()
                         REC_TEXT.draw(win)
                     for movie in MOVIES.values():
-                        if movie not in parents and movie not in CHILDREN:
+                        if movie not in watched and movie not in CHILDREN:
                             if movie in subgraph:
                                 movie.my_square.setFill(CHOSEN_COLOR)
                             else:
@@ -344,8 +384,8 @@ def run_program(win):
                     INSTRUCTION_TEXT.setText("Here are your recommendations!")
                     print("graphs checked: " + str(GRAPHS_CHECKED))
 
-                    BUTTONS[0][0].undraw()
-                    BUTTONS[0][1].undraw()
+                    BUTTONS["Next"]["Button"].undraw()
+                    BUTTONS["Next"]["Text"].undraw()
                     #NEXT_TEXT.setText("Reset")
         #back button
         if 60 < p.getX() < 70 and 60 < p.getY() < 65:
@@ -354,8 +394,8 @@ def run_program(win):
                 level = 3
                 GRAPHS_CHECKED = 0
                 INSTRUCTION_TEXT.setText("How many additional movies are you willing to watch?")
-                BUTTONS[0][0].draw(win)
-                BUTTONS[0][1].draw(win)
+                BUTTONS["Next"]["Button"].draw(win)
+                BUTTONS["Next"]["Text"].draw(win)
                 input_box.draw(win)
             # stage 3--> stage 2
             elif level == 3:
@@ -364,7 +404,7 @@ def run_program(win):
                 input_box.undraw()
                 selected = CHILDREN
                 for movie in MOVIES.values():
-                    if movie not in parents:
+                    if movie not in watched:
                         Movie.open.append(movie)
                         if movie not in CHILDREN:
                             movie.my_square.setFill("white")
@@ -374,30 +414,31 @@ def run_program(win):
             elif level == 2:
                 level = 1
                 INSTRUCTION_TEXT.setText("Select the movies you have already seen.")
-                selected = parents
+                selected = watched
                 for movie in MOVIES.values():
                     if movie not in Movie.open: Movie.open.append(movie)
                     if movie in CHILDREN:
                         movie.selected = False
                         movie.my_square.setFill(CHILDREN_COLOR)
-                    elif movie in parents:
+                    elif movie in watched:
                         movie.selected = True
                         movie.my_square.setFill(SELECTED_COLOR)
-                if len(CHILDREN) > 0 or len(parents) > 0:
-                    BUTTONS[1][1].setText("Reset")
+                if len(CHILDREN) > 0 or len(watched) > 0:
+                    BUTTONS["Previous"]["Text"].setText("Reset")
                 else:
-                    BUTTONS[1][0].undraw() #undraw the back button
-                    BUTTONS[1][1].undraw()
+                    BUTTONS["Previous"]["Button"].undraw() #undraw the back button
+                    BUTTONS["Previous"]["Text"].undraw()
             # reset button
             elif level == 1:
-                parents.clear()
+                watched.clear()
                 CHILDREN.clear()
                 for movie in MOVIES.values():
                     movie.selected = False
                     movie.my_square.setFill("white")
-                BUTTONS[1][0].undraw()  # undraw the back button
-                BUTTONS[1][1].undraw()
-                BUTTONS[1][1].setText("Back")
+                REC_TEXT.undraw()
+                BUTTONS["Previous"]["Button"].undraw()  # undraw the back button
+                BUTTONS["Previous"]["Text"].undraw()
+                BUTTONS["Previous"]["Text"].setText("Back")
         for movie in Movie.open:
             if movie.p1.getX() < p.getX() < movie.p2.getX() and movie.p1.getY() < p.getY() < movie.p2.getY():
                 CHANGED = True
@@ -430,8 +471,8 @@ def motion(event):
                 movie.my_square.setFill(CHILDREN_COLOR)
             else:
                 movie.my_square.setFill("white")
-    for button in BUTTONS:
-        button = button[0]
+    for button in BUTTONS.values():
+        button = button["Button"]
         if button.p1.getX() < x < button.p2.getX() and button.p1.getY() < y < button.p2.getY():
             button.setFill(HOVER_COLOR)
         # if we are not hovering over this movie, reset the colors back to normal
