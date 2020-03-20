@@ -27,7 +27,7 @@ NEXT_TEXT = None
 REC_TEXT = None
 BUTTONS = {}
 
-# takes in a CSV file, outputs a tuple containing a list of movies and a list of edges
+# takes in a CSV file, sets global variables for movies and edges
 def import_weighted_from_csv(file="MCUphase1to3-weighted.csv"):
     # put all the rows of the csv file into a list
     csv_rows = []
@@ -281,7 +281,7 @@ def draw_window():
             x_pos = 5'''
 
     # draw window
-    win = GraphWin(title="Recommender", width=WIDTH, height=HEIGHT, autoflush=False)
+    win = GraphWin(title="Most Interconnected MCU Watchlist", width=WIDTH, height=HEIGHT, autoflush=False)
     win.setCoords(0, 180*HEIGHT/WIDTH, 180, 0)
     win.bind('<Motion>', motion)
     for movie in MOVIES.values():
@@ -325,8 +325,11 @@ def run_program(win):
     input_box = Entry(Point(INSTRUCTION_TEXT.getAnchor().getX() + 50, INSTRUCTION_TEXT.getAnchor().getY()), 10)
     input_box.setFill("white")
     input_box.setText("1")
-    while True:
-        p = win.getMouse()
+    while (win.isOpen()):
+        try:
+            p = win.getMouse()
+        except:
+            break
         # Next Button
         if 80 < p.getX() < 90 and 60 < p.getY() < 65:
             # stage 1-> stage 2
