@@ -201,7 +201,7 @@ def prev_tree(nodes, watched, edges):
 # generates a limited ancestor tree, containing only more recent ancestors
 def limited_prev_tree(edges, nodes, children, n):
     current_level_nodes = nodes.copy()
-    while len(nodes) - len(children) < n:
+    while len(nodes) - len(children) < n and MOVIES["Iron Man"] not in nodes:
         recently_added_nodes = []
         for movie in current_level_nodes:
             movie_nodes, movie_edges = most_recent(movie)
@@ -235,19 +235,26 @@ def watch_order(watched, subgraph):
 
 # returns the most recent ancestors of a movie
 def most_recent(movie):
+    # step 1: find all nodes which are immediately relevant
+    direct_predecessors = []
+    direct_edges = []
+    for edge in EDGES:
+        if MOVIES[edge.v2] == movie:
+            direct_predecessors.append(MOVIES[edge.v1])
+            direct_edges.append(edge)
+    # step 2: generate family tree to discover if there will be missing pieces
     nodes = [movie]
     edges = []
     prev_tree(nodes, [], edges)
     edges_copy = edges.copy()
     for edge in edges_copy:
-        if not MOVIES[edge.v2] == movie and MOVIES[edge.v1] in nodes:
-            nodes.remove(MOVIES[edge.v1])
-            edges.remove(edge)
-    edges_copy = edges.copy()
+        if not MOVIES[edge.v2] == movie and MOVIES[edge.v1] in direct_predecessors and edge.weight > 1:
+            direct_predecessors.remove(MOVIES[edge.v1])
+    edges_copy = direct_edges.copy()
     for edge in edges_copy:
-        if MOVIES[edge.v1] not in nodes:
-            edges.remove(edge)
-    return nodes, edges
+        if MOVIES[edge.v1] not in direct_predecessors:
+            direct_edges.remove(edge)
+    return direct_predecessors, direct_edges
 
 
 # draws the window
