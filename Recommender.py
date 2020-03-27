@@ -188,12 +188,12 @@ def prev_tree(nodes, watched, edges):
     for edge in EDGES:
         for movie in nodes:
             if MOVIES[edge.v2] == movie:
-                if edge not in edges:
-                    edges.append(edge)
                 movie1 = MOVIES[edge.v1]
+                if edge not in edges and (edge.weight > 1 or movie1 in nodes):
+                    edges.append(edge)
                 # if we already added this one, we don't need to do it again
                 # if we already watched this one, its prevs aren't relevant.
-                if movie1 not in nodes and movie1 not in watched:
+                if movie1 not in nodes and movie1 not in watched and edge.weight > 1:
                     nodes.append(movie1)
                     prev_tree(nodes, watched, edges)
 
