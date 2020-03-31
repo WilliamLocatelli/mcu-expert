@@ -5,7 +5,7 @@ from MarvelTracker import Movie
 from graphics import *
 import csv
 
-RULE = "Interconnected"
+RULE = "Recent"
 EDGES = []
 MOVIES = {}
 WIDTH = 1200
@@ -129,10 +129,10 @@ def tie_breaker(best_graphs, excluded):
 def find_best_subgraph(watched, children, n):
     included = watched + children
     nodes = children.copy()
-    '''if RULE == "Recent":
+    if RULE == "Recent":
         limited_prev_tree(nodes, children, n)
-    else:'''
-    prev_tree(nodes, watched)
+    else:
+        prev_tree(nodes, watched)
     for parent in watched:
         nodes.append(parent)
     most_nodes = len(nodes) - len(children) - len(watched)
@@ -157,18 +157,15 @@ def prev_tree(nodes, watched):
 
 
 # generates a limited ancestor tree, containing only more recent ancestors
-def limited_prev_tree(edges, nodes, children, n):
+def limited_prev_tree(nodes, children, n):
     current_level_nodes = nodes.copy()
     while len(nodes) - len(children) < n and MOVIES["Iron Man"] not in nodes:
         recently_added_nodes = []
         for movie in current_level_nodes:
-            movie_nodes, movie_edges = most_recent(movie)
+            movie_nodes = most_recent(movie)
             for prev in movie_nodes:
                 if prev not in recently_added_nodes and prev not in nodes:
                     recently_added_nodes.append(prev)
-            for edge in movie_edges:
-                if edge not in edges:
-                    edges.append(edge)
         current_level_nodes = recently_added_nodes
         nodes.extend(recently_added_nodes)
 
@@ -195,25 +192,16 @@ def watch_order(watched, subgraph):
 # returns the most recent ancestors of a movie
 def most_recent(movie):
     # step 1: find all nodes which are immediately relevant
-    direct_predecessors = []
-    direct_edges = []
-    for edge in EDGES:
-        if MOVIES[edge.v2] == movie:
-            direct_predecessors.append(MOVIES[edge.v1])
-            direct_edges.append(edge)
+    direct_predecessors = [prev[0] for prev in movie.prevs]
     # step 2: generate family tree to discover if there will be missing pieces
     nodes = [movie]
-    edges = []
-    prev_tree(nodes, [], edges)
-    edges_copy = edges.copy()
-    for edge in edges_copy:
-        if not MOVIES[edge.v2] == movie and MOVIES[edge.v1] in direct_predecessors and edge.weight > 1:
-            direct_predecessors.remove(MOVIES[edge.v1])
-    edges_copy = direct_edges.copy()
-    for edge in edges_copy:
-        if MOVIES[edge.v1] not in direct_predecessors:
-            direct_edges.remove(edge)
-    return direct_predecessors, direct_edges
+    prev_tree(nodes, [])
+    nodes.remove(movie)
+    for film in nodes:
+        for prev in film.prevs:
+            if prev[0] in direct_predecessors:
+                direct_predecessors.remove(prev[0])
+    return direct_predecessors
 
 
 # draws the window
