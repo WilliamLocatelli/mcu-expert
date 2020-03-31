@@ -6,7 +6,6 @@ from graphics import *
 import csv
 
 RULE = "Recent"
-EDGES = []
 MOVIES = {}
 WIDTH = 1200
 HEIGHT = 600
@@ -27,7 +26,7 @@ NEXT_TEXT = None
 REC_TEXT = None
 BUTTONS = {}
 
-# takes in a CSV file, sets global variables for movies and edges
+# takes in a CSV file, sets global variables for movies
 def import_weighted_from_csv(file="MCUphase1to3-weighted.csv"):
     # put all the rows of the csv file into a list
     csv_rows = []
@@ -46,8 +45,6 @@ def import_weighted_from_csv(file="MCUphase1to3-weighted.csv"):
         this_movie.prevs_selected = True
         all_movies[row[0]] = this_movie
         i += 1
-    # create edges
-    all_edges = []
     i = 1  # skip the title row
     while i < movie_count:
         prevs = []
@@ -56,18 +53,13 @@ def import_weighted_from_csv(file="MCUphase1to3-weighted.csv"):
         while i2 < len(row):
             weight = row[i2]
             if len(weight) > 0 and weight != "0":
-                # csv_rows[i] tells you what movies i comes from, so the edges need to
-                # start at the movie it came from (found in the title list[i2] and end at i
-                this_edge = WeightedEdge(title_list[i2], row[0], float(weight))
-                all_edges.append(this_edge)
+                # csv_rows[i] tells you what movies i comes from, so the prevs need to be found in the title list[i2]
                 prevs.append((all_movies[title_list[i2]], float(weight)))
             i2 += 1
         all_movies[row[0]].prevs = prevs
         i += 1
 
-    global EDGES
     global MOVIES
-    EDGES = all_edges
     MOVIES = all_movies
 
 
@@ -435,15 +427,6 @@ def motion(event):
         # if we are not hovering over this movie, reset the colors back to normal
         else:
             button.setFill(BUTTON_COLOR)
-
-
-# class for edges of graph
-class WeightedEdge:
-
-    def __init__(self, v1, v2, weight):
-        self.v1 = v1
-        self.v2 = v2
-        self.weight = weight
 
 
 if __name__ == '__main__':
