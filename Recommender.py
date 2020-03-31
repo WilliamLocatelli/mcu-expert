@@ -71,18 +71,9 @@ def import_weighted_from_csv(file="MCUphase1to3-weighted.csv"):
     MOVIES = all_movies
 
 
-def edgeless_prev_tree(nodes, watched):
-    for movie in nodes:
-        nodes_copy = nodes.copy()
-        for prev in movie.prevs:
-            if prev[1] > 1:
-                nodes_copy.add(prev[0])
-                edgeless_prev_tree(nodes_copy, watched)
-
-
 # this version considers every option, but is slow.
 # returns a list containing every graph which tied for first place
-def brute_force_subgraph_helper(excluded, included, edges, n):
+def brute_force_subgraph_helper(excluded, included, n):
     global GRAPHS_CHECKED
     best_graphs = []
     if n == 0:
@@ -98,8 +89,8 @@ def brute_force_subgraph_helper(excluded, included, edges, n):
         included_copy.append(movie)
         excluded_copy.remove(movie)
         best_graph_next_level = []
-        best_graph_next_level += brute_force_subgraph_helper(excluded_copy, included_copy, edges, n-1)
-        weight = subgraph_weight(best_graph_next_level[0], edges)
+        best_graph_next_level += brute_force_subgraph_helper(excluded_copy, included_copy, n-1)
+        weight = subgraph_weight(best_graph_next_level[0])
         if weight > max_weight:
             max_weight = weight
             best_graphs = best_graph_next_level.copy()
@@ -111,7 +102,7 @@ def brute_force_subgraph_helper(excluded, included, edges, n):
     return best_graphs
 
 
-def tie_breaker(best_graphs, excluded, edges):
+def tie_breaker(best_graphs, excluded):
     if len(best_graphs) == 1:
         return best_graphs[0]
     else:
@@ -125,8 +116,8 @@ def tie_breaker(best_graphs, excluded, edges):
             for movie in graph:
                 if movie in excluded:
                     excluded_copy.remove(movie)
-            best_plus_one = tie_breaker(brute_force_subgraph_helper(excluded_copy, graph, edges, 1), excluded, edges)
-            weight = subgraph_weight(best_plus_one, edges)
+            best_plus_one = tie_breaker(brute_force_subgraph_helper(excluded_copy, graph, 1), excluded)
+            weight = subgraph_weight(best_plus_one)
             if weight > max_weight:
                 max_weight = weight
                 best_graph = graph
@@ -135,14 +126,13 @@ def tie_breaker(best_graphs, excluded, edges):
 
 
 # find the n best other movies to watch if you've watched the watched and want to watch the children
-def find_best_subgraph_prev_tree(watched, children, n):
+def find_best_subgraph(watched, children, n):
     included = watched + children
-    edges = []
     nodes = children.copy()
-    if RULE == "Recent":
-        limited_prev_tree(edges, nodes, children, n)
-    else:
-        prev_tree(nodes, watched, edges)  # fill nodes and edges with all watched of nodes and edges between those nodes
+    '''if RULE == "Recent":
+        limited_prev_tree(nodes, children, n)
+    else:'''
+    prev_tree(nodes, watched)
     for parent in watched:
         nodes.append(parent)
     most_nodes = len(nodes) - len(children) - len(watched)
@@ -153,27 +143,17 @@ def find_best_subgraph_prev_tree(watched, children, n):
         for movie in nodes:
             if movie not in included:
                 excluded.append(movie)
-    for edge in EDGES:
-        if MOVIES[edge.v2] in watched and edge in edges:
-            edges.remove(edge)
-    best_graphs = brute_force_subgraph_helper(excluded, included, edges, n)
-    return tie_breaker(best_graphs, excluded, edges)
+    best_graphs = brute_force_subgraph_helper(excluded, included, n)
+    return tie_breaker(best_graphs, excluded)
 
 
 # generates subgraph containing all ancestors of every node in nodes
-# excludes edges which lead to the movies already watched
-def prev_tree(nodes, watched, edges):
-    for edge in EDGES:
-        for movie in nodes:
-            if MOVIES[edge.v2] == movie:
-                movie1 = MOVIES[edge.v1]
-                if edge not in edges and (edge.weight > 1 or movie1 in nodes):
-                    edges.append(edge)
-                # if we already added this one, we don't need to do it again
-                # if we already watched this one, its prevs aren't relevant.
-                if movie1 not in nodes and movie1 not in watched and edge.weight > 1:
-                    nodes.append(movie1)
-                    prev_tree(nodes, watched, edges)
+def prev_tree(nodes, watched):
+    for movie in nodes:
+        for prev in movie.prevs:
+            if prev[1] > 1 and prev[0] not in watched and prev[0] not in nodes:
+                nodes.append(prev[0])
+                prev_tree(nodes, watched)
 
 
 # generates a limited ancestor tree, containing only more recent ancestors
@@ -194,11 +174,12 @@ def limited_prev_tree(edges, nodes, children, n):
 
 
 # computes and returns the weight of the subgraph
-def subgraph_weight(subgraph, edges):
+def subgraph_weight(subgraph):
     weight = 0
-    for edge in edges:
-        if MOVIES[edge.v1] in subgraph and MOVIES[edge.v2] in subgraph:
-            weight += edge.weight
+    for movie in subgraph:
+        for prev in movie.prevs:
+            if prev[0] in subgraph:
+                weight += prev[1]
     return weight
 
 
@@ -355,7 +336,7 @@ def run_program(win):
                     if CHANGED or not NUM_CHOSEN == int(input_box.getText()):
                         CHANGED = False
                         NUM_CHOSEN = int(input_box.getText())
-                        subgraph = find_best_subgraph_prev_tree(watched, CHILDREN, NUM_CHOSEN)
+                        subgraph = find_best_subgraph(watched, CHILDREN, NUM_CHOSEN)
                         order = watch_order(watched, subgraph)
                         #watched_string = "Already Watched:\n" + "\n".join(t.name for t in watched)
                         rec_string = "\nRecommended Watchlist:\n" + "\n\n".join(order)
