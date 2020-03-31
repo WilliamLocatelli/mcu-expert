@@ -50,6 +50,7 @@ def import_weighted_from_csv(file="MCUphase1to3-weighted.csv"):
     all_edges = []
     i = 1  # skip the title row
     while i < movie_count:
+        prevs = []
         row = csv_rows[i]
         i2 = 2  # skip the series column
         while i2 < len(row):
@@ -59,7 +60,9 @@ def import_weighted_from_csv(file="MCUphase1to3-weighted.csv"):
                 # start at the movie it came from (found in the title list[i2] and end at i
                 this_edge = WeightedEdge(title_list[i2], row[0], float(weight))
                 all_edges.append(this_edge)
+                prevs.append((all_movies[title_list[i2]], float(weight)))
             i2 += 1
+        all_movies[row[0]].prevs = prevs
         i += 1
 
     global EDGES
@@ -68,38 +71,13 @@ def import_weighted_from_csv(file="MCUphase1to3-weighted.csv"):
     MOVIES = all_movies
 
 
-# find the n best other movies to watch if you've watched the watched and want to watch the children
-def find_best_subgraph(watched, children, n):
-    edges = EDGES.copy()
-    # if the edge ends at a parent or starts at a child, don't include it
-    for edge in EDGES: # iterate through OTHER list so we don't mess up our iteration
-        if MOVIES[edge.v2] in watched or MOVIES[edge.v1] in children:
-            edges.remove(edge)
-    included = watched + children
-    excluded = []
-    for movie in MOVIES.values():
-        if movie not in included:
-            excluded.append(movie)
-    return brute_force_subgraph_helper(excluded, included, edges, n)
-
-
-# this version doesn't consider all possibilities, but is fast.
-def naive_subgraph_helper(excluded, included, edges, n):
-    if n == 0:
-        subgraph = included.copy()
-        return subgraph
-    max_weight = 0
-    max_movie = None
-    for movie in excluded:
-        included_copy = included.copy()
-        included_copy.append(movie)
-        weight = subgraph_weight(included_copy, edges)
-        if weight > max_weight:
-            max_weight = weight
-            max_movie = movie
-    excluded.remove(max_movie)
-    included.append(max_movie)
-    return naive_subgraph_helper(excluded, included, edges, n-1)
+def edgeless_prev_tree(nodes, watched):
+    for movie in nodes:
+        nodes_copy = nodes.copy()
+        for prev in movie.prevs:
+            if prev[1] > 1:
+                nodes_copy.add(prev[0])
+                edgeless_prev_tree(nodes_copy, watched)
 
 
 # this version considers every option, but is slow.
@@ -175,7 +153,7 @@ def find_best_subgraph_prev_tree(watched, children, n):
         for movie in nodes:
             if movie not in included:
                 excluded.append(movie)
-    for edge in EDGES:  # iterate through OTHER list so we don't mess up our iteration
+    for edge in EDGES:
         if MOVIES[edge.v2] in watched and edge in edges:
             edges.remove(edge)
     best_graphs = brute_force_subgraph_helper(excluded, included, edges, n)
