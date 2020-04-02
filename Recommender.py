@@ -119,14 +119,15 @@ def tie_breaker(best_graphs, excluded):
 
 # find the n best other movies to watch if you've watched the watched and want to watch the children
 def find_best_subgraph(watched, children, n):
-    included = watched + children
     nodes = children.copy()
+    children_copy = children.copy()
     if RULE == "Recent":
-        limited_prev_tree(nodes, children, n)
+        n = most_recent_prev_tree(nodes, children_copy, n)
     else:
         prev_tree(nodes, watched)
     for parent in watched:
         nodes.append(parent)
+    included = watched + children_copy
     most_nodes = len(nodes) - len(children) - len(watched)
     excluded = []
     if most_nodes <= n:  # if most_nodes is less than n, include all watched plus n
@@ -143,23 +144,30 @@ def find_best_subgraph(watched, children, n):
 def prev_tree(nodes, watched):
     for movie in nodes:
         for prev in movie.prevs:
-            if prev[1] > 1 and prev[0] not in watched and prev[0] not in nodes:
+            if (prev[1] > 1 or RULE == "Recent") and prev[0] not in watched and prev[0] not in nodes:
                 nodes.append(prev[0])
                 prev_tree(nodes, watched)
 
 
 # generates a limited ancestor tree, containing only more recent ancestors
-def limited_prev_tree(nodes, children, n):
+# ancestors are broken up into generations. if multiple generations are included,
+# all ancestors from every generation will be included except for some ancestors from
+# the furthest back generation.
+def most_recent_prev_tree(nodes, children, n):
+    original_children_count = len(children)
     current_level_nodes = nodes.copy()
-    while len(nodes) - len(children) < n and MOVIES["Iron Man"] not in nodes:
+    recently_added_nodes = []
+    while len(nodes) - original_children_count < n and MOVIES["Iron Man"] not in nodes:
+        children.extend(recently_added_nodes)
         recently_added_nodes = []
         for movie in current_level_nodes:
-            movie_nodes = most_recent(movie)
-            for prev in movie_nodes:
+            prev_nodes = most_recent(movie)
+            for prev in prev_nodes:
                 if prev not in recently_added_nodes and prev not in nodes:
                     recently_added_nodes.append(prev)
         current_level_nodes = recently_added_nodes
         nodes.extend(recently_added_nodes)
+    return n - (len(children) - original_children_count)
 
 
 # computes and returns the weight of the subgraph
