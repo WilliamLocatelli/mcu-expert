@@ -157,18 +157,21 @@ def prev_tree(nodes, watched):
 # all ancestors from every generation will be included except for some ancestors from
 # the furthest back generation.
 def most_recent_prev_tree(nodes, watched, children, n):
+    total_nodes = nodes.copy()
     original_children_count = len(children)
     current_level_nodes = nodes.copy()
     recently_added_nodes = []
     while len(nodes) - original_children_count < n and len(current_level_nodes) > 0:
-        children.extend(recently_added_nodes)
+        children.extend(list(set(recently_added_nodes) - set(watched)))
         recently_added_nodes = []
         prev_nodes = most_recent_tier(current_level_nodes)
         for prev in prev_nodes:
-            if prev not in recently_added_nodes and prev not in nodes and prev not in watched:
+            if prev not in recently_added_nodes and prev not in total_nodes:
                 recently_added_nodes.append(prev)
         current_level_nodes = recently_added_nodes
-        nodes.extend(recently_added_nodes)
+        total_nodes.extend(recently_added_nodes)
+        nodes.clear()
+        nodes.extend(list(set(total_nodes) - set(watched)))
     return n - (len(children) - original_children_count)
 
 
@@ -377,13 +380,15 @@ def run_program(win):
                 INSTRUCTION_TEXT.setText("Select the movies you have already seen.")
                 selected = watched
                 for movie in MOVIES.values():
-                    if movie not in Movie.open: Movie.open.append(movie)
-                    if movie in CHILDREN:
-                        movie.selected = False
-                        movie.my_square.setFill(CHILDREN_COLOR)
-                    elif movie in watched:
+                    if movie not in Movie.open:
+                        Movie.open.append(movie)
+                    if movie in watched:
                         movie.selected = True
                         movie.my_square.setFill(SELECTED_COLOR)
+                    else:
+                        movie.selected = False
+                        if movie in CHILDREN:
+                            movie.my_square.setFill(CHILDREN_COLOR)
                 if len(CHILDREN) > 0 or len(watched) > 0:
                     BUTTONS["Previous"]["Text"].setText("Reset")
                 else:
