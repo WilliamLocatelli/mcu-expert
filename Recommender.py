@@ -118,11 +118,12 @@ def tie_breaker(best_graphs, excluded):
 
 
 # find the n best other movies to watch if you've watched the watched and want to watch the children
-def find_best_subgraph(watched, children, n):
+def find_best_subgraph(watched, children, num_extras):
     nodes = children.copy()
     children_copy = children.copy()
+    num_to_check = num_extras
     if RULE == "Recent":
-        n = most_recent_prev_tree(nodes, children_copy, n)
+        num_to_check = most_recent_prev_tree(nodes, watched, children_copy, num_extras)
     else:
         prev_tree(nodes, watched)
     for parent in watched:
@@ -130,16 +131,17 @@ def find_best_subgraph(watched, children, n):
     included = watched + children_copy
     most_nodes = len(nodes) - len(children) - len(watched)
     excluded = []
-    if most_nodes <= n:  # if most_nodes is less than n, include all watched plus n
+    if most_nodes <= num_extras:  # if most_nodes is less than n, include all watched plus n
         return nodes
     else:
         for movie in nodes:
             if movie not in included:
                 excluded.append(movie)
-    best_graphs = brute_force_subgraph_helper(excluded, included, n)
+    best_graphs = brute_force_subgraph_helper(excluded, included, num_to_check)
     return tie_breaker(best_graphs, excluded)
 
 
+# NOTE: THIS FUNCTION MODIFIES NODES
 # generates subgraph containing all ancestors of every node in nodes
 def prev_tree(nodes, watched):
     for movie in nodes:
@@ -149,22 +151,22 @@ def prev_tree(nodes, watched):
                 prev_tree(nodes, watched)
 
 
+# NOTE: THIS FUNCTION MODIFIES NODES AND CHILDREN
 # generates a limited ancestor tree, containing only more recent ancestors
 # ancestors are broken up into generations. if multiple generations are included,
 # all ancestors from every generation will be included except for some ancestors from
 # the furthest back generation.
-def most_recent_prev_tree(nodes, children, n):
+def most_recent_prev_tree(nodes, watched, children, n):
     original_children_count = len(children)
     current_level_nodes = nodes.copy()
     recently_added_nodes = []
-    while len(nodes) - original_children_count < n and MOVIES["Iron Man"] not in nodes:
+    while len(nodes) - original_children_count < n and len(current_level_nodes) > 0:
         children.extend(recently_added_nodes)
         recently_added_nodes = []
-        for movie in current_level_nodes:
-            prev_nodes = most_recent(movie)
-            for prev in prev_nodes:
-                if prev not in recently_added_nodes and prev not in nodes:
-                    recently_added_nodes.append(prev)
+        prev_nodes = most_recent_tier(current_level_nodes)
+        for prev in prev_nodes:
+            if prev not in recently_added_nodes and prev not in nodes and prev not in watched:
+                recently_added_nodes.append(prev)
         current_level_nodes = recently_added_nodes
         nodes.extend(recently_added_nodes)
     return n - (len(children) - original_children_count)
@@ -190,13 +192,15 @@ def watch_order(watched, subgraph):
 
 
 # returns the most recent ancestors of a movie
-def most_recent(movie):
+def most_recent_tier(movies):
     # step 1: find all nodes which are immediately relevant
-    direct_predecessors = [prev[0] for prev in movie.prevs]
+    direct_predecessors = []
+    for movie in movies:
+        direct_predecessors.extend(prev[0] for prev in movie.prevs if prev[0] not in direct_predecessors)
     # step 2: generate family tree to discover if there will be missing pieces
-    nodes = [movie]
+    nodes = movies.copy()
     prev_tree(nodes, [])
-    nodes.remove(movie)
+    nodes = list(set(nodes) - set(movies))
     for film in nodes:
         for prev in film.prevs:
             if prev[0] in direct_predecessors:
