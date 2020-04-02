@@ -159,8 +159,9 @@ def prev_tree(nodes, watched):
 def most_recent_prev_tree(nodes, watched, children, n):
     total_nodes = nodes.copy()
     original_children_count = len(children)
-    current_level_nodes = nodes.copy()
-    recently_added_nodes = []
+    current_level_nodes = nodes.copy()  # the list of nodes whose parents we are currently finding
+    recently_added_nodes = []  # keeps track of movies currently being added to the list
+    children_duplicates = []  # handles situation where a tier contains one of the other movies they wanted to watch
     while len(nodes) - original_children_count < n and len(current_level_nodes) > 0:
         children.extend(list(set(recently_added_nodes) - set(watched)))
         recently_added_nodes = []
@@ -168,8 +169,10 @@ def most_recent_prev_tree(nodes, watched, children, n):
         for prev in prev_nodes:
             if prev not in recently_added_nodes and prev not in total_nodes:
                 recently_added_nodes.append(prev)
-        current_level_nodes = recently_added_nodes
+            elif prev in children:
+                children_duplicates.append(prev)
         total_nodes.extend(recently_added_nodes)
+        current_level_nodes = recently_added_nodes + children_duplicates
         nodes.clear()
         nodes.extend(list(set(total_nodes) - set(watched)))
     return n - (len(children) - original_children_count)
