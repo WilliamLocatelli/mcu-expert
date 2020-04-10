@@ -1,10 +1,10 @@
 # mcu-tracker
-Program for explorinng the watch order of the MCU.
+Program for exploring the watch order of the MCU.
 Run MarvelTracker.py to explore the interactive MCU watch-through, which follows strict rules with regards to when you 
 are allowed to watch certain movies.
 Run Recommender.py to see what movies you should watch in between other movies.
 
-#Rules for choosing edge weights
+## Rules for choosing edge weights
 Edge weights are chosen based on two criteria: internal references to previous movies, and external definition of 
 relationship to previous movies. 
 
@@ -24,7 +24,7 @@ Internal references:
  
  The weight of an edge will always be equal to the highest weight criteria in this list that applies.
  
- #Algorithms
+ ## Algorithms
  Each algorithm has 2 steps. The first step involves generating a tree of possible candidates for inclusion in the
  recommended watchlist. The second step involves iterating through all possible combinations of those candidates to 
  determine the optimal selections from this set of candidates.
