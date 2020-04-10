@@ -19,6 +19,7 @@ Internal references:
  movie
  - 5: Some scenes or plot points in this movie will be understood very differently by the viewer of they have seen this 
  previous movie.
+ - 5: This previous movie was the most recent appearance of one or more of the main heroes or villains in this movie.
  - 1: There are some lines of dialogue which reference events of these previous movies, but understanding the context
  of these lines of dialogue will not in any way affect your understanding of this movie.
  
