@@ -5,7 +5,8 @@ from MarvelTracker import Movie
 from graphics import *
 import csv
 
-RULE = "Recent"
+RULE = "Relevant"
+CURRENT_ANCESTOR_TIER = 0
 MOVIES = {}
 WIDTH = 1200
 HEIGHT = 600
@@ -65,7 +66,7 @@ def import_weighted_from_csv(file="MCUphase1to3-weighted.csv"):
 
 # this version considers every option, but is slow.
 # returns a list containing every graph which tied for first place
-def brute_force_subgraph_helper(excluded, included, n):
+def brute_force_subgraph_helper(excluded, included, n, children):
     global GRAPHS_CHECKED
     best_graphs = []
     if n == 0:
@@ -81,8 +82,11 @@ def brute_force_subgraph_helper(excluded, included, n):
         included_copy.append(movie)
         excluded_copy.remove(movie)
         best_graph_next_level = []
-        best_graph_next_level += brute_force_subgraph_helper(excluded_copy, included_copy, n-1)
-        weight = subgraph_weight(best_graph_next_level[0])
+        best_graph_next_level += brute_force_subgraph_helper(excluded_copy, included_copy, n-1, children)
+        if RULE == "Relevant" and CURRENT_ANCESTOR_TIER < 2:
+            weight = relevance_weight(list(set(best_graph_next_level[0]) - set(children)), children)
+        else:
+            weight = subgraph_weight(best_graph_next_level[0])
         if weight > max_weight:
             max_weight = weight
             best_graphs = best_graph_next_level.copy()
@@ -94,7 +98,7 @@ def brute_force_subgraph_helper(excluded, included, n):
     return best_graphs
 
 
-def tie_breaker(best_graphs, excluded):
+def tie_breaker(best_graphs, excluded, children):
     if len(best_graphs) == 1:
         return best_graphs[0]
     else:
@@ -108,7 +112,7 @@ def tie_breaker(best_graphs, excluded):
             for movie in graph:
                 if movie in excluded:
                     excluded_copy.remove(movie)
-            best_plus_one = tie_breaker(brute_force_subgraph_helper(excluded_copy, graph, 1), excluded)
+            best_plus_one = tie_breaker(brute_force_subgraph_helper(excluded_copy, graph, 1, children), excluded, children)
             weight = subgraph_weight(best_plus_one)
             if weight > max_weight:
                 max_weight = weight
@@ -122,10 +126,10 @@ def find_best_subgraph(watched, children, num_extras):
     nodes = children.copy()
     children_copy = children.copy()
     num_to_check = num_extras
-    if RULE == "Recent":
-        num_to_check = most_recent_prev_tree(nodes, watched, children_copy, num_extras)
-    else:
+    if RULE == "Interconnected":
         prev_tree(nodes, watched)
+    else:
+        num_to_check = limited_prev_tree(nodes, watched, children_copy, num_extras)
     for parent in watched:
         nodes.append(parent)
     included = watched + children_copy
@@ -137,8 +141,8 @@ def find_best_subgraph(watched, children, num_extras):
         for movie in nodes:
             if movie not in included:
                 excluded.append(movie)
-    best_graphs = brute_force_subgraph_helper(excluded, included, num_to_check)
-    return tie_breaker(best_graphs, excluded)
+    best_graphs = brute_force_subgraph_helper(excluded, included, num_to_check, children_copy)
+    return tie_breaker(best_graphs, excluded, children_copy)
 
 
 # NOTE: THIS FUNCTION MODIFIES NODES
@@ -156,16 +160,19 @@ def prev_tree(nodes, watched):
 # ancestors are broken up into generations. if multiple generations are included,
 # all ancestors from every generation will be included except for some ancestors from
 # the furthest back generation.
-def most_recent_prev_tree(nodes, watched, children, n):
+def limited_prev_tree(nodes, watched, children, n):
+    global CURRENT_ANCESTOR_TIER
     total_nodes = nodes.copy()
     original_children_count = len(children)
     current_level_nodes = nodes.copy()  # the list of nodes whose parents we are currently finding
     recently_added_nodes = []  # keeps track of movies currently being added to the list
     children_duplicates = []  # handles situation where a tier contains one of the other movies they wanted to watch
     while len(nodes) - original_children_count < n and len(current_level_nodes) > 0:
+        CURRENT_ANCESTOR_TIER = CURRENT_ANCESTOR_TIER + 1
+        children_duplicates.clear()
         children.extend(list(set(recently_added_nodes) - set(watched)))
         recently_added_nodes = []
-        prev_nodes = most_recent_tier(current_level_nodes)
+        prev_nodes = next_tier(current_level_nodes)
         for prev in prev_nodes:
             if prev not in recently_added_nodes and prev not in total_nodes:
                 recently_added_nodes.append(prev)
@@ -175,7 +182,7 @@ def most_recent_prev_tree(nodes, watched, children, n):
         current_level_nodes = recently_added_nodes + children_duplicates
         nodes.clear()
         nodes.extend(list(set(total_nodes) - set(watched)))
-    return n - (len(children) - original_children_count)
+    return n - (len(children) - original_children_count)  # number left to check will be n minus how many we've added
 
 
 # computes and returns the weight of the subgraph
@@ -188,6 +195,15 @@ def subgraph_weight(subgraph):
     return weight
 
 
+# determines weight of subgraph only by relevance to children
+def relevance_weight(parents, children):
+    weight = 0
+    for movie in children:
+        for prev in movie.prevs:
+            if prev[0] in parents:
+                weight += prev[1]
+    return weight
+
 # generates a watch order, excluding movies which have already been watched
 def watch_order(watched, subgraph):
     order = []
@@ -198,19 +214,22 @@ def watch_order(watched, subgraph):
 
 
 # returns the most recent ancestors of a movie
-def most_recent_tier(movies):
+def next_tier(movies):
     # step 1: find all nodes which are immediately relevant
     direct_predecessors = []
     for movie in movies:
-        direct_predecessors.extend(prev[0] for prev in movie.prevs if prev[0] not in direct_predecessors)
-    # step 2: generate family tree to discover if there will be missing pieces
-    nodes = movies.copy()
-    prev_tree(nodes, [])
-    nodes = list(set(nodes) - set(movies))
-    for film in nodes:
-        for prev in film.prevs:
-            if prev[0] in direct_predecessors:
-                direct_predecessors.remove(prev[0])
+        for prev in movie.prevs:
+            if prev[0] not in direct_predecessors and (prev[1] > 1 or RULE == "Recent"):
+                direct_predecessors.append(prev[0])
+    if RULE == "Recent":
+        # step 2: generate family tree to discover if there will be missing pieces
+        nodes = movies.copy()
+        prev_tree(nodes, [])
+        nodes = list(set(nodes) - set(movies))
+        for film in nodes:
+            for prev in film.prevs:
+                if prev[0] in direct_predecessors:
+                    direct_predecessors.remove(prev[0])
     return direct_predecessors
 
 
@@ -245,7 +264,7 @@ def draw_window():
             x_pos = 5'''
 
     # draw window
-    win = GraphWin(title="Most Interconnected MCU Watchlist", width=WIDTH, height=HEIGHT, autoflush=False)
+    win = GraphWin(title="MCU Watchlist Generator", width=WIDTH, height=HEIGHT, autoflush=False)
     win.setCoords(0, 180*HEIGHT/WIDTH, 180, 0)
     win.bind('<Motion>', motion)
     for movie in MOVIES.values():
@@ -281,6 +300,7 @@ def run_program(win):
     global REC_TEXT
     global CHANGED
     global CHILDREN
+    global CURRENT_ANCESTOR_TIER
     level = 1
     watched = []
     selected = watched
@@ -360,6 +380,7 @@ def run_program(win):
             if level == 4:
                 level = 3
                 GRAPHS_CHECKED = 0
+                CURRENT_ANCESTOR_TIER = 0
                 INSTRUCTION_TEXT.setText("How many additional movies are you willing to watch?")
                 BUTTONS["Next"]["Button"].draw(win)
                 BUTTONS["Next"]["Text"].draw(win)
