@@ -1,6 +1,6 @@
-""" Creates a GUI which allows user to specify which films they have seen and which films they
+''' Creates a GUI which allows user to specify which films they have seen and which films they
 would like to see, and gives them recommendations as to which movies they should watch in between.
-"""
+'''
 from MarvelTracker import Movie
 import Recommender as Rec
 from graphics import *
