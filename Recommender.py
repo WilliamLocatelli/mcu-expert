@@ -3,7 +3,7 @@
 from MarvelTracker import Movie
 import csv
 
-RULE = "Relevant"
+RULE = "Recent"
 CURRENT_ANCESTOR_TIER = 0
 MOVIES = {}
 GRAPHS_CHECKED = 0
