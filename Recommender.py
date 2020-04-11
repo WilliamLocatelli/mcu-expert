@@ -3,7 +3,7 @@
 from MarvelTracker import Movie
 import csv
 
-RULE = "Recent"
+RULE = "Relevant"
 CURRENT_ANCESTOR_TIER = 0
 MOVIES = {}
 GRAPHS_CHECKED = 0
@@ -66,9 +66,9 @@ def brute_force_subgraph_helper(excluded, included, n, children):
         best_graph_next_level = []
         best_graph_next_level += brute_force_subgraph_helper(excluded_copy, included_copy, n-1, children)
         if RULE == "Relevant" and CURRENT_ANCESTOR_TIER < 2:
-            weight = relevance_weight(list(set(best_graph_next_level[0]) - set(children)), children)
+            weight = subgraph_weight(list(set(best_graph_next_level[0]) - set(children)), children)
         else:
-            weight = subgraph_weight(best_graph_next_level[0])
+            weight = subgraph_weight(best_graph_next_level[0], best_graph_next_level[0])
         if weight > max_weight:
             max_weight = weight
             best_graphs = best_graph_next_level.copy()
@@ -95,7 +95,7 @@ def tie_breaker(best_graphs, excluded, children):
                 if movie in excluded:
                     excluded_copy.remove(movie)
             best_plus_one = tie_breaker(brute_force_subgraph_helper(excluded_copy, graph, 1, children), excluded, children)
-            weight = subgraph_weight(best_plus_one)
+            weight = subgraph_weight(best_plus_one, best_plus_one)
             if weight > max_weight:
                 max_weight = weight
                 best_graph = graph
@@ -133,7 +133,7 @@ def find_best_subgraph(watched, children, num_extras):
     return result
 
 
-# NOTE: THIS FUNCTION MODIFIES NODES
+# NOTE: THIS FUNCTION MODIFIES THE LIST NODES
 # generates subgraph containing all ancestors of every node in nodes
 def prev_tree(nodes, watched):
     for movie in nodes:
@@ -143,7 +143,7 @@ def prev_tree(nodes, watched):
                 prev_tree(nodes, watched)
 
 
-# NOTE: THIS FUNCTION MODIFIES NODES AND CHILDREN
+# NOTE: THIS FUNCTION MODIFIES THE LISTS NODES AND CHILDREN
 # generates a limited ancestor tree, containing only more recent ancestors
 # ancestors are broken up into generations. if multiple generations are included,
 # all ancestors from every generation will be included except for some ancestors from
@@ -173,24 +173,17 @@ def limited_prev_tree(nodes, watched, children, n):
     return n - (len(children) - original_children_count)  # number left to check will be n minus how many we've added
 
 
-# computes and returns the weight of the subgraph
-def subgraph_weight(subgraph):
-    weight = 0
-    for movie in subgraph:
-        for prev in movie.prevs:
-            if prev[0] in subgraph:
-                weight += prev[1]
-    return weight
-
-
-# determines weight of subgraph only by relevance to children
-def relevance_weight(parents, children):
+# computes and returns the weight of all links between set parents and set children
+# if the same set is passed for parents and children, it will compute the weight of
+# all links between all elements in the set
+def subgraph_weight(parents, children):
     weight = 0
     for movie in children:
         for prev in movie.prevs:
             if prev[0] in parents:
                 weight += prev[1]
     return weight
+
 
 # generates a watch order, excluding movies which have already been watched
 def watch_order(watched, subgraph):
