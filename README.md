@@ -1,8 +1,8 @@
 # mcu-tracker
 Program for exploring the watch order of the MCU.
-Run MarvelTracker.py to explore the interactive MCU watch-through, which follows strict rules with regards to when you 
+Run _MarvelTracker.py_ to explore the interactive MCU watch-through, which follows strict rules with regards to when you 
 are allowed to watch certain movies.
-Run RecommenderGUI.py to see what movies you should watch in between other movies.
+Run _RecommenderGUI.py_ to see what movies you should watch in between other movies.
 
 ## Rules for choosing edge weights
 Edge weights are chosen based on two criteria: internal references to previous movies, and external definition of 
@@ -10,30 +10,30 @@ relationship to previous movies.
 
 External definition:
  * 10: This movie is explicitly defined as a direct sequel to the previous movie 
-   * Example: Iron Man - Iron Man 2
+   * Example: _Iron Man_ - _Iron Man 2_
  * 5: This movie is explicitly defined as a sequel to the previous movie, but not a direct sequel.
-   * Example: Iron Man - Iron Man 3
+   * Example: _Iron Man_ - _Iron Man 3_
  
 Internal references:
  * 10: The way the viewer understands most or all of this movie will depend on whether they have seen this previous 
  movie.
-   * Example: Captain America: Civil War is not explicitly a sequel to Avengers: Age of Ultron, but many of the actions
-  characters take in this film, from the creation of the Sokovia accords to Clint's willingness to break the law and
-  come out of retirement to rescue Wanda, directly stem from the events of Age of Ultron.
+   * Example: _Captain America: Civil War_ is not explicitly a sequel to _Avengers: Age of Ultron_, but many of the 
+   actions characters take in this film, from the creation of the Sokovia accords to Clint's willingness to break the 
+   law and come out of retirement to rescue Wanda, directly stem from the events of _Age of Ultron_.
  * 5: Some scenes or plot points in this movie will be understood very differently by the viewer if they have seen this 
  previous movie.
-   * Example: Spider-Man: Far From Home contains a flashback to Iron Man ("Tony Stark was able to build this in a 
-   cave!") and several callbacks to Iron Man (such as when Peter designs the suit) which support the perception of 
+   * Example: _Spider-Man: Far From Home_ contains a flashback to _Iron Man_ ("Tony Stark was able to build this in a 
+   cave!") and several callbacks to _Iron Man_ (such as when Peter designs the suit) which support the perception of 
    Peter as "the new Iron Man". However, the majority of each of these films has little to do with the other.
  * 5: This previous movie was the most recent appearance of one or more of the characters in this movie.
-   * Example: Black Panther was the most recent appearance of Black Panther before Avengers: Infinity War.
+   * Example: _Black Panther_ was the most recent appearance of Black Panther before _Avengers: Infinity War_.
  * 1: There are some brief moments which reference events of these previous movies, but understanding the context
  of these moments will not in any way affect your understanding of this movie.
-   * Example: In Iron Man 3, Aldrich Killian says "Ever since that big dude with the hammer fell out of the sky, 
-   subtlety has kind of had its day." This quote directly references Thor, but it in no way impacts a viewer's 
+   * Example: In _Iron Man 3_, Aldrich Killian says "Ever since that big dude with the hammer fell out of the sky, 
+   subtlety has kind of had its day." This quote directly references _Thor_, but it in no way impacts a viewer's 
    understanding or interpretation of the scene.
  
-There is one more criterion that currently only applies to Infinity War/Endgame:
+There is one more criterion that currently only applies to _Infinity War_/_Endgame_:
  
  * 20: These 2 movies were conceived of, planned, and written at the same time, and for all intents and purposes can be 
  seen as 2 halves of the same story
@@ -61,7 +61,7 @@ there are no intermediate movies that also connect to this movie.
 
 Thus, all ancestors in the 1st "most recent" tier of a movie will also be in that movie's 1st "most relevant" tier.
 However, some movies in the "most relevant" tier might not be in the "most recent" tier.
- * Example: Age of Ultron's "most relevant" tier would include both _The Winter Soldier_ and _The Avengers_. However,
+ * Example: _Age of Ultron_'s "most relevant" tier would include both _The Winter Soldier_ and _The Avengers_. However,
  since _Winter Soldier_ takes place between _The Avengers_ and _Age of Ultron_, _The Avengers_ would be excluded from
  _Age of Ultron_'s "most recent" tier.
  
@@ -73,5 +73,6 @@ interconnected experience overall. Note that the tier will still consist of the 
 to all movies in the first tier; the interconnectivity algorithm will merely be used to choose which of these to
 recommend. The same applies for third tier, fourth tier, etc.
  
-###Most Interconnected
+### Most Interconnected
+
 This algorithm simply generates a tree of all ancestors of this movie.
