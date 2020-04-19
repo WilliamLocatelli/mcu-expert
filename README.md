@@ -15,11 +15,14 @@ External definition:
    * Example: _Iron Man_ - _Iron Man 3_
  
 Internal references:
- * 10: The way the viewer understands most or all of this movie will depend on whether they have seen this previous 
- movie.
+ * 10: The way the viewer understands most or all of this movie will depend on whether they have seen most or all of
+ this previous movie.
    * Example: _Captain America: Civil War_ is not explicitly a sequel to _Avengers: Age of Ultron_, but many of the 
    actions characters take in this film, from the creation of the Sokovia accords to Clint's willingness to break the 
    law and come out of retirement to rescue Wanda, directly stem from the events of _Age of Ultron_.
+ * 5: Something that is a BIG part of this movie relates back to something that is a SMALL part of the previous movie.
+   * Example: Thanos's desire for infinity stones and relationship with his daughters is a very small part of _Guardians
+   of the Galaxy_, but that small bit of _Guardians of the Galaxy_ is hugely important to _Avengers: Infinity War_.
  * 5: Some scenes or plot points in this movie will be understood very differently by the viewer if they have seen this 
  previous movie.
    * Example: _Spider-Man: Far From Home_ contains a flashback to _Iron Man_ ("Tony Stark was able to build this in a 

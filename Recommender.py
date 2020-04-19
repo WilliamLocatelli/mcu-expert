@@ -46,6 +46,21 @@ def import_weighted_from_csv(file="MCUphase1to3-weighted.csv"):
     MOVIES = all_movies
 
 
+def import_data_from_csv(file="data.csv"):
+    csv_rows = []
+    with open(file, newline='', encoding='utf-8-sig') as csvfile:
+        reader = csv.reader(csvfile, delimiter=',', quotechar='|')
+        for row in reader:
+            csv_rows.append(row)
+    i = 1  # skip the title row
+    movie_count = len(csv_rows)
+    while i < movie_count:
+        row = csv_rows[i]
+        this_movie = MOVIES[row[0]]
+        this_movie.rt_score = row[1]
+        i += 1
+
+
 # this version considers every option, but is slow.
 # returns a list containing every graph which tied for first place
 def brute_force_subgraph_helper(excluded, included, n, children):
@@ -84,9 +99,13 @@ def tie_breaker(best_graphs, excluded, children):
     if len(best_graphs) == 1:
         return best_graphs[0]
     else:
-        print("number of equally good choices: " + str(len(best_graphs)))
+        '''print("\nnumber of equally good choices: " + str(len(best_graphs)))
+        print("the options are:")
+        for graph in best_graphs:
+            print(",".join(movie.name for movie in graph))'''
         best_graph = None
-        max_weight = 0
+        max_score = 0
+        '''max_weight = 0
         # find best of bests
         for graph in best_graphs:
             # create new list of excluded movies
@@ -99,7 +118,28 @@ def tie_breaker(best_graphs, excluded, children):
             if weight > max_weight:
                 max_weight = weight
                 best_graph = graph
-        # choose the subgraph of highest weight
+        # choose the subgraph of highest weight'''
+        best_graphs_2 = []
+        for graph in best_graphs:
+            score = sum(int(movie.rt_score) for movie in graph)
+            if score > max_score:
+                best_graphs_2 = [graph]
+                best_graph = graph
+                max_score = score
+            elif score == max_score:
+                best_graphs_2.append(graph)
+        if len(best_graphs_2) > 1:
+            max_score = 0
+            for graph in best_graphs_2:
+                score = 0
+                for movie in graph:
+                    movie_score = sum(int(prev[1]) for prev in movie.prevs)
+                    score += movie_score
+                if score > max_score:
+                    best_graph = graph
+                    max_score = score
+                elif score == max_score:
+                    print("not rigorous enough")
         return best_graph
 
 
@@ -128,8 +168,6 @@ def find_best_subgraph(watched, children, num_extras):
     best_graphs = brute_force_subgraph_helper(excluded, included, num_to_check, children_copy)
     result = tie_breaker(best_graphs, excluded, children_copy)
     print("graphs checked: " + str(GRAPHS_CHECKED))
-    GRAPHS_CHECKED = 0
-    CURRENT_ANCESTOR_TIER = 0
     return result
 
 

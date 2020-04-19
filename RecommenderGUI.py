@@ -165,6 +165,8 @@ def run_program(win):
             # stage 4-->stage 3
             if level == 4:
                 level = 3
+                Rec.GRAPHS_CHECKED = 0
+                Rec.CURRENT_ANCESTOR_TIER = 0
                 INSTRUCTION_TEXT.setText("How many additional movies are you willing to watch?")
                 BUTTONS["Next"]["Button"].draw(win)
                 BUTTONS["Next"]["Text"].draw(win)
@@ -256,5 +258,6 @@ def motion(event):
 
 if __name__ == '__main__':
     Rec.import_weighted_from_csv()
+    Rec.import_data_from_csv()
     win = draw_window()
     run_program(win)
