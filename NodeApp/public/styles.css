@@ -1,0 +1,84 @@
+body {
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    align-items: center;
+}
+
+#main {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+#instructions {
+    background: #fffc94;
+    width: 200px;
+    margin: 20px;
+    border-radius: 3px;
+}
+
+#options {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+p {
+    text-align: center;
+}
+
+h2 {
+    font-weight: bold;
+    font-size: 20px;
+    text-align: center;
+}
+
+#movies {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+#movies p {
+    width: 120px;
+    height: 50px;
+    padding: 15px;
+    border-style: solid;
+    border-radius: 3px;
+    border-width: 1px;
+    margin: 10px;
+    text-align: center;
+}
+
+#movies p:hover {
+    background-color: lightblue;
+}
+
+#count {
+    align-self: center;
+}
+
+.hidden, #options.hidden {
+    display: none;
+}
+
+.selected {
+    background-color: lightgreen;
+    /*outline: 2px solid black;*/
+}
+
+.disabled {
+    pointer-events: none;
+}
+
+.wantToSee {
+    background-color: #ffba69;
+}
+
+.seen {
+    background-color: #84fffa;
+}

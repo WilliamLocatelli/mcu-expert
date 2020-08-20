@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="MarvelTracker.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <title>What MCU Movies Should I Watch?</title>
+</head>
+<body>
+<h1>What MCU Movies Should I Watch?</h1>
+<div id="main">
+    <div id="instructions">
+        <h2>Step 1: Select the movies you've already seen</h2>
+        <div id="options" class="hidden">
+            <p>How many additional movies are you willing to watch?</p>
+            <input type="number" id="count" min=1 max=23><br>
+            <p>Heuristic for choosing films</p>
+            <div id="buttons">
+                <div>
+                    <input type="radio" id="inter" name="heuristic" value="Interconnected" checked>
+                    <label for="inter">Most Interconnected</label>
+                </div>
+                <div>
+                    <input type="radio" id="rel" name="heuristic" value="Relevant">
+                    <label for="rel">Most Relevant</label>
+                </div>
+                <div>
+                    <input type="radio" id="rec" name="heuristic" value="Recent">
+                    <label for="rec">Most Recent</label>
+                </div>
+            </div>
+        </div>
+        <button id="previous" disabled>Previous</button>
+        <button id="next">Next</button>
+    </div>
+    <div id="movies"></div>
+</div>
+</body>
+</html>
