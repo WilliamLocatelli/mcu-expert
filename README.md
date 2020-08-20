@@ -41,7 +41,7 @@ There is one more criterion that currently only applies to _Infinity War_/_Endga
  * 20: These 2 movies were conceived of, planned, and written at the same time, and for all intents and purposes can be 
  seen as 2 halves of the same story
  
-The weight of an edge will always be equal to the highest weight criteria in this list that applies.
+The weight of an edge will always be equal to the highest weight criterion in this list that applies.
  
 ## Algorithms
 Each algorithm has 2 steps: 
