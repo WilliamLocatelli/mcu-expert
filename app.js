@@ -50,7 +50,7 @@ app.get('/main/', async function(req, res) {
 app.post('/results/', async function (req, res) {
     try {
         const python = spawn('python', [path.join(__dirname, 'LaunchScript.py'), req.body.options]);
-        let dataToSend = "[no data]";
+        let dataToSend = '["no data"]\n';
         python.stdout.on('data', (data) => {
             console.log('Pipe data from python script ...');
             dataToSend = data.toString();
