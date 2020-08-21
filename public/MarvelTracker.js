@@ -117,6 +117,9 @@
     }
 
     function submit() {
+        document.querySelector("h2").textContent = "Processing...";
+        document.getElementById("next").disabled = true;
+        document.getElementById("previous").disabled = true;
         let body = new FormData;
         let options = {};
         options['parents'] = JSON.parse(stringifyMovieList(seenBefore));
@@ -180,6 +183,7 @@
         document.getElementById("options").classList.add("hidden");
         recs.classList.remove("hidden");
         document.getElementById("next").disabled = true;
+        document.getElementById("previous").disabled = false;
         document.getElementById("previous").removeEventListener("click", backto2);
         document.getElementById("previous").addEventListener("click", backto3);
     }
