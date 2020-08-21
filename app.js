@@ -1,5 +1,6 @@
 'use strict';
 
+const path = require('path')
 const express = require('express');
 const {spawn} = require('child_process');
 const app = express();
@@ -35,8 +36,23 @@ app.get('/main/', async function(req, res) {
     }
 });
 
-app.get('/results', async function (req, res) {
+app.post('/results/', async function (req, res) {
+    const python = spawn('python', [path.join(__dirname, 'LaunchScript.py'), req.body.options]);
+    let dataToSend = "no data";
+    python.stdout.on('data', (data) => {
+        console.log('Pipe data from python script ...');
+        dataToSend = data.toString();
+    });
 
+    python.stderr.on('data', (data) => {
+        console.log(`error:${data}`);
+    });
+    python.on('close', (code) => {
+        console.log(`child process close all stdio with code ${code}`);
+        // send data to frontend
+        res.text;
+        res.send(dataToSend.substring(0, dataToSend.length - 1));
+    });
 });
 
 async function getDBConnection() {

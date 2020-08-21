@@ -14,9 +14,10 @@ body {
 
 #instructions {
     background: #fffc94;
-    width: 200px;
+    width: 400px;
+    padding: 20px;
     margin: 20px;
-    border-radius: 3px;
+    border-radius: 10px;
 }
 
 #options {
@@ -81,4 +82,12 @@ h2 {
 
 .seen {
     background-color: #84fffa;
+}
+
+#recs {
+    white-space: pre-line;
+}
+
+.recommended {
+    background-color: #fffe6a;
 }

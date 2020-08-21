@@ -1,9 +1,9 @@
 ''' Creates a GUI which allows user to specify which films they have seen and which films they
 would like to see, and gives them recommendations as to which movies they should watch in between.
 '''
-from MarvelTracker import Movie
-import Recommender as Rec
-from graphics import *
+from ProcessData.MarvelTracker import Movie
+from ProcessData import Recommender as Rec
+from ProcessData.graphics import *
 
 WIDTH = 1200
 HEIGHT = 600
@@ -141,7 +141,7 @@ def run_program(win):
                     if CHANGED or not NUM_CHOSEN == int(input_box.getText()):
                         CHANGED = False
                         NUM_CHOSEN = int(input_box.getText())
-                        subgraph = Rec.find_best_subgraph(watched, CHILDREN, NUM_CHOSEN)
+                        subgraph = Rec.find_best_subgraph(watched, CHILDREN, NUM_CHOSEN, "Interconnected")
                         order = Rec.watch_order(watched, subgraph)
                         #watched_string = "Already Watched:\n" + "\n".join(t.name for t in watched)
                         rec_string = "\nRecommended Watchlist:\n" + "\n\n".join(order)

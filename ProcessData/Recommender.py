@@ -1,9 +1,9 @@
 """ Main code for the recommendation algorithm.
 """
-from MarvelTracker import Movie
+from ProcessData.MarvelTracker import Movie
 import csv
 
-RULE = "Recent"
+RULE = "Relevant"
 CURRENT_ANCESTOR_TIER = 0
 MOVIES = {}
 GRAPHS_CHECKED = 0
@@ -11,7 +11,7 @@ NUM_TIES = 0
 
 
 # takes in a CSV file, sets global variables for movies
-def import_weighted_from_csv(file="MCUphase1to3-weighted.csv"):
+def import_weighted_from_csv(file="ProcessData/MCUphase1to3-weighted.csv"):
     # put all the rows of the csv file into a list
     csv_rows = []
     with open(file, newline='', encoding='utf-8-sig') as csvfile:
@@ -46,7 +46,7 @@ def import_weighted_from_csv(file="MCUphase1to3-weighted.csv"):
     MOVIES = all_movies
 
 
-def import_data_from_csv(file="data.csv"):
+def import_data_from_csv(file="ProcessData/data.csv"):
     csv_rows = []
     with open(file, newline='', encoding='utf-8-sig') as csvfile:
         reader = csv.reader(csvfile, delimiter=',', quotechar='|')
@@ -133,8 +133,7 @@ def tie_breaker(best_graphs, excluded, children):
             for graph in best_graphs_2:
                 score = 0
                 for movie in graph:
-                    movie_score = sum(int(prev[1]) for prev in movie.prevs)
-                    score += movie_score
+                    score += sum(int(prev[1]) for prev in movie.prevs)
                 if score > max_score:
                     best_graph = graph
                     max_score = score
@@ -143,8 +142,24 @@ def tie_breaker(best_graphs, excluded, children):
         return best_graph
 
 
+# for use by web app Launch Script
+def get_objects_and_find_best_subgraph(watched, children, num_extras, rule):
+    watched_movies = []
+    child_movies = []
+    for movie in watched:
+        if movie in MOVIES.keys():
+            watched_movies.append(MOVIES[movie])
+    for movie in children:
+        if movie in MOVIES.keys():
+            child_movies.append(MOVIES[movie])
+    result = find_best_subgraph(watched_movies, child_movies, num_extras, rule);
+    return watch_order(watched_movies, result)
+
+
 # find the n best other movies to watch if you've watched the watched and want to watch the children
-def find_best_subgraph(watched, children, num_extras):
+def find_best_subgraph(watched, children, num_extras, rule):
+    global RULE
+    RULE = rule
     global GRAPHS_CHECKED
     global CURRENT_ANCESTOR_TIER
     nodes = children.copy()
@@ -167,7 +182,7 @@ def find_best_subgraph(watched, children, num_extras):
                 excluded.append(movie)
     best_graphs = brute_force_subgraph_helper(excluded, included, num_to_check, children_copy)
     result = tie_breaker(best_graphs, excluded, children_copy)
-    print("graphs checked: " + str(GRAPHS_CHECKED))
+    # print("graphs checked: " + str(GRAPHS_CHECKED))
     return result
 
 

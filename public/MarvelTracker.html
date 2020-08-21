@@ -13,23 +13,25 @@
         <h2>Step 1: Select the movies you've already seen</h2>
         <div id="options" class="hidden">
             <p>How many additional movies are you willing to watch?</p>
-            <input type="number" id="count" min=1 max=23><br>
+            <input type="number" id="count" min=1 max=23 value=1><br>
             <p>Heuristic for choosing films</p>
             <div id="buttons">
                 <div>
-                    <input type="radio" id="inter" name="heuristic" value="Interconnected" checked>
-                    <label for="inter">Most Interconnected</label>
-                </div>
-                <div>
-                    <input type="radio" id="rel" name="heuristic" value="Relevant">
+                    <input type="radio" id="rel" name="heuristic" value="Relevant" checked>
                     <label for="rel">Most Relevant</label>
                 </div>
                 <div>
                     <input type="radio" id="rec" name="heuristic" value="Recent">
                     <label for="rec">Most Recent</label>
                 </div>
+                <div>
+                    <input type="radio" id="inter" name="heuristic" value="Interconnected">
+                    <label for="inter">Most Interconnected</label>
+                    <p>Note: Most Interconnected can take up to 30 seconds if requesting 8 to 17 films</p>
+                </div>
             </div>
         </div>
+        <p id="recs" class="hidden"></p>
         <button id="previous" disabled>Previous</button>
         <button id="next">Next</button>
     </div>

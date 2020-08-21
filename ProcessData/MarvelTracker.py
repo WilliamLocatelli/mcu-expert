@@ -3,7 +3,7 @@ MCU watch-through, following strict rules with regards to when you
 are allowed to watch certain movies.
 """
 
-from graphics import *
+from ProcessData.graphics import *
 import csv
 
 root = []
