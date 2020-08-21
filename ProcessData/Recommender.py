@@ -1,6 +1,6 @@
 """ Main code for the recommendation algorithm.
 """
-from ProcessData.MarvelTracker import Movie
+#from ProcessData.MarvelTracker import Movie
 import csv
 
 RULE = "Relevant"
@@ -265,3 +265,27 @@ def next_tier(movies):
                 if prev[0] in direct_predecessors and prev[1] > 1:
                     direct_predecessors.remove(prev[0])
     return direct_predecessors
+
+# COPIED FROM MARVELTRACKER
+# create a class for movies. each movie will be at a certain point and have a name. clicking on the movie will make it
+# do stuff.
+class Movie:
+    first = None
+    open = []
+    selected = []
+    # if this is the main program, create the window
+    if __name__ == '__main__':
+        win = GraphWin(width=500, height=700, title="MCU Tracker", autoflush=False)
+        win.setCoords(0, 0, 100, 140)
+
+    def __init__(self, name, rank1=0, rank2=0, rank3=0, series=""):
+        self.selected = False  # whether or not this movie has been marked as watched
+        self.prevs = []  # the parents of this movie
+        self.seqs = []  # the children of this movie
+        self.p1 = None
+        self.p2 = None
+        self.my_square = None
+        self.name = name  # the name of the movie
+        self.prevs_selected = False  # whether or not all of this movies parents have been marked as watched
+        self.rank = [rank1, rank2, rank3]
+        self.series = series
