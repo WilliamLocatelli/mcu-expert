@@ -20,7 +20,9 @@
     function screen2() {
         document.getElementById("next").removeEventListener("click", screen2);
         document.getElementById("next").addEventListener("click", screen3);
+        document.getElementById("previous").removeEventListener("click", reset);
         document.getElementById("previous").addEventListener("click", backto1);
+        document.getElementById("previous").textContent = "Previous";
         document.querySelector("h2").textContent = "Step 2. Select the movies you're interested in seeing";
         seenBefore = document.querySelectorAll(".selected");
         for (let i = 0; i < seenBefore.length; i++) {
@@ -77,9 +79,27 @@
             seenBefore[i].classList.add("selected");
             seenBefore[i].classList.remove("seen");
         }
-        document.getElementById('previous').disabled = true;
+        document.getElementById('previous').textContent = "Reset";
+        document.getElementById("previous").addEventListener("click", reset);
         document.getElementById("next").removeEventListener("click", screen3);
         document.getElementById("next").addEventListener("click", screen2);
+    }
+
+    function reset() {
+        seenBefore = null;
+        wantToSee = null;
+        numToSearch = 0;
+        rule = null;
+        let allMovies = document.querySelectorAll("#movies p");
+
+        for (let i = 0; i < allMovies.length; i++) {
+            allMovies[i].classList.remove("selected");
+            allMovies[i].classList.remove("disabled");
+            allMovies[i].classList.remove("wantToSee");
+            allMovies[i].classList.remove("seen");
+            allMovies[i].classList.remove("recommended");
+        }
+        document.getElementById('previous').disabled = true;
     }
 
     function backto2() {

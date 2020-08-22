@@ -2,7 +2,7 @@ body {
     width: 50%;
 }
 
-p, ul {
+p, ul, ol {
     line-height: 150%;
 }
 

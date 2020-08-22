@@ -46,11 +46,24 @@
     <h3>How Do The Algorithms Work?</h3>
     <p>The set of films is modeled as a directed acyclic weighted graph, where each vertex represents a film. Connections
     between the films are represented as edges between the vertices, with stronger connections having higher weights.
-    The way the films are selected from this graph is dependent on which heuristic you choose.</p>
+    The way the films are selected from this graph is dependent on which heuristic you choose.
+    </p>
     <h4>How are the weights chosen?</h4>
     <p>The weights are based on a highly subjective scale, which is based on my highly subjective evaluation
         of the relevance of each film to each other film. In order to try to reduce the subjectivity of the weights, I
         standardized them as best as I could. For the full set of weight rules, click <a href="Weights.html">here</a>.
+    </p>
+    <h4>How are ties broken?</h4>
+    <p>Within the algorithm, ties are generally broken by the little microconnections between movies, which are given a
+    weight of 1 for this purpose. However, sometimes 2 or 3 sets of movies end up being equally good based on the
+    metrics used here. These ties are broken by a series of 3 metrics:
+    <ol>
+        <li>Which set of movies has the highest weight if we ignore the movies you've already seen?</li>
+        <li>Which movies have the highest Rotten Tomatoes scores? (As this is designed for more casual viewers,
+        if 2 sets of movies are equally relevant, you might as well pick the movies considered the best.)</li>
+        <li>Which movies are connected to the most other movies, including movies you aren't going to be recommended?</li>
+    </ol>
+    </p>
     <footer>©2020 William Locatelli.</footer>
 </body>
 </html>
