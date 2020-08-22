@@ -95,7 +95,7 @@ def brute_force_subgraph_helper(excluded, included, n, children):
     return best_graphs
 
 
-def tie_breaker(best_graphs, excluded, children):
+def tie_breaker(best_graphs, excluded, children, parents):
     if len(best_graphs) == 1:
         return best_graphs[0]
     else:
@@ -120,14 +120,34 @@ def tie_breaker(best_graphs, excluded, children):
                 best_graph = graph
         # choose the subgraph of highest weight'''
         best_graphs_2 = []
-        for graph in best_graphs:
-            score = sum(int(movie.rt_score) for movie in graph)
+        # choose subgraph of highest weight when parents are removed
+        i = 0
+        best_graphs_no_parents = []
+        while i < len(best_graphs):
+            best_graphs_no_parents.append(list(set(best_graphs[i]) - set(parents)))
+            i += 1
+        i = 0
+        while i < len(best_graphs):
+            score = subgraph_weight(best_graphs_no_parents[i], best_graphs_no_parents[i])
             if score > max_score:
-                best_graphs_2 = [graph]
-                best_graph = graph
+                best_graphs_2 = [best_graphs[i]]
+                best_graph = best_graphs[i]
                 max_score = score
             elif score == max_score:
-                best_graphs_2.append(graph)
+                best_graphs_2.append(best_graphs[i])
+            i += 1
+        # if not enough, choose subgraph of highest cumulative RT score
+        if len(best_graphs_2) > 1:
+            max_score = 0
+            for graph in best_graphs:
+                score = sum(int(movie.rt_score) for movie in graph)
+                if score > max_score:
+                    best_graphs_2 = [graph]
+                    best_graph = graph
+                    max_score = score
+                elif score == max_score:
+                    best_graphs_2.append(graph)
+        # if that wasn't enough, choose subgraph of highest cumulative weight of ancestors
         if len(best_graphs_2) > 1:
             max_score = 0
             for graph in best_graphs_2:
@@ -181,7 +201,7 @@ def find_best_subgraph(watched, children, num_extras, rule):
             if movie not in included:
                 excluded.append(movie)
     best_graphs = brute_force_subgraph_helper(excluded, included, num_to_check, children_copy)
-    result = tie_breaker(best_graphs, excluded, children_copy)
+    result = tie_breaker(best_graphs, excluded, children_copy, watched)
     # print("graphs checked: " + str(GRAPHS_CHECKED))
     return result
 
