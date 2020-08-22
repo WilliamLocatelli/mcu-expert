@@ -5,6 +5,27 @@ body {
     align-items: center;
 }
 
+a {
+    color: #575757;
+    text-decoration: none;
+}
+
+a:hover {
+    color: gray;
+}
+
+footer {
+    margin: 10px;
+}
+
+#movies div {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    margin: 3px;
+    border-radius: 3px;
+}
+
 #main {
     display: flex;
     flex-direction: row;
@@ -53,6 +74,7 @@ h2 {
     border-width: 1px;
     margin: 10px;
     text-align: center;
+    background: white;
 }
 
 #movies p:hover {
@@ -67,20 +89,20 @@ h2 {
     display: none;
 }
 
-.selected {
+#movies p.selected {
     background-color: lightgreen;
     /*outline: 2px solid black;*/
 }
 
-.disabled {
+#movies p.disabled {
     pointer-events: none;
 }
 
-.wantToSee {
+#movies p.wantToSee {
     background-color: #ffba69;
 }
 
-.seen {
+#movies p.seen {
     background-color: #84fffa;
 }
 
@@ -88,6 +110,10 @@ h2 {
     white-space: pre-line;
 }
 
-.recommended {
+#movies p.recommended {
     background-color: #fffe6a;
+}
+
+.requested {
+    font-style: italic;
 }

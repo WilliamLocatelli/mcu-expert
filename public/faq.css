@@ -1,0 +1,11 @@
+body {
+    width: 50%;
+}
+
+p, ul {
+    line-height: 150%;
+}
+
+h4 {
+    text-align: center;
+}

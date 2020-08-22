@@ -108,6 +108,7 @@
     function backto3() {
         document.getElementById("options").classList.remove("hidden");
         document.getElementById("recs").classList.add("hidden");
+        document.getElementById("recs").innerHTML = "";
         document.querySelector("h2").textContent = "Step 3. Options";
 
         document.getElementById("next").disabled = false;
@@ -139,7 +140,8 @@
     }
 
     function displayError(res) {
-        document.getElementById("error").textContent = res;
+        document.getElementById("error").textContent = "Error occurred, please refresh. \n" + res;
+        document.getElementById("error").classList.remove("hidden");
     }
 
     function stringifyMovieList(list) {
@@ -163,11 +165,10 @@
         // must replace ' with " or else JSON won't parse
         let films = JSON.parse(response.replace(/'/g, '"'));
         let recs = document.getElementById("recs");
-        let result = "";
+        //let result = "";
         for (let i = 0; i < films.length; i++) {
+            let result = document.createElement("p");
             let movie = films[i];
-            // Add this movie to the list
-            result += ("\n\n" + movie);
             // highlight this movie in the graphics
             let movieObj = document.getElementById(cleanString(movie));
             let requested = false;
@@ -178,12 +179,15 @@
             }
             if (!requested) {
                 movieObj.classList.add("recommended");
+            } else {
+                result.classList.add("requested");
             }
+            result.textContent = movie;
+            recs.appendChild(result);
         }
-        recs.textContent = result;
 
         // update instructions box
-        document.querySelector("h2").textContent = "Results";
+        document.querySelector("h2").textContent = "Watchlist:";
         document.getElementById("options").classList.add("hidden");
         recs.classList.remove("hidden");
         document.getElementById("next").disabled = true;

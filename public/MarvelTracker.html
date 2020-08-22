@@ -7,36 +7,37 @@
     <title>Which MCU Movies Should I Watch?</title>
 </head>
 <body>
-<h1>Which MCU Movies Should I Watch?</h1>
-<p id="error"></p>
-<div id="main">
-    <div id="instructions">
-        <h2>Step 1: Select the movies you've already seen</h2>
-        <div id="options" class="hidden">
-            <p>How many additional movies are you willing to watch?</p>
-            <input type="number" id="count" min=1 max=23 value=1><br>
-            <p>Heuristic for choosing films</p>
-            <div id="buttons">
-                <div>
-                    <input type="radio" id="rel" name="heuristic" value="Relevant" checked>
-                    <label for="rel">Most Relevant</label>
-                </div>
-                <div>
-                    <input type="radio" id="rec" name="heuristic" value="Recent">
-                    <label for="rec">Most Recent</label>
-                </div>
-                <div>
-                    <input type="radio" id="inter" name="heuristic" value="Interconnected">
-                    <label for="inter">Most Interconnected</label>
-                    <p>Note: Most Interconnected can take up to 30 seconds if requesting 8 to 17 films</p>
+    <h1>Which MCU Movies Should I Watch?</h1>
+    <p id="error" class="hidden"></p>
+    <div id="main">
+        <div id="instructions">
+            <h2>Step 1: Select the movies you've already seen</h2>
+            <div id="options" class="hidden">
+                <p>How many additional movies are you willing to watch?</p>
+                <input type="number" id="count" min=1 max=23 value=1><br>
+                <p>Heuristic for choosing films</p>
+                <div id="buttons">
+                    <div>
+                        <input type="radio" id="rel" name="heuristic" value="Relevant" checked>
+                        <label for="rel">Most Relevant</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="rec" name="heuristic" value="Recent">
+                        <label for="rec">Most Recent</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="inter" name="heuristic" value="Interconnected">
+                        <label for="inter">Most Interconnected</label>
+                        <p>Note: Most Interconnected can take up to 30 seconds if requesting 8 to 17 films</p>
+                    </div>
                 </div>
             </div>
+            <div id="recs" class="hidden"></div>
+            <button id="previous" disabled>Previous</button>
+            <button id="next">Next</button>
         </div>
-        <p id="recs" class="hidden"></p>
-        <button id="previous" disabled>Previous</button>
-        <button id="next">Next</button>
+        <div id="movies"></div>
     </div>
-    <div id="movies"></div>
-</div>
+    <footer>©2020 William Locatelli ◦ <a href="FAQ.html">FAQ</a></footer>
 </body>
 </html>

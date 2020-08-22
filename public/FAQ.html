@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="faq.css">
+    <title>Frequently Asked Questions</title>
+</head>
+<body>
+    <h1>Which MCU Movies Should I Watch?</h1>
+    <h2>Frequently Asked Questions</h2>
+    <header><a href="MarvelTracker.html"><em>Return to Main Page</em></a></header>
+    <h3>What is the Point of This App?</h3>
+    <p>There are 23 movies and counting in the Marvel Cinematic Universe. You may have have seen a few of them, and
+        there may be a few you want to see. (If you want to watch all 23 movies, this app is pointless for you!!)
+        When you watch the movies you've been wanting to see, you probably will want to have seen a few other movies
+        first so you have proper context for the movies you're watching. This app will give you recommendations for
+        which other movies to watch first.</p>
+    <h4>Why Did I Get Fewer Movies Than I Requested?</h4>
+    <p>The algorithms recommend you movies to watch before you watch your selected movies. You will never be recommended
+    movies released after your newest selected movie, which can result in fewer recommendations
+    than you requested.</p>
+    <h3>What Does Each Heuristic Do?</h3>
+    <h4>Most Interconnected</h4>
+    <p>Selecting the Most Interconnected option will get you a set of movies which have characters, plotlines, etc that
+        are all highly interconnected with the movies you've seen, the movies you want to watch, and each other. Note:
+        if the movies you want to watch are not highly interconnected with many other movies, you will likely end up
+        being recommended movies which are highly interconnected with each other, and only somewhat related to the
+        movies you've been wanting to watch.
+    </p>
+    <h4>Most Relevant</h4>
+    <p>Selecting the Most Relevant option will get you a set of movies which have characters, plotlines, etc that
+        are most relevant to the movies you want to watch. These movies may not be very related to each other; they are
+        only guaranteed to be relevant to your selected movies. (Note: If you request more movies than the number of
+        relevant movies to your selections, you will still be served the full number of movies you selected. The extra
+        movies will be movies which are very interconnected with the movies relevant to your selected movies.)
+    </p>
+    <h4>Most Recent</h4>
+    <p>Selecting the Most Recent option does not simply recommend you the movies released most recently to your selected
+        movies. It gets rid of any movies that don't include characters, plotlines, etc that are present in your
+        selected movies. For example, the 3 most recently released movies before <em>Black Panther</em> are <em>Guardians of The Galaxy Vol. 2</em>,
+        <em>Spider-Man: Homecoming</em>, and <em>Thor: Ragnarok</em>. But nothing in these movies is relevant to <em>Black Panther</em>, so the
+        Most Recent option will skip those and instead recommend you
+        <em>Avengers: Age of Ultron</em>, <em>Ant-Man</em>, and <em>Captain America: Civil War</em>.
+    </p>
+    <h3>How Do The Algorithms Work?</h3>
+    <p>The set of films is modeled as a directed acyclic weighted graph, where each vertex represents a film. Connections
+    between the films are represented as edges between the vertices, with stronger connections having higher weights.
+    The way the films are selected from this graph is dependent on which heuristic you choose.</p>
+    <h4>How are the weights chosen?</h4>
+    <p>The weights are based on a highly subjective scale, which is based on my highly subjective evaluation
+        of the relevance of each film to each other film. In order to try to reduce the subjectivity of the weights, I
+        standardized them as best as I could. For the full set of weight rules, click <a href="Weights.html">here</a>.
+    <footer>©2020 William Locatelli.</footer>
+</body>
+</html>
