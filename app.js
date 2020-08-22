@@ -49,21 +49,26 @@ app.get('/main/', async function(req, res) {
 
 app.post('/results/', async function (req, res) {
     try {
-        const python = spawn('python', [path.join(__dirname, 'LaunchScript.py'), req.body.options]);
-        let dataToSend = '["no data"]\n';
-        python.stdout.on('data', (data) => {
-            console.log('Pipe data from python script ...');
-            dataToSend = data.toString();
-        });
-        python.stderr.on('data', (data) => {
-            console.log(`error:${data}`);
-        });
-        python.on('close', (code) => {
-            console.log(`child process close all stdio with code ${code}`);
-            // send data to frontend
-            res.text;
-            res.send(dataToSend.substring(0, dataToSend.length - 1));
-        });
+        if (parseInt(JSON.parse(req.body.options).count) < 1) {
+            res.status(400).json({"error": "Cannot select a negative number of films"})
+        } else {
+            const python = spawn('python', [path.join(__dirname, 'LaunchScript.py'), req.body.options]);
+            let dataToSend = '["no data"]\n';
+            python.stdout.on('data', (data) => {
+                console.log('Pipe data from python script ...');
+                dataToSend = data.toString();
+            });
+            python.stderr.on('data', (data) => {
+                console.log(`error:${data}`);
+            });
+            python.on('close', (code) => {
+                console.log(`child process close all stdio with code ${code}`);
+                // send data to frontend
+                res.text;
+                res.send(dataToSend.substring(0, dataToSend.length - 1));
+            });
+        }
+
     } catch(err) {
         res.status(500).json({'error': 'Internal server error'});
     }

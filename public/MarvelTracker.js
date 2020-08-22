@@ -135,7 +135,11 @@
             .then(checkStatus)
             .then(res => res.text())
             .then(outputResult)
-            .catch(console.error);
+            .catch(displayError);
+    }
+
+    function displayError(res) {
+        document.getElementById("error").textContent = res;
     }
 
     function stringifyMovieList(list) {
