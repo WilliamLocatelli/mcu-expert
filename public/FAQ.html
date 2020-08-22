@@ -38,15 +38,15 @@
     <h4>Most Recent</h4>
     <p>Selecting the Most Recent option does not simply recommend you the movies released most recently to your selected
         movies. It gets rid of any movies that don't include characters, plotlines, etc that are present in your
-        selected movies. For example, the 3 most recently released movies before <em>Black Panther</em> are <em>Guardians of The Galaxy Vol. 2</em>,
-        <em>Spider-Man: Homecoming</em>, and <em>Thor: Ragnarok</em>. But nothing in these movies is relevant to <em>Black Panther</em>, so the
-        Most Recent option will skip those and instead recommend you
-        <em>Avengers: Age of Ultron</em>, <em>Ant-Man</em>, and <em>Captain America: Civil War</em>.
+        selected movies. For example, the 3 most recently released movies before <em>Black Panther</em> are
+        <em>Guardians of The Galaxy Vol. 2</em>, <em>Spider-Man: Homecoming</em>, and <em>Thor: Ragnarok</em>. But
+        nothing in these movies is relevant to <em>Black Panther</em>, so the Most Recent option will skip those and
+        instead recommend you<em>Avengers: Age of Ultron</em>, <em>Ant-Man</em>, and <em>Captain America: Civil War</em>.
     </p>
     <h3>How Do The Algorithms Work?</h3>
     <p>The set of films is modeled as a directed acyclic weighted graph, where each vertex represents a film. Connections
-    between the films are represented as edges between the vertices, with stronger connections having higher weights.
-    The way the films are selected from this graph is dependent on which heuristic you choose.
+        between the films are represented as edges between the vertices, with stronger connections having higher weights.
+        The way the films are selected from this graph is dependent on which heuristic you choose.
     </p>
     <h4>How are the weights chosen?</h4>
     <p>The weights are based on a highly subjective scale, which is based on my highly subjective evaluation
@@ -55,8 +55,9 @@
     </p>
     <h4>How are ties broken?</h4>
     <p>Within the algorithm, ties are generally broken by the little microconnections between movies, which are given a
-    weight of 1 for this purpose. However, sometimes 2 or 3 sets of movies end up being equally good based on the
-    metrics used here. These ties are broken by a series of 3 metrics:
+        weight of 1 for this purpose. However, sometimes 2 or 3 sets of movies end up being equally good based on the
+        metrics used here. These ties are broken by a series of 3 metrics, each of which only comes into play if the
+        previous metric fails to break the tie:
     <ol>
         <li>Which set of movies has the highest weight if we ignore the movies you've already seen?</li>
         <li>Which movies have the highest Rotten Tomatoes scores? (As this is designed for more casual viewers,
