@@ -14,10 +14,22 @@ const app = express();
 const sqlite3 = require('sqlite3');
 const sqlite = require('sqlite');
 const multer = require('multer');
-
+const redir = "<!DOCTYPE html>\n" +
+    "<html lang=\"en\">\n" +
+    "   <head>\n" +
+    "      <title>Root</title>\n" +
+    "      <meta http-equiv = \"refresh\" content = \"0; url = /index.html\" />\n" +
+    "   </head>\n" +
+    "   <body>\n" +
+    "   </body>\n" +
+    "</html>";
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 app.use(multer().none());
+
+app.get('/', async function(req, res) {
+    res.send(redir);
+});
 
 app.get('/main/', async function(req, res) {
     try {

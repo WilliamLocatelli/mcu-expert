@@ -18,18 +18,21 @@
     }
 
     function screen2() {
+        // Update prev/next buttons & instructions
         document.getElementById("next").removeEventListener("click", screen2);
         document.getElementById("next").addEventListener("click", screen3);
         document.getElementById("previous").removeEventListener("click", reset);
         document.getElementById("previous").addEventListener("click", backto1);
         document.getElementById("previous").textContent = "Previous";
         document.querySelector("h2").textContent = "Step 2. Select the movies you're interested in seeing";
+        // Mark movies already seen
         seenBefore = document.querySelectorAll(".selected");
         for (let i = 0; i < seenBefore.length; i++) {
             seenBefore[i].classList.remove("selected");
             seenBefore[i].classList.add("disabled");
             seenBefore[i].classList.add("seen");
         }
+        // Make movies previously marked as "want to see" selectable
         if (wantToSee) {
             for (let i = 0; i < wantToSee.length; i++) {
                 wantToSee[i].classList.remove("disabled");
@@ -37,15 +40,18 @@
                 wantToSee[i].classList.add("selected");
             }
         }
+        // Enable previous button
         document.getElementById('previous').disabled = false;
     }
 
     function screen3() {
+        // Make sure at lest one movie is selected
         wantToSee = document.querySelectorAll(".selected");
         if (wantToSee.length === 0) {
             document.querySelector("h2").textContent = "Must select at least one movie you want to see.";
             return;
         }
+        // Update prev/next buttons & instructions
         document.getElementById("next").removeEventListener("click", screen3);
         document.getElementById("next").addEventListener("click", submit);
         document.getElementById("next").textContent = "Submit";
@@ -53,13 +59,16 @@
         document.getElementById("previous").addEventListener("click", backto2);
         document.querySelector("h2").textContent = "Step 3. Options";
         document.getElementById("options").classList.remove("hidden");
+        // Mark selected movies as want to see
         for (let i = 0; i < wantToSee.length; i++) {
             wantToSee[i].classList.remove("selected");
             wantToSee[i].classList.add("wantToSee");
         }
+        // Mark seen movies as seen...i dont remember why this is necessary
         for (let i = 0; i < seenBefore.length; i++) {
             seenBefore[i].classList.add("seen");
         }
+        // disable clicking on movies
         let allMovies = document.querySelectorAll("#movies p");
         for (let i = 0; i < allMovies.length; i++) {
             allMovies[i].classList.add("disabled");
