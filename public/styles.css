@@ -97,6 +97,10 @@ h2 {
     /*outline: 2px solid black;*/
 }
 
+#movies p.selected:hover {
+    background-color: rgba(50,120,60,0.51);
+}
+
 #movies p.disabled {
     pointer-events: none;
 }
