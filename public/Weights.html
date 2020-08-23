@@ -1,4 +1,8 @@
 <!DOCTYPE html>
+<!--
+Copyright 2020 William Locatelli.
+Describes the rules I used to determine edge weights.
+-->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -21,10 +25,10 @@
         <li>Edges of weight 1 do not make a film a candidate for inclusion in the Most Relevant or Most Recent
             recommendations. Example: In <em>Iron Man 3</em>,
             Aldrich Killian says "Ever since that big dude with the hammer fell out of the sky, subtlety has kind of had
-            its day." This doesn't in any way mean you should watch <em>Thor</em> before you see <em>Iron Man 3</em>, so
+            its day." This doesn't mean you should watch <em>Thor</em> first if you want see <em>Iron Man 3</em>, so
             it's really only used as a tie breaker.</li>
-        <li>Connection weights are chosen based on two criteria: internal references to previous movies, and external
-            definition of relationship to previous movies. </li>
+        <li>Connection weights are chosen based on two types of criteria: internal references to previous movies, and
+            external definition of relationship to previous movies. </li>
         <h3>External definitions:</h3>
         <h4>10</h4>
         <li>This movie is explicitly defined as a direct sequel to the previous movie</li>

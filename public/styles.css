@@ -1,3 +1,7 @@
+/*
+Copyright 2020 William Locatelli.
+Styles the main page and other pages for the Marvel Movie Wizard Picker.
+ */
 body {
     display: flex;
     flex-direction: column;

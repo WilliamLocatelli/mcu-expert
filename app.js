@@ -1,3 +1,7 @@
+/**
+ * Copyright 2020 William Locatelli.
+ * Backend for Marvel Movie Wizard.
+ */
 'use strict';
 
 /*const { Pool } = require('pg');

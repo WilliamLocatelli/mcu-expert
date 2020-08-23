@@ -1,3 +1,7 @@
+/**
+ * Copyright 2020 William Locatelli.
+ * This code handles all of the interactive functionality of the Marvel Movie Picker Wizard interface.
+ */
 'use strict';
 
 (function() {

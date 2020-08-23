@@ -1,4 +1,8 @@
 <!DOCTYPE html>
+<!--
+Copyright 2020 William Locatelli.
+The FAQ page for the Marvel Movie Picker Helper Wizard App.
+-->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -10,16 +14,26 @@
     <h1>Which MCU Movies Should I Watch?</h1>
     <h2>Frequently Asked Questions</h2>
     <header><a href="index.html"><em>Return to Main Page</em></a></header>
-    <h3>What is the Point of This App?</h3>
+    <h3>General</h3>
+    <h4>What is the point of this app?</h4>
     <p>There are 23 movies and counting in the Marvel Cinematic Universe. You may have have seen a few of them, and
         there may be a few you want to see. (If you want to watch all 23 movies, this app is pointless for you!!)
         When you watch the movies you've been wanting to see, you probably will want to have seen a few other movies
         first so you have proper context for the movies you're watching. This app will give you recommendations for
         which other movies to watch first.</p>
-    <h4>Why Did I Get Fewer Movies Than I Requested?</h4>
+    <h4>Why did I get fewer movies than I requested?</h4>
     <p>The algorithms recommend you movies to watch before you watch your selected movies. You will never be recommended
     movies released after your newest selected movie, which can result in fewer recommendations
     than you requested.</p>
+    <h4>What does MCU stand for?</h4>
+    <p>The MCU is the Marvel Cinematic Universe, which is the setting of every film made by Marvel Studios, and
+        the upcoming Disney+ shows made by Marvel Studios, and many now-cancelled television shows made by Marvel
+        Television. For more on this, see <a href="http://en.Wikipedia.org/wiki/Marvel_Cinematic_Universe">Wikipedia</a>.</p>
+    <h4>Why should I trust you? This app is obviously very subjective and I'm probably a bigger MCU fan than you!</h4>
+    <p>If you're a bigger MCU fan than me, you aren't the target audience for this app because you've already seen
+        all of the movies many times. And if your friends want to know which movies they should watch, they'll just ask you,
+        so you don't need to worry about them getting bad info from this site! However, for the poor souls who aren't so
+        lucky as to have you as a friend, this site will hopefully be more useful than having no resource at all.</p>
     <h3>What Does Each Heuristic Do?</h3>
     <h4>Most Interconnected</h4>
     <p>Selecting the Most Interconnected option will get you a set of movies which have characters, plotlines, etc that
@@ -41,9 +55,9 @@
         selected movies. For example, the 3 most recently released movies before <em>Black Panther</em> are
         <em>Guardians of The Galaxy Vol. 2</em>, <em>Spider-Man: Homecoming</em>, and <em>Thor: Ragnarok</em>. But
         nothing in these movies is relevant to <em>Black Panther</em>, so the Most Recent option will skip those and
-        instead recommend you<em>Avengers: Age of Ultron</em>, <em>Ant-Man</em>, and <em>Captain America: Civil War</em>.
+        instead recommend you <em>Avengers: Age of Ultron</em>, <em>Ant-Man</em>, and <em>Captain America: Civil War</em>.
     </p>
-    <h3>How Do The Algorithms Work?</h3>
+    <h3>How does the code work?</h3>
     <p>The set of films is modeled as a directed acyclic weighted graph, where each vertex represents a film. Connections
         between the films are represented as edges between the vertices, with stronger connections having higher weights.
         The way the films are selected from this graph is dependent on which heuristic you choose.
@@ -64,7 +78,12 @@
         if 2 sets of movies are equally relevant, you might as well pick the movies considered the best.)</li>
         <li>Which movies are connected to the most other movies, including movies you aren't going to be recommended?</li>
     </ol>
-    </p>
+    <h4>Does this project use Artificial Intelligence (AI)?</h4>
+    <p>Artifical Intelligence is very poorly defined. In what is known as the <a href="https://en.wikipedia.org/wiki/AI_effect">
+        AI effect</a>, as soon as a task becomes achievable by computers, people decide that task doesn't count as AI
+        anymore. The task of telling someone what movies they should watch certainly sounds to me like something you
+        would only expect a human to be able to do. But I don't think the programming strategies I used for this project
+        would be considered AI by most programmers.</p>
     <footer>©2020 William Locatelli.</footer>
 </body>
 </html>
