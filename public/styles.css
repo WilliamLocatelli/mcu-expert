@@ -7,6 +7,7 @@ body {
     flex-direction: column;
     margin: auto;
     align-items: center;
+    text-align: center;
 }
 
 a {
@@ -52,19 +53,16 @@ footer {
 }
 
 p {
-    text-align: center;
 }
 
 h2 {
     font-weight: bold;
     font-size: 20px;
-    text-align: center;
 }
 
 h3 {
     font-weight: bold;
     font-size: 1.17em;
-    text-align: center;
 }
 
 #error {
@@ -86,7 +84,6 @@ h3 {
     border-radius: 3px;
     border-width: 1px;
     margin: 10px;
-    text-align: center;
     background: white;
     font-size: small;
 }
