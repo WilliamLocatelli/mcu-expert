@@ -14,6 +14,12 @@
 
     function LoadData() {
         document.getElementById("next").addEventListener("click", screen2);
+        document.getElementById("whatever").addEventListener("click", function() {
+            document.getElementById("count").disabled = true;
+        });
+        document.getElementById("select_num").addEventListener("click", function() {
+            document.getElementById("count").disabled = false;
+        });
         /*
         fetch('/main')
             .then(checkStatus)
@@ -167,10 +173,13 @@
         options['children'] = JSON.parse(stringifyMovieList(wantToSee));
         // get input rule
         rule = document.querySelector('input[name=heuristic]:checked');
-        numToSearch = document.getElementById("count").value;
         options['rule'] = rule.value;
-        options['count'] = numToSearch;
         // get number of films
+        numToSearch = document.getElementById("count").value;
+        options['count'] = numToSearch;
+        // get count rule
+        let count_rule = document.querySelector('input[name=count_rule]:checked');
+        options['count_rule'] = count_rule.value;
         body.append("options", JSON.stringify(options));
         fetch('/results', {method: 'POST', body: body})
             .then(checkStatus)

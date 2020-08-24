@@ -60,6 +60,14 @@ h2 {
     font-size: 20px;
     text-align: center;
 }
+/*
+.end {
+    align-self: center;
+}*/
+
+#error {
+    color: red;
+}
 
 #movies {
     display: flex;
@@ -70,7 +78,7 @@ h2 {
 
 #movies p {
     width: 120px;
-    height: 50px;
+    height: 80px;
     padding: 15px;
     border-style: solid;
     border-radius: 3px;
@@ -78,6 +86,7 @@ h2 {
     margin: 10px;
     text-align: center;
     background: white;
+    font-size: small;
 }
 
 #movies p:hover {

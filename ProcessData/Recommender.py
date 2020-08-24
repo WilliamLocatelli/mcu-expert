@@ -4,6 +4,7 @@
 import csv
 
 RULE = "Relevant"
+COUNT_RULE = "Count"
 CURRENT_ANCESTOR_TIER = 0
 MOVIES = {}
 GRAPHS_CHECKED = 0
@@ -163,7 +164,11 @@ def tie_breaker(best_graphs, excluded, children, parents):
 
 
 # for use by web app Launch Script
-def get_objects_and_find_best_subgraph(watched, children, num_extras, rule):
+def get_objects_and_find_best_subgraph(watched, children, num_extras, rule, count_rule):
+    global COUNT_RULE
+    COUNT_RULE = count_rule
+    if COUNT_RULE == "Whatever It Takes":
+        num_extras = len(MOVIES)
     watched_movies = []
     child_movies = []
     for movie in watched:
@@ -172,7 +177,7 @@ def get_objects_and_find_best_subgraph(watched, children, num_extras, rule):
     for movie in children:
         if movie in MOVIES.keys():
             child_movies.append(MOVIES[movie])
-    result = find_best_subgraph(watched_movies, child_movies, num_extras, rule);
+    result = find_best_subgraph(watched_movies, child_movies, num_extras, rule)
     return watch_order(watched_movies, result)
 
 
@@ -243,6 +248,8 @@ def limited_prev_tree(nodes, watched, children, n):
         current_level_nodes = recently_added_nodes + children_duplicates
         nodes.clear()
         nodes.extend(list(set(total_nodes) - set(watched)))
+        if COUNT_RULE == "Whatever It Takes":  # breaks out of loop after first tier
+            break
     return n - (len(children) - original_children_count)  # number left to check will be n minus how many we've added
 
 
