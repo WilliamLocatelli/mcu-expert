@@ -47,8 +47,8 @@ footer {
 #options {
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
+    align-items: center;
 }
 
 p {
@@ -60,10 +60,12 @@ h2 {
     font-size: 20px;
     text-align: center;
 }
-/*
-.end {
-    align-self: center;
-}*/
+
+h3 {
+    font-weight: bold;
+    font-size: 1.17em;
+    text-align: center;
+}
 
 #error {
     color: red;

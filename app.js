@@ -4,13 +4,6 @@
  */
 'use strict';
 
-/*const { Pool } = require('pg');
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
-});*/
 const path = require('path')
 const express = require('express');
 const {spawn} = require('child_process');
@@ -18,6 +11,7 @@ const app = express();
 const sqlite3 = require('sqlite3');
 const sqlite = require('sqlite');
 const multer = require('multer');
+
 const redir = "<!DOCTYPE html>\n" +
     "<html lang=\"en\">\n" +
     "   <head>\n" +
@@ -27,6 +21,7 @@ const redir = "<!DOCTYPE html>\n" +
     "   <body>\n" +
     "   </body>\n" +
     "</html>";
+
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 app.use(multer().none());

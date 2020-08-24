@@ -20,7 +20,8 @@ This is the main page for the Marvel Movie Wizard Helper App.
             <div id="instructions" class="col-sm-9 col-md-3">
                 <h2>Step 1: Select the movies you've already seen</h2>
                 <div id="options" class="hidden">
-                    <p>How many additional movies are you willing to watch?</p>
+                    <h3>How many additional movies are you willing to watch?</h3>
+                    <div>
                         <div>
                             <input type="radio" id="select_num" name="count_rule" value="Count" checked>
                             <label for="select_num"><input type="number" id="count" min=1 max=23 value=1><br></label>
@@ -29,7 +30,8 @@ This is the main page for the Marvel Movie Wizard Helper App.
                             <input type="radio" id="whatever" name="count_rule" value="Whatever It Takes">
                             <label for="whatever">Whatever It Takes</label>
                         </div>
-                    <p>Heuristic for choosing films</p>
+                    </div>
+                    <h3>Heuristic for choosing films:</h3>
                     <div id="buttons">
                         <div>
                             <input type="radio" id="rel" name="heuristic" value="Relevant" checked>
@@ -42,9 +44,9 @@ This is the main page for the Marvel Movie Wizard Helper App.
                         <div>
                             <input type="radio" id="inter" name="heuristic" value="Interconnected">
                             <label for="inter">Most Interconnected</label>
-                            <p>Note: Most Interconnected can take up to 30 seconds if requesting 8 to 17 films</p>
                         </div>
                     </div>
+                    <p><em>Note: Most Interconnected can take up to 30 seconds.</em></p>
                 </div>
                 <div id="recs" class="hidden"></div>
                 <button id="previous" disabled>Reset</button>
