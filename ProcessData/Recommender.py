@@ -245,7 +245,12 @@ def limited_prev_tree(nodes, watched, children, n):
             elif prev in children:
                 children_duplicates.append(prev)
         total_nodes.extend(recently_added_nodes)
-        current_level_nodes = recently_added_nodes + children_duplicates
+        if RULE == "Relevant":
+            # for most relevant, we don't want to look at the parents' parents
+            current_level_nodes = list(set(recently_added_nodes) - set(watched)) + children_duplicates
+        elif RULE == "Recent":
+            # for most recent, we do want to look at the parents' parents
+            current_level_nodes = recently_added_nodes + children_duplicates
         nodes.clear()
         nodes.extend(list(set(total_nodes) - set(watched)))
         if COUNT_RULE == "Whatever It Takes":  # breaks out of loop after first tier
