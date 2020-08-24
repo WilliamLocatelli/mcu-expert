@@ -14,11 +14,18 @@
 
     function LoadData() {
         document.getElementById("next").addEventListener("click", screen2);
+        /*
         fetch('/main')
             .then(checkStatus)
             .then(res => res.json())
             .then(populateScreen)
-            .catch(console.error);
+            .catch(console.error);*/
+        let movies = document.querySelectorAll("#movies p");
+        for (let i = 0; i < movies.length; i++) {
+            movies[i].addEventListener("click", function () {
+                movies[i].classList.toggle("selected");
+            });
+        }
     }
 
     function screen2() {
