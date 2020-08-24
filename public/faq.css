@@ -3,7 +3,8 @@ Copyright 2020 William Locatelli.
 CSS styling for FAQ page for Marvel Movie Wizard Helper App.
  */
 body {
-    width: 80%;
+    max-width: 40em;
+    padding: 2em;
 }
 
 p, ul, ol {

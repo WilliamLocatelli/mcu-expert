@@ -58,6 +58,19 @@ The FAQ page for the Marvel Movie Picker Helper Wizard App.
         nothing in these movies is relevant to <em>Black Panther</em>, so the Most Recent option will skip those and
         instead recommend you <em>Avengers: Age of Ultron</em>, <em>Ant-Man</em>, and <em>Captain America: Civil War</em>.
     </p>
+    <h4>What does Whatever It Takes do?</h4>
+    <p>Whatever It Takes will give you the "default" movies for the heuristic you selected.</p>
+    <p>If you selected Most Relevant, you will be recommended all the movies immediately relevant to your selected
+        movies and nothing else.</p>
+    <p>If you selected Most Recent, it will give you all the movies which your movies directly continue from, but no
+        movies that those additional movies continue from. For example, if you request the most recent movies to
+        <em>Avengers: Infinity War</em>, you will receive <em>Guardians Of The Galaxy Vol. 2</em>,
+        <em>Spider-Man: Homecoming</em>, <em>Thor: Ragnarok</em>, and <em>Black Panther</em>. You will not receive
+        <em>Captain America: Civil War</em>, as <em>Spider-Man: Homecoming</em> and <em>Black Panther</em> both
+        continue stories from <em>Captain America: Civil War</em>. Another way of explaining this would be to say
+        you get the most recent movies which could be watched in any order.</p>
+    <p>When Most Interconnected is selected, Whatever It Takes is treated exactly the same as if you had requested an
+        unlimited number of movies.</p>
     <h3>How does the code work?</h3>
     <p>The set of films is modeled as a weighted directed acyclic graph, where each vertex represents a film. Connections
         between the films are represented as edges between the vertices, with stronger connections having higher weights.

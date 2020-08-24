@@ -23,6 +23,10 @@ footer {
     margin: 10px;
 }
 
+ol, ul {
+    text-align: left;
+}
+
 #movies div {
     display: flex;
     flex-direction: column;
