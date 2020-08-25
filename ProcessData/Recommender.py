@@ -273,7 +273,7 @@ def limited_prev_tree(nodes, watched, children, n):
         nodes.clear()
         # nodes now equals every node that has been looked at that wasn't watched
         nodes.extend(list(set(total_nodes) - set(watched)))
-        if COUNT_RULE == "Whatever It Takes":  # breaks out of loop after first tier
+        if COUNT_RULE == "Whatever It Takes" and RULE == "Relevant":  # breaks out of loop after first tier
             break
     return n - (len(children) - original_children_count)  # number left to check will be n minus how many we've added
 

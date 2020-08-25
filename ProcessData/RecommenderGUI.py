@@ -141,7 +141,7 @@ def run_program(win):
                     if CHANGED or not NUM_CHOSEN == int(input_box.getText()):
                         CHANGED = False
                         NUM_CHOSEN = int(input_box.getText())
-                        subgraph = Rec.find_best_subgraph(watched, CHILDREN, NUM_CHOSEN, "Interconnected")
+                        subgraph = Rec.find_best_subgraph(watched, CHILDREN, NUM_CHOSEN, "Recent")
                         order = Rec.watch_order(watched, subgraph)
                         #watched_string = "Already Watched:\n" + "\n".join(t.name for t in watched)
                         rec_string = "\nRecommended Watchlist:\n" + "\n\n".join(order)
