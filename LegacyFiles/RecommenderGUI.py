@@ -1,9 +1,12 @@
 ''' Creates a GUI which allows user to specify which films they have seen and which films they
 would like to see, and gives them recommendations as to which movies they should watch in between.
+
+This python GUI is currently broken. However, it is entirely unnecessary, because the program can easily
+be run locally using the node.js app.
 '''
-from ProcessData.MarvelTracker import Movie
-from ProcessData import Recommender as Rec
-from ProcessData.graphics import *
+from LegacyFiles.MarvelTracker import Movie
+import Recommender as Rec
+from LegacyFiles.graphics import *
 
 WIDTH = 1200
 HEIGHT = 600

@@ -1,9 +1,13 @@
 """ Creates a GUI in which users can walk through an interactive
 MCU watch-through, following strict rules with regards to when you
 are allowed to watch certain movies.
+
+This was an early version of the Marvel Movie Picker, which changed so
+much throughout development that the current version contains almost
+nothing from this original project.
 """
 
-from ProcessData.graphics import *
+from LegacyFiles.graphics import *
 import csv
 
 root = []
@@ -70,7 +74,7 @@ def prohibit_children(movie):
 
 
 #import the graph from a csv file
-def import_adj_list_from_csv(file="AdjacencyList.csv"):
+def import_adj_list_from_csv(file="Data/AdjacencyList.csv"):
     # put all the rows of the csv file into a list
     movies_list = []
     with open(file, newline='', encoding='utf-8-sig') as csvfile:

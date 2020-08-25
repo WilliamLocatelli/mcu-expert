@@ -4,18 +4,19 @@
  */
 'use strict';
 
-const path = require('path')
-const express = require('express');
-const {spawn} = require('child_process');
+const path = require('path');  // For accessing python file
+const {spawn} = require('child_process');  // For running python script
+const express = require('express');  // For node app
 const app = express();
-const sqlite3 = require('sqlite3');
-const sqlite = require('sqlite');
-const multer = require('multer');
+const sqlite3 = require('sqlite3');  // For database
+const sqlite = require('sqlite');  // For database
+const multer = require('multer');  // For post requests
 
+// For main page redirect:
 const redir = "<!DOCTYPE html>\n" +
     "<html lang=\"en\">\n" +
     "   <head>\n" +
-    "      <title>Root</title>\n" +
+    "      <title>Which Marvel Movies Should I Watch?</title>\n" +
     "      <meta http-equiv = \"refresh\" content = \"0; url = /index.html\" />\n" +
     "   </head>\n" +
     "   <body>\n" +
@@ -26,15 +27,20 @@ app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 app.use(multer().none());
 
+/*
+ * Redirects requests to root to main page
+ */
 app.get('/', async function(req, res) {
     res.send(redir);
 });
 
+/*
+ * Retrieves all movie titles from database, organizing them by series and release date.
+ * Response format: {"All Series:" [ { "Series": "Series 1 name", "Films": ["Film 1", "Film 2", ...]}, {"Series": ...}]}
+ * Possible errors: 500 server error
+ */
 app.get('/main/', async function(req, res) {
     try {
-        //const client = await pool.connect();
-        //const titles = await client.query("SELECT title, series, release_date FROM films ORDER BY series");
-        //client.release();
         let db = await getDBConnection();
         let titles = await db.all("SELECT Title, Series, ReleaseDate FROM Films ORDER BY Series");
         await db.close();
@@ -58,6 +64,13 @@ app.get('/main/', async function(req, res) {
     }
 });
 
+/*
+ * Runs python script on input data and outputs results.
+ * Input format example: {"parents": ["watched_film_1", "watched_film_2", ...], "children": ["film_1", "film_2", ...],
+ *                        "count": "3", "rule": "Recent", "count_rule": "Whatever It Takes"}
+ * Output format: {"msg": "", "films": ["film_x", "film_1", "film_2", ...]
+ * Possible errors: 400 if negative count passed, 500 server error
+ */
 app.post('/results/', async function (req, res) {
     try {
         if (parseInt(JSON.parse(req.body.options).count) < 1) {
@@ -85,6 +98,9 @@ app.post('/results/', async function (req, res) {
     }
 });
 
+/*
+ * Returns connection to the sqlite database
+ */
 async function getDBConnection() {
   const db = await sqlite.open({
     filename: 'FilmData.db',

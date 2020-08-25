@@ -1,8 +1,6 @@
-# mcu-tracker
-Program for exploring the watch order of the MCU.
-Run _MarvelTracker.py_ to explore the interactive MCU watch-through, which follows strict rules with regards to when you 
-are allowed to watch certain movies.
-Run _RecommenderGUI.py_ to see what movies you should watch in between other movies.
+# Marvel Movie Recommender
+This program can be used to help a person determine which Marvel Movies they want to watch. A demo is live at
+http://marvelmoviepicker.herokuapp.com/
 
 ## Rules for choosing edge weights
 Edge weights are chosen based on two criteria: internal references to previous movies, and external definition of 
