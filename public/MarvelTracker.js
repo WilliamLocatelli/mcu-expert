@@ -152,6 +152,7 @@
     }
 
     function backto3() {
+        document.getElementById("error").classList.add("hidden");
         document.getElementById("options").classList.remove("hidden");
         document.getElementById("recs").classList.add("hidden");
         document.getElementById("recs").innerHTML = "";
@@ -212,7 +213,12 @@
             lastrecs[i].classList.remove("recommended");
         }
         // must replace ' with " or else JSON won't parse
-        let films = JSON.parse(response.replace(/'/g, '"'));
+        let data = JSON.parse(response.replace(/'/g, '"'));
+        let films = data['films'];
+        if (films.length === 0) {
+            document.getElementById("error").textContent = data['msg'];
+            document.getElementById("error").classList.remove("hidden");
+        }
         let recs = document.getElementById("recs");
         //let result = "";
         for (let i = 0; i < films.length; i++) {
