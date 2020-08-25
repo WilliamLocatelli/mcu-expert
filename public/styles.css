@@ -27,6 +27,10 @@ ol, ul {
     text-align: left;
 }
 
+h1 {
+    padding: 10px;
+}
+
 #movies div {
     display: flex;
     flex-direction: column;

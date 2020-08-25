@@ -233,25 +233,45 @@ def limited_prev_tree(nodes, watched, children, n):
     current_level_nodes = nodes.copy()  # the list of nodes whose parents we are currently finding
     recently_added_nodes = []  # keeps track of movies currently being added to the list
     children_duplicates = []  # handles situation where a tier contains one of the other movies they wanted to watch
-    while len(nodes) - original_children_count < n and len(current_level_nodes) > 0:
+    discarded_nodes = []  # used only for Most Recent heuristic
+    while len(nodes) - original_children_count < n and (len(current_level_nodes) > 0 or len(discarded_nodes) > 0):
         CURRENT_ANCESTOR_TIER = CURRENT_ANCESTOR_TIER + 1
         children_duplicates.clear()
+        # ONLY add stuff to children if this isn't the final tier
         children.extend(list(set(recently_added_nodes) - set(watched)))
+        prev_nodes, recently_discarded_nodes = next_tier(current_level_nodes)
         recently_added_nodes = []
-        prev_nodes = next_tier(current_level_nodes)
         for prev in prev_nodes:
             if prev not in recently_added_nodes and prev not in total_nodes:
                 recently_added_nodes.append(prev)
             elif prev in children:
                 children_duplicates.append(prev)
-        total_nodes.extend(recently_added_nodes)
-        if RULE == "Relevant":
-            # for most relevant, we don't want to look at the parents' parents
-            current_level_nodes = list(set(recently_added_nodes) - set(watched)) + children_duplicates
-        elif RULE == "Recent":
-            # for most recent, we do want to look at the parents' parents
-            current_level_nodes = recently_added_nodes + children_duplicates
+        total_nodes.extend(recently_added_nodes)  # recently added nodes
+        current_level_nodes = list(set(recently_added_nodes) - set(watched)) + children_duplicates
+        # make discarded nodes = all the nodes that have been discarded that weren't put back in
+        discarded_nodes.extend(list(set(recently_discarded_nodes) - set(discarded_nodes) - set(total_nodes)))
+        discarded_nodes = list(set(discarded_nodes) - set(total_nodes))
+        recently_added_watched = set(watched).intersection(set(recently_added_nodes))
+        # Check if any of the discarded movies are a parent of a movie we watched. If so, create a custom movie with
+        # those movies as parents, and add that custom movie to the next round of parent lookups
+        # (but don't add it into anything permanent).
+        for movie in recently_added_watched:
+            temp_movie = Movie("Temp Movie")
+            for prev in movie.prevs:
+                if prev[0] in discarded_nodes:
+                    temp_movie.prevs.append(prev)
+            if len(temp_movie.prevs) > 0:
+                current_level_nodes.append(temp_movie)
+        # if we traversed the whole tree and somehow missed some nodes, put those nodes back in. (is this possible?)
+        if len(current_level_nodes) == 0 and len(discarded_nodes) > 0:
+            temp_movie = Movie("Temp Movie")
+            for discard in discarded_nodes:
+                temp_movie.prevs.append((discard, 0))
+            current_level_nodes.append(temp_movie)
+            discarded_nodes.clear()
+        # current_level_nodes = recently_added_nodes + children_duplicates
         nodes.clear()
+        # nodes now equals every node that has been looked at that wasn't watched
         nodes.extend(list(set(total_nodes) - set(watched)))
         if COUNT_RULE == "Whatever It Takes":  # breaks out of loop after first tier
             break
@@ -283,6 +303,7 @@ def watch_order(watched, subgraph):
 def next_tier(movies):
     # step 1: find all nodes which are immediately relevant
     direct_predecessors = []
+    discarded_predecessors = []
     for movie in movies:
         for prev in movie.prevs:
             if prev[0] not in direct_predecessors and prev[1] > 1:
@@ -296,7 +317,9 @@ def next_tier(movies):
             for prev in film.prevs:
                 if prev[0] in direct_predecessors and prev[1] > 1:
                     direct_predecessors.remove(prev[0])
-    return direct_predecessors
+                    if prev[0] not in discarded_predecessors:
+                        discarded_predecessors.append(prev[0])
+    return direct_predecessors, discarded_predecessors
 
 # COPIED FROM MARVELTRACKER
 # create a class for movies. each movie will be at a certain point and have a name. clicking on the movie will make it
