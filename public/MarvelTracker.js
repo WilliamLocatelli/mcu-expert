@@ -191,7 +191,7 @@
         }
 
         // update instructions box
-        document.querySelector("h2").textContent = "Watchlist:";
+        document.querySelector("h2").textContent = "Suggested Watch Order:";
         document.getElementById("options").classList.add("hidden");
         recs.classList.remove("hidden");
         document.getElementById("previous").disabled = false;
