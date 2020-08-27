@@ -27,6 +27,8 @@ app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 app.use(multer().none());
 
+
+app.use(express.static("public"));
 /*
  * Redirects requests to root to main page
  */
@@ -109,7 +111,9 @@ async function getDBConnection() {
   return db;
 }
 
+app.get('*', function(req, res){
+  res.status(404).send('<strong>404 error</strong>.<br> Page not found. <a href="/index.html">Back to Main Page</a>');
+});
 
-app.use(express.static("public"));
 const PORT = process.env.PORT || 8000;
 app.listen(PORT);
