@@ -314,7 +314,7 @@ def limited_prev_tree(nodes, watched, children, n):
                         temp_movie.prevs.append(prev)
                 if len(temp_movie.prevs) > 0:
                     current_level_nodes.append(temp_movie)
-            # if we traversed the whole tree and somehow missed some nodes, put those nodes back in. (is this possible?)
+            # if we traversed the whole tree and somehow missed some nodes, put those nodes back in.
             if len(current_level_nodes) == 0:
                 temp_movie = Movie("Temp Movie")
                 for discard in discarded_nodes:
