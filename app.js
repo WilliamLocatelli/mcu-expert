@@ -112,7 +112,7 @@ async function getDBConnection() {
 }
 
 app.get('*', function(req, res){
-  res.status(404).send('<strong>404 error</strong>.<br> Page not found. <a href="/index.html">Back to Main Page</a>');
+  res.status(404).send('<strong>404 error</strong>.<br> Page not found. <a href="/">Back to Main Page</a>');
 });
 
 const PORT = process.env.PORT || 8000;
