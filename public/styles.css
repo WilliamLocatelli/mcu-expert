@@ -146,14 +146,7 @@ h3 {
     font-style: italic;
 }
 
-.youtube-outer-container {
-    /*max-width: 500px;
-    max-height: 281px;*/
-    /*justify-self: center;*/
-}
-
 .youtube-inner-container {
-    margin: 20px;
     position: relative;
     overflow: hidden;
     width: 98%;
