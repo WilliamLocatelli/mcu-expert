@@ -129,28 +129,36 @@
      * Formats data from page and sends it to backend for processing.
      */
     function submit() {
-        document.querySelector("h2").textContent = "Processing...";
-        document.getElementById("next").disabled = true;
-        document.getElementById("previous").disabled = true;
-        let body = new FormData;
-        let options = {};
-        options['parents'] = JSON.parse(stringifyMovieList(seenBefore));
-        options['children'] = JSON.parse(stringifyMovieList(wantToSee));
-        // get input rule
         rule = document.querySelector('input[name=heuristic]:checked');
-        options['rule'] = rule.value;
-        // get number of films
-        numToSearch = document.getElementById("count").value;
-        options['count'] = numToSearch;
-        // get count rule
-        let count_rule = document.querySelector('input[name=count_rule]:checked');
-        options['count_rule'] = count_rule.value;
-        body.append("options", JSON.stringify(options));
-        fetch('/results', {method: 'POST', body: body})
-            .then(checkStatus)
-            .then(res => res.text())
-            .then(outputResult)
-            .catch(displayError);
+        if (rule === null) {
+            document.getElementById("error").textContent = "Must select a heuristic.";
+            document.getElementById("error").classList.remove("hidden");
+        } else {
+            document.getElementById("error").classList.add("hidden");
+            document.querySelector("h2").textContent = "Processing...";
+            document.getElementById("next").disabled = true;
+            document.getElementById("previous").disabled = true;
+            let body = new FormData;
+            let options = {};
+            options['parents'] = JSON.parse(stringifyMovieList(seenBefore));
+            options['children'] = JSON.parse(stringifyMovieList(wantToSee));
+            // get input rule
+            rule = document.querySelector('input[name=heuristic]:checked');
+            options['rule'] = rule.value;
+            // get number of films
+            numToSearch = document.getElementById("count").value;
+            options['count'] = numToSearch;
+            // get count rule
+            let count_rule = document.querySelector('input[name=count_rule]:checked');
+            options['count_rule'] = count_rule.value;
+            body.append("options", JSON.stringify(options));
+            fetch('/results', {method: 'POST', body: body})
+                .then(checkStatus)
+                .then(res => res.text())
+                .then(outputResult)
+                .catch(displayError);
+        }
+
     }
 
     /*
@@ -226,6 +234,7 @@
      * and changing instructions.
      */
     function backto2() {
+        document.getElementById("error").classList.add("hidden");
         updatePrevNext(submit, screen3, backto2, backto1)
         /*document.getElementById("next").removeEventListener("click", submit);
         document.getElementById("next").addEventListener("click", screen3);
