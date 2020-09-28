@@ -16,12 +16,13 @@ pick the movies.
 </head>
 <body>
     <h1>Which Marvel Movies Should I Watch?</h1>
-    <h2 id="subheading">A web app for casual viewers who don't want to watch every movie.</h2>
+    <h2 class="subheading">A web app for casual viewers who don't want to watch every movie.</h2>
     <p id="error" class="hidden"></p>
     <div class="container-fluid">
         <div id="main" class="row">
             <div id="instructions" class="col-sm-9 col-md-3">
                 <h2>Step 1: Select the movies you've already seen</h2>
+                <h3 class="subheading">If you wouldn't mind watching the movie again, don't select it.</h3>
                 <div id="options" class="hidden">
                     <h3>How many additional movies are you willing to watch?</h3>
                     <div>
@@ -49,8 +50,8 @@ pick the movies.
                             <label for="inter">Most Interconnected</label>
                         </div>
                     </div>
-                    <p><em>Most Interconnected can take up to 30 seconds.
-                    More information regarding these heuristics can be found in the <a href="FAQ.html">FAQ</a>.</em></p>
+                    <p class="subheading">Most Interconnected can take up to 30 seconds.
+                    More information regarding these heuristics can be found in the <a href="FAQ.html">FAQ</a>.</p>
                 </div>
                 <div id="recs" class="hidden"></div>
                 <button id="previous" disabled>Reset</button>

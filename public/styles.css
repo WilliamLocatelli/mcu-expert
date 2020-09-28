@@ -15,12 +15,15 @@ a {
     text-decoration: none;
 }
 
-#subheading {
+.subheading {
     font-style: italic;
     font-weight: normal;
     font-size: 100%;
     margin: 0 5px 15px;
-    color: #929292;
+}
+
+body > .subheading {
+    color: #636363;
 }
 
 #instructions a {
