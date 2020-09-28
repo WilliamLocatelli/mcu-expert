@@ -102,7 +102,7 @@
         // Make sure at least one movie is selected
         wantToSee = document.querySelectorAll(".selected");
         if (wantToSee.length === 0) {
-            document.querySelector("#instructions h2").textContent = "Must select at least one movie you want to see.";
+            document.querySelector("#instructions .subheading").textContent = "Must select at least one movie you want to see.";
             return;
         }
         document.querySelector("#instructions .subheading").classList.add("hidden");
@@ -230,10 +230,6 @@
      */
     function backto2() {
         updatePrevNext(submit, screen3, backto2, backto1)
-        /*document.getElementById("next").removeEventListener("click", submit);
-        document.getElementById("next").addEventListener("click", screen3);
-        document.getElementById("previous").removeEventListener("click", backto2);
-        document.getElementById("previous").addEventListener("click", backto1);*/
         document.getElementById("next").textContent = "Next";
         let allMovies = document.querySelectorAll("#movies p");
         for (let i = 0; i < allMovies.length; i++) {
@@ -249,6 +245,7 @@
         }
 
         document.querySelector("#instructions h2").textContent = "Step 2. Select the movies you're interested in seeing";
+        document.querySelector("#instructions .subheading").textContent = "You'll be recommended movies to watch before you watch these.";
         document.querySelector("#instructions .subheading").classList.remove("hidden");
         document.getElementById("options").classList.add("hidden");
     }
