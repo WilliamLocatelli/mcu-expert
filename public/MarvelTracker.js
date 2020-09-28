@@ -73,7 +73,7 @@
         // Update prev/next buttons & instructions
         updatePrevNext(screen2, screen3, reset, backto1);
         document.getElementById("previous").textContent = "Previous";
-        document.querySelector("h2").textContent = "Step 2. Select the movies you're interested in seeing";
+        document.querySelector("#instructions h2").textContent = "Step 2. Select the movies you're interested in seeing";
         // Mark movies already seen
         seenBefore = document.querySelectorAll(".selected");
         for (let i = 0; i < seenBefore.length; i++) {
@@ -101,13 +101,13 @@
         // Make sure at least one movie is selected
         wantToSee = document.querySelectorAll(".selected");
         if (wantToSee.length === 0) {
-            document.querySelector("h2").textContent = "Must select at least one movie you want to see.";
+            document.querySelector("#instructions h2").textContent = "Must select at least one movie you want to see.";
             return;
         }
         // Update prev/next buttons & instructions
         updatePrevNext(screen3, submit, backto1, backto2);
         document.getElementById("next").textContent = "Submit";
-        document.querySelector("h2").textContent = "Step 3. Options";
+        document.querySelector("#instructions h2").textContent = "Step 3. Options";
         document.getElementById("options").classList.remove("hidden");
         // Mark selected movies as want to see
         for (let i = 0; i < wantToSee.length; i++) {
@@ -129,7 +129,7 @@
      * Formats data from page and sends it to backend for processing.
      */
     function submit() {
-        document.querySelector("h2").textContent = "Processing...";
+        document.querySelector("#instructions h2").textContent = "Processing...";
         document.getElementById("next").disabled = true;
         document.getElementById("previous").disabled = true;
         let body = new FormData;
@@ -191,7 +191,7 @@
         }
 
         // update instructions box
-        document.querySelector("h2").textContent = "Suggested Watch Order:";
+        document.querySelector("#instructions h2").textContent = "Suggested Watch Order:";
         document.getElementById("options").classList.add("hidden");
         recs.classList.remove("hidden");
         document.getElementById("previous").disabled = false;
@@ -205,7 +205,7 @@
      * and changing instructions.
      */
     function backto1() {
-        document.querySelector("h2").textContent = "Step 1: Select the movies you've already seen";
+        document.querySelector("#instructions h2").textContent = "Step 1: Select the movies you've already seen";
         wantToSee = document.querySelectorAll(".selected");
         for (let i = 0; i < wantToSee.length; i++) {
             wantToSee[i].classList.remove("selected");
@@ -245,7 +245,7 @@
             seenBefore[i].classList.add("disabled");
         }
 
-        document.querySelector("h2").textContent = "Step 2. Select the movies you're interested in seeing";
+        document.querySelector("#instructions h2").textContent = "Step 2. Select the movies you're interested in seeing";
         document.getElementById("options").classList.add("hidden");
     }
 
@@ -258,7 +258,7 @@
         document.getElementById("options").classList.remove("hidden");
         document.getElementById("recs").classList.add("hidden");
         document.getElementById("recs").innerHTML = "";
-        document.querySelector("h2").textContent = "Step 3. Options";
+        document.querySelector("#instructions h2").textContent = "Step 3. Options";
 
         document.getElementById("next").disabled = false;
         document.getElementById("previous").removeEventListener("click", backto3);
