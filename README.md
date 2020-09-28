@@ -26,8 +26,12 @@ Internal references:
    * Example: _Spider-Man: Far From Home_ contains a flashback to _Iron Man_ ("Tony Stark was able to build this in a 
    cave!") and several callbacks to _Iron Man_ (such as when Peter designs the suit) which support the perception of 
    Peter as "the new Iron Man". However, the majority of each of these films has little to do with the other.
- * 5: This previous movie was the most recent appearance of one or more of the characters in this movie.
+ * 5: This previous movie was the most recent appearance of one or more of the main characters in this movie.
    * Example: _Black Panther_ was the most recent appearance of Black Panther before _Avengers: Infinity War_.
+ * 3: A side character who appears in this movie most recently appeared in this other movie, and has a memorable 
+ appearance in both movies, but does not have any kind of character arc that makes the previous movie relevant to this movie.
+   * Example: _Avengers: Age of Ultron_ was the most recent appearance of Maria Hill before _Spider-Man: Far From Home_,
+   but she has no character arc and nothing that happens in _Age of Ultron_ informs her behavior in _Far From Home_.
  * 1: There are some brief moments which reference events of these previous movies, but understanding the context
  of these moments will not in any way affect your understanding of this movie.
    * Example: In _Iron Man 3_, Aldrich Killian says "Ever since that big dude with the hammer fell out of the sky, 

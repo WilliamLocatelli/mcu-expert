@@ -250,7 +250,7 @@ def tie_breaker(best_graphs, excluded, children, parents):
 def prev_tree(nodes, watched):
     for movie in nodes:
         for prev in movie.prevs:
-            if prev[1] > 1 and prev[0] not in watched and prev[0] not in nodes:
+            if prev[1] > 4 and prev[0] not in watched and prev[0] not in nodes:
                 nodes.append(prev[0])
                 prev_tree(nodes, watched)
 
@@ -352,7 +352,7 @@ def next_tier(movies):
     discarded_predecessors = []
     for movie in movies:
         for prev in movie.prevs:
-            if prev[0] not in direct_predecessors and prev[1] > 1:
+            if prev[0] not in direct_predecessors and prev[1] > 4:
                 direct_predecessors.append(prev[0])
     if RULE == "Recent":
         # step 2: generate family tree to discover if there will be missing pieces
@@ -361,7 +361,7 @@ def next_tier(movies):
         nodes = list(set(nodes) - set(movies))
         for film in nodes:
             for prev in film.prevs:
-                if prev[0] in direct_predecessors and prev[1] > 1:
+                if prev[0] in direct_predecessors and prev[1] > 4:
                     direct_predecessors.remove(prev[0])
                     if prev[0] not in discarded_predecessors:
                         discarded_predecessors.append(prev[0])

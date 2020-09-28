@@ -12,56 +12,63 @@ Describes the rules used to determine edge weights.
     <title>Rules For Deciding Edge Weights</title>
 </head>
 <body>
-<h1>Which MCU Movies Should I Watch?</h1>
+    <h1>Which MCU Movies Should I Watch?</h1>
     <header>
         <a href="FAQ.html"><em>Return to FAQ</em></a> ◦ <a href="/"><em>Main Page</em></a>
     </header>
-<h2>Edge Weight Rules</h2>
+    <h2>Edge Weight Rules</h2>
     <ul>
-        <li>Connection weights are standardized to values of 10 (strong connection), 5 (semistrong connection),
-            or 1 (weak connection).</li>
+        <li>Connection weights are standardized to values of 10 (strong connection), 5 (semistrong connection), 3
+            (semiweak connection), or 1 (weak connection).</li>
         <li>The weight of an edge is equal to the <strong>highest</strong> weight of any connection between the two films. This means
             that if a film has 3 very strong connections to another film, the edge is given a weight of 10, and if a
             film has only 1 very strong connection to another film, it is also given a weight of 10.</li>
-        <li>Edges of weight 1 do not make a film a candidate for inclusion in the Most Relevant or Most Recent
-            recommendations. Example: In <em>Iron Man 3</em>,
+        <li>Edges of weight less than 5 do not make a film a candidate for inclusion in recommendations. Example:
+            In <em>Iron Man 3</em>,
             Aldrich Killian says "Ever since that big dude with the hammer fell out of the sky, subtlety has kind of had
             its day." This doesn't mean you should watch <em>Thor</em> first if you want see <em>Iron Man 3</em>, so
             it's really only used as a tie breaker.</li>
         <li>Connection weights are chosen based on two types of criteria: internal references to previous movies, and
             external definition of relationship to previous movies. </li>
     </ul>
-        <h3>External definitions:</h3>
-        <h4>10</h4>
+    <h3>External definitions:</h3>
+    <h4>10</h4>
     <ul>
         <li>This movie is explicitly defined as a direct sequel to the previous movie</li>
     </ul>
-        <h4>5</h4>
+    <h4>5</h4>
     <ul>
         <li>This movie is explicitly defined as a sequel to the previous movie, but not a direct sequel.</li>
     </ul>
-        <h3>Internal references:</h3>
-        <h4>10</h4>
+    <h3>Internal references:</h3>
+    <h4>10</h4>
     <ul>
         <li>The way the viewer understands most or all of this movie will depend on whether they have seen most or all of
             this previous movie.</li>
     </ul>
-        <h4>5</h4>
+    <h4>5</h4>
     <ul>
         <li>Something that is a BIG part of this movie relates back to something that is a SMALL part of the previous movie.</li>
         <li>Some scenes or plot points in this movie will be understood very differently by the viewer if they have seen this
          previous movie.</li>
-        <li>This previous movie was the most recent appearance of one or more of the characters/plotlines in this movie.
-            (Credits scenes don't count.)</li>
+        <li>This previous movie was the most recent appearance of one or more of the main characters/plotlines in this
+            movie. (Credits scenes don't count.)</li>
     </ul>
-        <h4>1</h4>
+    <h4>3</h4>
+    <ul>
+        <li>A side character who appears in this movie most recently appeared in this other movie, and has a memorable
+            appearance in both movies, but does not have any kind of character arc that
+            makes the previous movie relevant to this movie.</li>
+    </ul>
+    <h4>1</h4>
     <ul>
         <li>There are some brief moments which reference events of these previous movies, but understanding the context
-            of these moments will not in any way affect your understanding of this movie. Again, this mostly comes into play as a
-            tie breaker.</li>
+            of these moments will not in any way affect your understanding of this movie.</li>
+        <li>A character who appears in this movie most recently appeared in this previous movie, but their appearance in
+            at least one of the two movies was so minor that you may not even remember it.</li>
     </ul>
-        <p>There is one more rule that currently only applies to <em>Infinity War</em>/<em>Endgame</em>:</p>
-        <h4>20</h4>
+    <p>There is one more rule that currently only applies to <em>Infinity War</em>/<em>Endgame</em>:</p>
+    <h4>20</h4>
     <ul>
         <li>These 2 movies were conceived of, planned, and written at the same time, and for all intents and purposes can be
             seen as 2 halves of the same story.</li>
