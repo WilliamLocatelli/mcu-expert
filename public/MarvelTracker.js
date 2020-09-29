@@ -208,7 +208,8 @@
      */
     function backto1() {
         document.querySelector("#instructions h2").textContent = "Step 1: Select the movies you've already seen";
-        document.querySelector("#instructions .subheading").textContent = "If you wouldn't mind watching the movie again, don't select it.";
+        document.querySelector("#instructions .subheading").textContent = "If you don't remember the " +
+            "movie and wouldn't mind watching it again, don't select it.";
         wantToSee = document.querySelectorAll(".selected");
         for (let i = 0; i < wantToSee.length; i++) {
             wantToSee[i].classList.remove("selected");
