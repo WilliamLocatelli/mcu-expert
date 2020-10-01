@@ -75,8 +75,11 @@ app.get('/main/', async function(req, res) {
  */
 app.post('/results/', async function (req, res) {
     try {
-        if (parseInt(JSON.parse(req.body.options).count) < 1) {
+        let count = parseFloat(JSON.parse(req.body.options).count)
+        if (count < 1) {
             res.status(400).json({"error": "Cannot select a negative number of films"})
+        } else if (isNaN(count) || !Number.isInteger(count)) {
+            res.status(400).json({"error": "Number of films must be an integer number"})
         } else {
             const python = spawn('python', [path.join(__dirname, 'LaunchScript.py'), req.body.options]);
             let dataToSend = '["no data"]\n';
