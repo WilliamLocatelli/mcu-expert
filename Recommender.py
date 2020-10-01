@@ -5,8 +5,7 @@ It is designed to be used for selecting movies from the Marvel Cinematic Univers
 but could be used for other applications with a few minor tweaks.
 """
 import csv
-
-RULE = "Relevant"
+RULE = "Recent"
 COUNT_RULE = "Count"
 CURRENT_ANCESTOR_TIER = 0
 MOVIES = {}
@@ -64,6 +63,7 @@ def import_data_from_csv(file="Data/data.csv"):
         row = csv_rows[i]
         this_movie = MOVIES[row[0]]
         this_movie.rt_score = row[1]
+        this_movie.date = row[2]
         i += 1
 
 
@@ -111,7 +111,9 @@ def find_best_subgraph(watched, children, num_extras):
     # add parents to nodes. they couldn't be added before because we didn't want their parents to also get added.
     for parent in watched:
         nodes.append(parent)
+    # included is all the movies we know we are going to include
     included = watched + included_unwatched
+    # excluded is the candidate movies we are considering for inclusion
     excluded = []
     # if there are less extra films than the total requested films, return all the films.
     if len(nodes) <= num_extras + len(children) + len(watched):
@@ -120,7 +122,10 @@ def find_best_subgraph(watched, children, num_extras):
         for movie in nodes:
             if movie not in included:
                 excluded.append(movie)
-    best_graphs = brute_force_subgraph_helper(excluded, included, num_to_check, included_unwatched)
+    if RULE == "Recent":
+        best_graphs = [most_recent_movies(excluded, included, num_to_check)]
+    else:
+        best_graphs = brute_force_subgraph_helper(excluded, included, num_to_check, included_unwatched)
     result = tie_breaker(best_graphs, excluded, included_unwatched, watched)
     return result
 
@@ -139,6 +144,16 @@ def watch_order(watched, subgraph):
 
 
 ##############################################  HELPER FUNCTIONS  ##############################################
+
+# Returns a list containing included plus the num most recent movies in excluded.
+def most_recent_movies(excluded, included, num):
+    excluded_sorted = sorted(excluded, key=lambda x: x.date, reverse=True)
+    i = 0
+    result = included.copy()
+    while i < num:
+        result.append(excluded_sorted[i])
+        i += 1
+    return result
 
 
 # Iterates through every possible set of movies containing the movies in included and
@@ -368,10 +383,11 @@ def next_tier(movies):
     return direct_predecessors, discarded_predecessors
 
 
-# Movies have names, series, and lists of previous (and potentially next) films.
+# Movies have names, series, release dates,and lists of previous (and potentially next) films.
 class Movie:
-    def __init__(self, name, series=""):
+    def __init__(self, name, series="", date=""):
         self.prevs = []  # the parents of this movie
         self.seqs = []  # the children of this movie (unused field)
         self.name = name  # the name of the movie
         self.series = series  # the film series this movie belongs to
+        self.date = date
