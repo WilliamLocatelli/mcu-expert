@@ -21,7 +21,7 @@
         // If somebody clicks "whatever it takes", disable changing the count.
         let count = document.getElementById("count");
         let count_slider = document.getElementById("count-slider");
-        count.addEventListener("input", function() {
+        count.addEventListener("change", function() {
             count.value = Math.min(count.value, NUM_FILMS - 1);
             count.value = Math.max(count.value, 1);
             count_slider.value = count.value;
