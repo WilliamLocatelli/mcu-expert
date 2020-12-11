@@ -9,6 +9,7 @@
     let wantToSee = null;
     let numToSearch = 0;
     let rule = null;
+    const NUM_FILMS = 23;
 
     window.addEventListener("load", LoadData);
 
@@ -18,13 +19,28 @@
     function LoadData() {
         document.getElementById("next").addEventListener("click", screen2);
         // If somebody clicks "whatever it takes", disable changing the count.
+        let count = document.getElementById("count");
+        let count_slider = document.getElementById("count-slider");
+        count.addEventListener("input", function() {
+            count.value = Math.min(count.value, NUM_FILMS - 1);
+            count.value = Math.max(count.value, 1);
+            count_slider.value = count.value;
+        });
+        count_slider.addEventListener("input", function() {
+            count_slider.value = Math.min(count_slider.value, NUM_FILMS - 1);
+            count_slider.value = Math.max(count_slider.value, 1);
+            count.value = count_slider.value;
+        });
+
         document.getElementById("whatever").addEventListener("click", function() {
             document.getElementById("count").disabled = true;
+            document.getElementById("count-slider").disabled = true;
         });
 
         // If somebody clicks the radio button next to the count, enable changing the count.
         document.getElementById("select_num").addEventListener("click", function() {
             document.getElementById("count").disabled = false;
+            document.getElementById("count-slider").disabled = false;
         });
         // Retrieve info from database (currently not being used)
         /*
