@@ -52,9 +52,7 @@
         // make movies selectable
         let movies = document.querySelectorAll("#movies p");
         for (let i = 0; i < movies.length; i++) {
-            movies[i].addEventListener("click", function () {
-                movies[i].classList.toggle("selected");
-            });
+            movies[i].addEventListener("click", selectElement);
         }
     }
 
@@ -80,6 +78,17 @@
         }
     }
 
+    function selectElement() {
+        this.classList.toggle("selected");
+        // Figure out what page we're on
+        let header = document.querySelector("#instructions h2").textContent;
+        if (header === "Step 1: Select the movies you've already seen") {
+            this.classList.toggle("seen");
+        } else {
+            this.classList.toggle("wantToSee");
+        }
+    }
+
     //-----------------------------------------Next Button Functions-----------------------------------------\\
     /*
      * Transitions from screen 1 to screen 2 by updating previous/next buttons, coloring/disabling movies, and changing
@@ -96,13 +105,13 @@
         for (let i = 0; i < seenBefore.length; i++) {
             seenBefore[i].classList.remove("selected");
             seenBefore[i].classList.add("disabled");
-            seenBefore[i].classList.add("seen");
+            //seenBefore[i].classList.add("seen");
         }
         // Make movies previously marked as "want to see" selectable
         if (wantToSee) {
             for (let i = 0; i < wantToSee.length; i++) {
                 wantToSee[i].classList.remove("disabled");
-                wantToSee[i].classList.remove("wantToSee");
+                //wantToSee[i].classList.remove("wantToSee");
                 wantToSee[i].classList.add("selected");
             }
         }
@@ -130,7 +139,7 @@
         // Mark selected movies as want to see
         for (let i = 0; i < wantToSee.length; i++) {
             wantToSee[i].classList.remove("selected");
-            wantToSee[i].classList.add("wantToSee");
+            //wantToSee[i].classList.add("wantToSee");
         }
         // Mark seen movies as seen...i dont remember why this is necessary
         for (let i = 0; i < seenBefore.length; i++) {
@@ -230,12 +239,12 @@
         for (let i = 0; i < wantToSee.length; i++) {
             wantToSee[i].classList.remove("selected");
             wantToSee[i].classList.add("disabled");
-            wantToSee[i].classList.add("wantToSee");
+            //wantToSee[i].classList.add("wantToSee");
         }
         for (let i = 0; i < seenBefore.length; i++) {
             seenBefore[i].classList.remove("disabled");
             seenBefore[i].classList.add("selected");
-            seenBefore[i].classList.remove("seen");
+            //seenBefore[i].classList.remove("seen");
         }
         document.getElementById('previous').textContent = "Reset";
         updatePrevNext(screen3, screen2, backto1, reset)
@@ -251,7 +260,7 @@
         let allMovies = document.querySelectorAll("#movies p");
         for (let i = 0; i < allMovies.length; i++) {
             allMovies[i].classList.remove("disabled");
-            allMovies[i].classList.remove("wantToSee");
+            //allMovies[i].classList.remove("wantToSee");
             allMovies[i].classList.remove("recommended");
         }
         for (let i = 0; i < wantToSee.length; i++) {
