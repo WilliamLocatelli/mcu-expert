@@ -333,7 +333,7 @@ def limited_prev_tree(nodes, watched, children, n):
             if len(current_level_nodes) == 0:
                 temp_movie = Movie("Temp Movie")
                 for discard in discarded_nodes:
-                    temp_movie.prevs.append((discard, 0))
+                    temp_movie.prevs.append((discard, 5))
                 current_level_nodes.append(temp_movie)
                 discarded_nodes.clear()
         nodes.clear()
