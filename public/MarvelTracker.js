@@ -312,6 +312,7 @@
         document.querySelector("#instructions .subheading").textContent = "You'll be recommended movies to watch before you watch these.";
         document.querySelector("#instructions .subheading").classList.remove("hidden");
         document.getElementById("options").classList.add("hidden");
+        document.getElementById('results').classList.add("hidden");
     }
 
     /*
