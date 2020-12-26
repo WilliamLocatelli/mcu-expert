@@ -372,14 +372,16 @@ def next_tier(movies):
     if RULE == "Recent":
         # step 2: generate family tree to discover if there will be missing pieces
         nodes = movies.copy()
-        prev_tree(nodes, [])
-        nodes = list(set(nodes) - set(movies))
-        for film in nodes:
-            for prev in film.prevs:
-                if prev[0] in direct_predecessors and prev[1] > 4:
-                    direct_predecessors.remove(prev[0])
-                    if prev[0] not in discarded_predecessors:
-                        discarded_predecessors.append(prev[0])
+        for node in nodes:
+            nodelist = [node]
+            prev_tree(nodelist, [])
+            nodelist.remove(node)
+            for film in nodelist:
+                for prev in film.prevs:
+                    if prev[0] in direct_predecessors and prev[1] > 4:
+                        direct_predecessors.remove(prev[0])
+                        if prev[0] not in discarded_predecessors:
+                            discarded_predecessors.append(prev[0])
     return direct_predecessors, discarded_predecessors
 
 
