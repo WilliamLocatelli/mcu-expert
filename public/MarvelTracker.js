@@ -184,10 +184,9 @@
      * Processes data returned from backend and displays it on the page.
      */
     function outputResult(response) {
-        // clear the movies recommended last time
-        let lastrecs = document.querySelectorAll(".recommended");
-        for (let i = 0; i < lastrecs.length; i++) {
-            lastrecs[i].classList.remove("recommended");
+        let lastRecs = document.querySelectorAll(".recommended");
+        for (let i = 0; i < lastRecs.length; i++) {
+            lastRecs[i].classList.remove("recommended");
         }
         // must replace ' with " or else JSON won't parse
         let data = JSON.parse(response.replace(/'/g, '"'));
@@ -196,31 +195,70 @@
             document.getElementById("error").textContent = data['msg'];
             document.getElementById("error").classList.remove("hidden");
         }
+        let recommendedFilms = [];
+        let requestedFilms = [];
         let recs = document.getElementById("recs");
+        let order = document.getElementById("watch-order");
+        order.innerHTML = "";
         for (let i = 0; i < films.length; i++) {
-            let result = document.createElement("p");
             let movie = films[i];
-            // highlight this movie in the graphics
             let movieObj = document.getElementById(cleanString(movie));
+            let result = document.createElement("p");
+            result.textContent = movie;
             let requested = false;
             for (let i = 0; i < wantToSee.length; i++) {
                 if (wantToSee[i].textContent === movie) {
                     requested = true;
                 }
             }
-            if (!requested) {
-                movieObj.classList.add("recommended");
-            } else {
+            if (requested) {
+                requestedFilms.push(movie);
+                //result.textContent += " (Your selection)";
                 result.classList.add("requested");
+            } else {
+                recommendedFilms.push(movie);
+                movieObj.classList.add("recommended");
+                //result.textContent += " (Our recommended film)";
             }
-            result.textContent = movie;
-            recs.appendChild(result);
+            let li = document.createElement("li");
+            li.appendChild(result);
+            order.appendChild(li);
+        }
+        let text1;
+        // Case where there are no recommended films
+        if (recommendedFilms.length === 0) {
+            text1 = "There are no other films you should watch ";
+        // Case where there is 1 recommended film
+        } else if (recommendedFilms.length === 1) {
+            text1 = "Based on your selections, we recommend you watch " + recommendedFilms[0];
+        } else if (recommendedFilms.length === 2) {
+            text1 = "Based on your selections, we recommend you watch " + recommendedFilms[0] + " and " + recommendedFilms[1];
+        } else {
+            text1 = "Based on your selections, we recommend you watch ";
+            for (let i = 0; i < recommendedFilms.length - 1; i++) {
+                text1 += recommendedFilms[i] + ", ";
+            }
+            text1 += "and " + recommendedFilms[recommendedFilms.length - 1];
         }
 
+        // Case where there was 1 requested film
+        if (requestedFilms.length === 1) {
+            text1 += " before watching " + requestedFilms[0] + ".";
+        } else if (requestedFilms.length === 2) {
+            text1 += " before/between watching " + requestedFilms[0] + " and " + requestedFilms[1] + ".";
+        } else {
+            text1 += " before/between watching ";
+            for (let i = 0; i < requestedFilms.length - 1; i++) {
+                text1 += requestedFilms[i] + ", ";
+            }
+            text1 += "and " + requestedFilms[requestedFilms.length - 1] + ".";
+        }
+        recs.textContent = text1;
+
         // update instructions box
-        document.querySelector("#instructions h2").textContent = "Suggested Watch Order:";
+        document.querySelector("#instructions h2").textContent = "Done! Scroll down for results.";
         document.getElementById("options").classList.add("hidden");
-        recs.classList.remove("hidden");
+        document.getElementById("results").classList.remove("hidden");
         document.getElementById("previous").disabled = false;
         document.getElementById("previous").removeEventListener("click", backto2);
         document.getElementById("previous").addEventListener("click", backto3);
@@ -283,8 +321,6 @@
     function backto3() {
         document.getElementById("error").classList.add("hidden");
         document.getElementById("options").classList.remove("hidden");
-        document.getElementById("recs").classList.add("hidden");
-        document.getElementById("recs").innerHTML = "";
         document.querySelector("#instructions h2").textContent = "Step 3. Options";
 
         document.getElementById("next").disabled = false;
@@ -311,6 +347,7 @@
             allMovies[i].classList.remove("recommended");
         }
         document.getElementById('previous').disabled = true;
+        document.getElementById('results').classList.add("hidden");
     }
 
     //------------------------------------------Helper Functions--------------------------------------------\\

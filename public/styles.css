@@ -70,6 +70,18 @@ h1 {
     border-radius: 10px;
 }
 
+#watch-order {
+    align-self: center;
+    justify-self: center;
+}
+
+#results {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    margin: 20px;
+}
+
 #options {
     display: flex;
     flex-direction: column;
@@ -125,7 +137,7 @@ h3 {
     align-self: center;
 }
 
-.hidden, #options.hidden {
+.hidden, #options.hidden, #results.hidden {
     display: none;
 }
 
