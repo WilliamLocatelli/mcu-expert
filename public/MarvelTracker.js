@@ -228,30 +228,14 @@
         // Case where there are no recommended films
         if (recommendedFilms.length === 0) {
             text1 = "There are no other films you should watch ";
-        // Case where there is 1 recommended film
-        } else if (recommendedFilms.length === 1) {
-            text1 = "Based on your selections, we recommend you watch " + recommendedFilms[0];
-        } else if (recommendedFilms.length === 2) {
-            text1 = "Based on your selections, we recommend you watch " + recommendedFilms[0] + " and " + recommendedFilms[1];
         } else {
-            text1 = "Based on your selections, we recommend you watch ";
-            for (let i = 0; i < recommendedFilms.length - 1; i++) {
-                text1 += recommendedFilms[i] + ", ";
-            }
-            text1 += "and " + recommendedFilms[recommendedFilms.length - 1];
+            text1 = "Based on your selections, you should watch " + listFilms(recommendedFilms);
         }
-
         // Case where there was 1 requested film
         if (requestedFilms.length === 1) {
-            text1 += " before watching " + requestedFilms[0] + ".";
-        } else if (requestedFilms.length === 2) {
-            text1 += " before/between watching " + requestedFilms[0] + " and " + requestedFilms[1] + ".";
+            text1 += " before watching " + listFilms(requestedFilms) + ".";
         } else {
-            text1 += " before/between watching ";
-            for (let i = 0; i < requestedFilms.length - 1; i++) {
-                text1 += requestedFilms[i] + ", ";
-            }
-            text1 += "and " + requestedFilms[requestedFilms.length - 1] + ".";
+            text1 += " before/between watching " + listFilms(requestedFilms) + ".";
         }
         recs.textContent = text1;
 
@@ -263,6 +247,7 @@
         document.getElementById("previous").removeEventListener("click", backto2);
         document.getElementById("previous").addEventListener("click", backto3);
     }
+
 
     //-----------------------------------------Back Button Functions-----------------------------------------\\
     /*
@@ -392,6 +377,27 @@
     function displayError(res) {
         document.getElementById("error").textContent = "Error occurred, please refresh. \n" + res;
         document.getElementById("error").classList.remove("hidden");
+    }
+
+    /*
+     * Returns a string which lists the films in list.
+     * list - array containing the titles of all films to list
+     * returns: a string of the format "<film name>" for single-item lists, "<film name> and <film name>" for 2-item
+     *          lists, and "<film name>, <film name>, and <film name>" for lists containing 3+ items.
+     */
+    function listFilms(list) {
+        if (list.length === 1) {
+            return list[0];
+        } else if (list.length === 2) {
+            return list[0] + " and " + list[1];
+        } else {
+            let result = "";
+            for (let i = 0; i < list.length - 1; i++) {
+                result += list[i] + ", ";
+            }
+            result += "and " + list[list.length - 1];
+            return result;
+        }
     }
 
     /*
