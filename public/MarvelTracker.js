@@ -159,6 +159,11 @@
         document.querySelector("#instructions h2").textContent = "Processing...";
         document.getElementById("next").disabled = true;
         document.getElementById("previous").disabled = true;
+        document.getElementById("rel").disabled = true;
+        document.getElementById("rec").disabled = true;
+        document.getElementById("inter").disabled = true;
+        document.getElementById("count").disabled = true;
+        document.getElementById("count-slider").disabled = true;
         let body = new FormData;
         let options = {};
         options['parents'] = JSON.parse(stringifyMovieList(seenBefore));
@@ -224,20 +229,9 @@
             li.appendChild(result);
             order.appendChild(li);
         }
-        let text1;
-        // Case where there are no recommended films
-        if (recommendedFilms.length === 0) {
-            text1 = "There are no other films you should watch ";
-        } else {
-            text1 = "Based on your selections, you should watch " + listFilms(recommendedFilms);
-        }
-        // Case where there was 1 requested film
-        if (requestedFilms.length === 1) {
-            text1 += " before watching " + listFilms(requestedFilms) + ".";
-        } else {
-            text1 += " before/between watching " + listFilms(requestedFilms) + ".";
-        }
-        recs.textContent = text1;
+        // generate text output
+
+        recs.textContent = generateSentence(recommendedFilms, requestedFilms);
 
         // update instructions box
         document.querySelector("#instructions h2").textContent = "Done! Scroll down for results.";
@@ -246,6 +240,61 @@
         document.getElementById("previous").disabled = false;
         document.getElementById("previous").removeEventListener("click", backto2);
         document.getElementById("previous").addEventListener("click", backto3);
+    }
+
+    /*
+     * Generates a sentence telling the user what their recommended films are.
+     */
+    function generateSentence(recommendedFilms, requestedFilms) {
+        let text1;
+        let rule = document.querySelector('input[name=heuristic]:checked');
+        // Case where there are no recommended films
+        if (recommendedFilms.length === 0) {
+            text1 = "There are no other films you should watch ";
+            if (requestedFilms.length === 1) {
+                text1 += " before watching " + listFilms(requestedFilms);
+            } else {
+                text1 += " before/between watching " + listFilms(requestedFilms);
+            }
+        } else if (rule.value === "Interconnected") {
+            text1 = "In order to have the most interconnected viewing experience possible while only watching " + recommendedFilms.length;
+            if (recommendedFilms.length === 1) {
+                text1 += " additional film";
+            } else {
+                text1 += " additional films";
+            }
+            text1 += ", you should watch " + listFilms(recommendedFilms);
+            if (requestedFilms.length === 1) {
+                text1 += " before watching " + listFilms(requestedFilms);
+            } else {
+                text1 += " before/between watching " + listFilms(requestedFilms);
+            }
+        } else if (rule.value === "Relevant") {
+            if (recommendedFilms.length === 1) {
+                text1 = "The most relevant film to " + listFilms(requestedFilms) + " is " + listFilms(recommendedFilms);
+            } else {
+                text1 = "The " + recommendedFilms.length + " most relevant films to " + listFilms(requestedFilms) + " are " + listFilms(recommendedFilms);
+            }
+        } else if (rule.value === "Recent") {
+            text1 = "When " + listFilms(requestedFilms) + " came out, the ";
+            if (recommendedFilms.length === 1) {
+                text1 += "most recent film featuring characters/plotlines in ";
+            } else {
+                text1 += recommendedFilms.length + " most recent films featuring characters/plotlines in ";
+            }
+            if (requestedFilms.length === 1) {
+                text1 += "this movie ";
+            } else {
+                text1 += "these movies ";
+            }
+            if (recommendedFilms.length === 1) {
+                text1 += " was " + listFilms(recommendedFilms);
+            } else {
+                text1 += " were " + listFilms(recommendedFilms);
+            }
+        }
+        text1 += ".";
+        return text1;
     }
 
 
@@ -310,6 +359,11 @@
         document.querySelector("#instructions h2").textContent = "Step 3. Options";
 
         document.getElementById("next").disabled = false;
+        document.getElementById("rel").disabled = false;
+        document.getElementById("rec").disabled = false;
+        document.getElementById("inter").disabled = false;
+        document.getElementById("count").disabled = false;
+        document.getElementById("count-slider").disabled = false;
         document.getElementById("previous").removeEventListener("click", backto3);
         document.getElementById("previous").addEventListener("click", backto2);
 
