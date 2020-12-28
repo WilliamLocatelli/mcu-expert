@@ -231,7 +231,7 @@
         }
         // generate text output
 
-        recs.textContent = generateSentence(recommendedFilms, requestedFilms);
+        recs.innerHTML = generateSentence(recommendedFilms, requestedFilms);
 
         // update instructions box
         document.querySelector("#instructions h2").textContent = "Done! Scroll down for results.";
@@ -468,15 +468,15 @@
      */
     function listFilms(list) {
         if (list.length === 1) {
-            return list[0];
+            return "<cite>" + list[0] + "</cite>";
         } else if (list.length === 2) {
-            return list[0] + " and " + list[1];
+            return "<cite>" + list[0] + "</cite> and <cite>" + list[1] + "</cite>";
         } else {
             let result = "";
             for (let i = 0; i < list.length - 1; i++) {
-                result += list[i] + ", ";
+                result += "<cite>" + list[i] + "</cite>, ";
             }
-            result += "and " + list[list.length - 1];
+            result += "and <cite>" + list[list.length - 1] + "</cite>";
             return result;
         }
     }
