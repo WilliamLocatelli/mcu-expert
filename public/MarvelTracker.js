@@ -256,9 +256,9 @@
                 text1 = "You requested " + count + " films, but there";
             }
             if (recommendedFilms.length === 0) {
-                text1 += " are no films which should be watched before";
+                text1 += " are no films to watch before";
             } else if (recommendedFilms.length === 1) {
-                text1 += " is only 1 film which should be watched before";
+                text1 += " is only 1 film to watch before";
             } else {
                 text1 += " are only " + recommendedFilms.length + " films to watch before";
             }
