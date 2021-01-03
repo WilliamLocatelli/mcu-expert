@@ -246,82 +246,82 @@
      * Generates a sentence telling the user what their recommended films are.
      */
     function generateSentence(recommendedFilms, requestedFilms) {
-        let text1;
+        let text;
         let rule = document.querySelector('input[name=heuristic]:checked');
         let count = parseInt(document.getElementById("count").value);
         if (recommendedFilms.length < count) {
             if (count === 1) {
-                text1 = "You requested 1 film, but there "
+                text = "You requested 1 film, but there "
             } else {
-                text1 = "You requested " + count + " films, but there";
+                text = "You requested " + count + " films, but there";
             }
             if (recommendedFilms.length === 0) {
-                text1 += " are no films to watch before";
+                text += " are no films to watch before";
             } else if (recommendedFilms.length === 1) {
-                text1 += " is only 1 film to watch before";
+                text += " is only 1 film to watch before";
             } else {
-                text1 += " are only " + recommendedFilms.length + " films to watch before";
+                text += " are only " + recommendedFilms.length + " films to watch before";
             }
             if (requestedFilms.length === 1) {
-                text1 += " watching ";
+                text += " watching ";
             } else {
-                text1 += "/between watching ";
+                text += "/between watching ";
             }
-            text1 += listFilms(requestedFilms);
+            text += listFilms(requestedFilms);
             if (recommendedFilms.length === 1) {
-                text1 += ". That film is " + listFilms(recommendedFilms);
+                text += ". That film is " + listFilms(recommendedFilms);
             } else if (recommendedFilms.length > 1) {
-                text1 += ". Those films are " + listFilms(recommendedFilms);
+                text += ". Those films are " + listFilms(recommendedFilms);
             }
         } else {
             // Case where there are no recommended films
             if (recommendedFilms.length === 0) {
-                text1 = "There are no other films you should watch ";
+                text = "There are no other films you should watch ";
                 if (requestedFilms.length === 1) {
-                    text1 += " before watching " + listFilms(requestedFilms);
+                    text += " before watching " + listFilms(requestedFilms);
                 } else {
-                    text1 += " before/between watching " + listFilms(requestedFilms);
+                    text += " before/between watching " + listFilms(requestedFilms);
                 }
             } else if (rule.value === "Interconnected") {
-                text1 = "In order to have the most interconnected viewing experience possible while only watching " + recommendedFilms.length;
+                text = "In order to have the most interconnected viewing experience possible while only watching " + recommendedFilms.length;
                 if (recommendedFilms.length === 1) {
-                    text1 += " additional film";
+                    text += " additional film";
                 } else {
-                    text1 += " additional films";
+                    text += " additional films";
                 }
-                text1 += ", you should watch " + listFilms(recommendedFilms);
+                text += ", you should watch " + listFilms(recommendedFilms);
                 if (requestedFilms.length === 1) {
-                    text1 += " before watching " + listFilms(requestedFilms);
+                    text += " before watching " + listFilms(requestedFilms);
                 } else {
-                    text1 += " before/between watching " + listFilms(requestedFilms);
+                    text += " before/between watching " + listFilms(requestedFilms);
                 }
             } else if (rule.value === "Relevant") {
                 if (recommendedFilms.length === 1) {
-                    text1 = "The most relevant film to " + listFilms(requestedFilms) + " is " + listFilms(recommendedFilms);
+                    text = "The most relevant film to " + listFilms(requestedFilms) + " is " + listFilms(recommendedFilms);
                 } else {
-                    text1 = "The " + recommendedFilms.length + " most relevant films to " + listFilms(requestedFilms) + " are " + listFilms(recommendedFilms);
+                    text = "The " + recommendedFilms.length + " most relevant films to " + listFilms(requestedFilms) + " are " + listFilms(recommendedFilms);
                 }
             } else if (rule.value === "Recent") {
-                text1 = "When " + listFilms(requestedFilms) + " came out, the ";
+                text = "When " + listFilms(requestedFilms) + " came out, the ";
                 if (recommendedFilms.length === 1) {
-                    text1 += "most recent film featuring characters/plotlines in ";
+                    text += "most recent film featuring characters/plotlines in ";
                 } else {
-                    text1 += recommendedFilms.length + " most recent films featuring characters/plotlines in ";
+                    text += recommendedFilms.length + " most recent films featuring characters/plotlines in ";
                 }
                 if (requestedFilms.length === 1) {
-                    text1 += "this movie ";
+                    text += "this movie ";
                 } else {
-                    text1 += "these movies ";
+                    text += "these movies ";
                 }
                 if (recommendedFilms.length === 1) {
-                    text1 += " was " + listFilms(recommendedFilms);
+                    text += " was " + listFilms(recommendedFilms);
                 } else {
-                    text1 += " were " + listFilms(recommendedFilms);
+                    text += " were " + listFilms(recommendedFilms);
                 }
             }
         }
-        text1 += ".";
-        return text1;
+        text += ".";
+        return text;
     }
 
 
