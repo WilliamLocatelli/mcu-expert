@@ -116,7 +116,9 @@ def find_best_subgraph(watched, children, num_extras):
     # excluded is the candidate movies we are considering for inclusion
     excluded = []
     # if there are less extra films than the total requested films, return all the films.
+    global CURRENT_ANCESTOR_TIER
     if len(nodes) <= num_extras + len(children) + len(watched):
+        CURRENT_ANCESTOR_TIER = 0
         return nodes
     else:
         for movie in nodes:
@@ -127,6 +129,7 @@ def find_best_subgraph(watched, children, num_extras):
     else:
         best_graphs = brute_force_subgraph_helper(excluded, included, num_to_check, included_unwatched)
     result = tie_breaker(best_graphs, excluded, included_unwatched, watched)
+    CURRENT_ANCESTOR_TIER = 0
     return result
 
 
