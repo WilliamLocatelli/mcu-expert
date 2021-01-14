@@ -100,7 +100,7 @@ def find_best_subgraph(watched, children, num_extras):
     nodes = children.copy()
     included_unwatched = children.copy()
     num_to_check = num_extras
-    if RULE == "Interconnected":
+    if RULE == "Interconnected" or RULE == "Recent":
         #  fill the nodes with all parents of the children, excluding isolated parents of the watched films.
         prev_tree(nodes, watched)
     else:
@@ -295,9 +295,9 @@ def limited_prev_tree(nodes, watched, children, n):
     total_nodes = nodes.copy()
     requested_watchlist_count = len(children) + n
     current_level_nodes = nodes.copy()  # the list of nodes whose parents we are currently finding
-    discarded_nodes = []  # used only for Most Recent heuristic
+    # discarded_nodes = []  # used only for Most Recent heuristic
     recently_added_nodes = []  # represents the newest tier (not including any children in the tier)
-    while len(nodes) < requested_watchlist_count and (len(current_level_nodes) > 0 or len(discarded_nodes) > 0):
+    while len(nodes) < requested_watchlist_count and len(current_level_nodes) > 0:  # or len(discarded_nodes) > 0
         CURRENT_ANCESTOR_TIER = CURRENT_ANCESTOR_TIER + 1
         children.clear()
         children.extend(nodes)
@@ -318,27 +318,27 @@ def limited_prev_tree(nodes, watched, children, n):
         # unwatched movies.
         current_level_nodes = list(set(recently_added_nodes) - set(watched)) + children_duplicates
         # make discarded nodes = all the nodes that have been discarded that weren't put back in
-        discarded_nodes = (list((set(discarded_nodes) | set(recently_discarded_nodes)) - set(total_nodes)))
+        # discarded_nodes = (list((set(discarded_nodes) | set(recently_discarded_nodes)) - set(total_nodes)))
         # Check if any of the discarded movies are a parent of a movie we watched. If so, create a custom movie with
         # those movies as parents, and add that custom movie to the next round of parent lookups
         # (but don't add it into anything permanent). This allows us to include less recent parents of our selected
         # movies without including any other parents of watched movies.
-        if len(discarded_nodes) > 0:
-            recently_added_watched = set(watched) & set(recently_added_nodes)  # intersection
-            for movie in recently_added_watched:
-                temp_movie = Movie("Temp Movie")
-                for prev in movie.prevs:
-                    if prev[0] in discarded_nodes:
-                        temp_movie.prevs.append(prev)
-                if len(temp_movie.prevs) > 0:
-                    current_level_nodes.append(temp_movie)
-            # if we traversed the whole tree and somehow missed some nodes, put those nodes back in.
-            if len(current_level_nodes) == 0:
-                temp_movie = Movie("Temp Movie")
-                for discard in discarded_nodes:
-                    temp_movie.prevs.append((discard, 5))
-                current_level_nodes.append(temp_movie)
-                discarded_nodes.clear()
+        # if len(discarded_nodes) > 0:
+        #         #     recently_added_watched = set(watched) & set(recently_added_nodes)  # intersection
+        #         #     for movie in recently_added_watched:
+        #         #         temp_movie = Movie("Temp Movie")
+        #         #         for prev in movie.prevs:
+        #         #             if prev[0] in discarded_nodes:
+        #         #                 temp_movie.prevs.append(prev)
+        #         #         if len(temp_movie.prevs) > 0:
+        #         #             current_level_nodes.append(temp_movie)
+        #         #     # if we traversed the whole tree and somehow missed some nodes, put those nodes back in.
+        #         #     if len(current_level_nodes) == 0:
+        #         #         temp_movie = Movie("Temp Movie")
+        #         #         for discard in discarded_nodes:
+        #         #             temp_movie.prevs.append((discard, 5))
+        #         #         current_level_nodes.append(temp_movie)
+        #         #         discarded_nodes.clear()
         nodes.clear()
         # nodes now equals every node that has been looked at that wasn't watched
         nodes.extend(list(set(total_nodes) - set(watched)))
@@ -372,19 +372,19 @@ def next_tier(movies):
         for prev in movie.prevs:
             if prev[0] not in direct_predecessors and prev[1] > 4:
                 direct_predecessors.append(prev[0])
-    if RULE == "Recent":
-        # step 2: generate family tree to discover if there will be missing pieces
-        nodes = movies.copy()
-        for node in nodes:
-            nodelist = [node]
-            prev_tree(nodelist, [])
-            nodelist.remove(node)
-            for film in nodelist:
-                for prev in film.prevs:
-                    if prev[0] in direct_predecessors and prev[1] > 4:
-                        direct_predecessors.remove(prev[0])
-                        if prev[0] not in discarded_predecessors:
-                            discarded_predecessors.append(prev[0])
+    # if RULE == "Recent":
+    #     # step 2: generate family tree to discover if there will be missing pieces
+    #     nodes = movies.copy()
+    #     for node in nodes:
+    #         nodelist = [node]
+    #         prev_tree(nodelist, [])
+    #         nodelist.remove(node)
+    #         for film in nodelist:
+    #             for prev in film.prevs:
+    #                 if prev[0] in direct_predecessors and prev[1] > 4:
+    #                     direct_predecessors.remove(prev[0])
+    #                     if prev[0] not in discarded_predecessors:
+    #                         discarded_predecessors.append(prev[0])
     return direct_predecessors, discarded_predecessors
 
 
