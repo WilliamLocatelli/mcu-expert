@@ -40,8 +40,7 @@ Rec.import_weighted_from_csv()
 Rec.import_data_from_csv()
 
 # check for the edge case in which the process times out due to heroku's restrictions
-# 10 to 14 doesn't make sense. only 11 should be disallowed. 22 - 11 = 11. 22 - 12 = 10, which is allowed.
-if (data['parents'][0] == "" and len(data['children']) == 1 and 10 < int(data['count']) < 12 and
+if (data['parents'][0] == "" and len(data['children']) == 1 and 10 < int(data['count']) < 14 and
         data['rule'] == "Interconnected" and data['count_rule'] == "Count" and
         data['children'][0] == "Spider-Man: Far From Home"):
     print("{'films': [], 'msg': 'This request is too computationally expensive. This can be fixed by adding a movie" +
