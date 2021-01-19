@@ -304,18 +304,15 @@ def limited_prev_tree(nodes, watched, children, n):
         # Get the next tier. Split the tier up based on whether the films in it have already been checked.
         prev_nodes = next_tier(current_level_nodes)
         recently_added_nodes.clear()
-        children_duplicates = []  # handles situation where a tier contains one of the other movies they wanted to watch
         for prev in prev_nodes:
             if prev not in recently_added_nodes and prev not in total_nodes:
                 recently_added_nodes.append(prev)
-            else:
-                children_duplicates.append(prev)
 
         # Add the new arrivals to the list of total nodes checked.
         total_nodes.extend(recently_added_nodes)  # recently added nodes
         # create a list of the movies whose parents should be checked on the next round. This should be all
         # unwatched movies.
-        current_level_nodes = list(set(recently_added_nodes) - set(watched)) + children_duplicates
+        current_level_nodes = list(set(recently_added_nodes) - set(watched))
 
         nodes.clear()
         # nodes now equals every node that has been looked at that wasn't watched
