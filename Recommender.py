@@ -264,7 +264,8 @@ def tie_breaker(best_graphs, excluded, children, parents):
 #       nodes: the nodes whose ancestors we want to find
 #       watched: the films we've already watched. use to block the pipe so that those films' ancestors aren't scanned
 def prev_tree(nodes, watched):
-    for movie in nodes:
+    nodes_copy = nodes.copy()
+    for movie in nodes_copy:
         for prev in movie.prevs:
             if prev[1] > 4 and prev[0] not in watched and prev[0] not in nodes:
                 nodes.append(prev[0])
