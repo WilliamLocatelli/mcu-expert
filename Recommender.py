@@ -7,7 +7,6 @@ but could be used for other applications with a few minor tweaks.
 import csv
 RULE = "Recent"
 COUNT_RULE = "Count"
-CURRENT_ANCESTOR_TIER = 0
 MOVIES = {}
 GRAPHS_CHECKED = 0
 NUM_TIES = 0
@@ -100,14 +99,16 @@ def find_best_subgraph(watched, children, num_extras):
     nodes = children.copy()
     included_unwatched = children.copy()
     num_to_check = num_extras
-    if RULE == "Interconnected" or RULE == "Recent":
+    use_relevant = False
+    if RULE != "Relevant":
         #  fill the nodes with all parents of the children, excluding isolated parents of the watched films.
         prev_tree(nodes, watched)
     else:
         #  generate each tier of ancestors one at a time, dequeuing the ancestors into the included_unwatched
         #  if fewer than num_extras ancestors have been discovered. nodes will contain the nodes in
         #  included_unwatched plus the nodes in the final tier.
-        num_to_check = limited_prev_tree(nodes, watched, included_unwatched, num_extras)
+        num_to_check, use_relevant = limited_prev_tree(nodes, watched, children, num_extras, included_unwatched)
+
     # add parents to nodes. they couldn't be added before because we didn't want their parents to also get added.
     for parent in watched:
         nodes.append(parent)
@@ -116,9 +117,7 @@ def find_best_subgraph(watched, children, num_extras):
     # excluded is the candidate movies we are considering for inclusion
     excluded = []
     # if there are less extra films than the total requested films, return all the films.
-    global CURRENT_ANCESTOR_TIER
     if len(nodes) <= num_extras + len(children) + len(watched):
-        CURRENT_ANCESTOR_TIER = 0
         return nodes
     else:
         for movie in nodes:
@@ -127,9 +126,8 @@ def find_best_subgraph(watched, children, num_extras):
     if RULE == "Recent":
         best_graphs = [most_recent_movies(excluded, included, num_to_check)]
     else:
-        best_graphs = brute_force_subgraph_helper(excluded, included, num_to_check, included_unwatched)
+        best_graphs = brute_force_subgraph_helper(excluded, included, num_to_check, included_unwatched, relevant=use_relevant)
     result = tie_breaker(best_graphs, excluded, included_unwatched, watched)
-    CURRENT_ANCESTOR_TIER = 0
     return result
 
 
@@ -168,7 +166,7 @@ def most_recent_movies(excluded, included, num):
 #           included: films which should be included in every graph
 #           children: the films people want to watch - a subset of included
 #           n:        the size of each final graph should equal len(included) + n
-def brute_force_subgraph_helper(excluded, included, n, children):
+def brute_force_subgraph_helper(excluded, included, n, children, relevant=False):
     global GRAPHS_CHECKED
     best_graphs = []
     if n == 0:
@@ -184,8 +182,8 @@ def brute_force_subgraph_helper(excluded, included, n, children):
         included_copy.append(movie)
         excluded_copy.remove(movie)
         best_graph_next_level = []
-        best_graph_next_level += brute_force_subgraph_helper(excluded_copy, included_copy, n - 1, children)
-        if RULE == "Relevant" and CURRENT_ANCESTOR_TIER < 2:
+        best_graph_next_level += brute_force_subgraph_helper(excluded_copy, included_copy, n - 1, children, relevant)
+        if relevant:
             weight = subgraph_weight(list(set(best_graph_next_level[0]) - set(children)), children)
         else:
             weight = subgraph_weight(best_graph_next_level[0], best_graph_next_level[0])
@@ -287,42 +285,35 @@ def prev_tree(nodes, watched):
 #   watched: films which have already been watched
 #   children: films which were requested
 #   n: number of ancestors to add to nodes before stopping
-# Returns: The number of additional films in nodes which should be added to children using some other algorithm.
-def limited_prev_tree(nodes, watched, children, n):
-    global CURRENT_ANCESTOR_TIER
-    # all of the nodes whose ancestors have been checked, and all of the ancestors. different from nodes in that nodes
-    # does not include any watched.
-    total_nodes = nodes.copy()
-    requested_watchlist_count = len(children) + n
-    current_level_nodes = nodes.copy()  # the list of nodes whose parents we are currently finding
-    recently_added_nodes = []  # represents the newest tier (not including any children in the tier)
-    while len(nodes) < requested_watchlist_count and len(current_level_nodes) > 0:
-        CURRENT_ANCESTOR_TIER = CURRENT_ANCESTOR_TIER + 1
-        children.clear()
-        children.extend(nodes)
-
-        # Get the next tier. Split the tier up based on whether the films in it have already been checked.
-        prev_nodes = next_tier(current_level_nodes)
-        recently_added_nodes.clear()
-        for prev in prev_nodes:
-            if prev not in recently_added_nodes and prev not in total_nodes:
-                recently_added_nodes.append(prev)
-
-        # Add the new arrivals to the list of total nodes checked.
-        total_nodes.extend(recently_added_nodes)  # recently added nodes
-        # create a list of the movies whose parents should be checked on the next round. This should be all
-        # unwatched movies.
-        current_level_nodes = list(set(recently_added_nodes) - set(watched))
-
-        nodes.clear()
-        # nodes now equals every node that has been looked at that wasn't watched
-        nodes.extend(list(set(total_nodes) - set(watched)))
-        if COUNT_RULE == "Whatever It Takes" and RULE == "Relevant":  # breaks out of loop after first tier
-            break
-    # set children to the nodes minus the "recently added" nodes
-    # children = list(set(nodes) - set(recently_added_nodes))
-    # number left to check will be how many they wanted minus how many we already have
-    return requested_watchlist_count - len(children)
+# Returns a tuple containing:
+#   The number of additional films in nodes which should be added to children using some other algorithm.
+#   True iff the subgraph weight should be calculated based on most_relevant
+def limited_prev_tree(nodes, watched, children, num_extras, included_unwatched):
+    # Use sets to simplify updating
+    nodes_set = set(nodes)
+    included_unwatched_set = set(included_unwatched)
+    use_relevant = False
+    # Get ancestors of these nodes
+    ancestors = next_tier(nodes)
+    unwatched_ancestors = list(set(ancestors) - set(watched))
+    nodes_set.update(unwatched_ancestors)  # put unwatched ancestors into nodes
+    n = len(nodes_set) - len(children)  # n is the number of additional movies we have added so far
+    if n > num_extras:
+        use_relevant = True
+    else:
+        while len(ancestors) > 0 and n < num_extras:  # if n == num_extras, we won't enter the loop
+            # Dump unwatched ancestors into included unwatched
+            included_unwatched_set.update(set(unwatched_ancestors))
+            ancestors = list(set(next_tier(unwatched_ancestors)) - set(children))  # get new ancestors
+            unwatched_ancestors = list(set(ancestors) - set(watched))
+            nodes_set.update(unwatched_ancestors)  # Dump unwatched ancestors into nodes
+            n = len(nodes_set) - len(children)
+    # put sets back into lists
+    nodes.clear()
+    nodes.extend(list(nodes_set))
+    included_unwatched.clear()
+    included_unwatched.extend(list(included_unwatched_set))
+    return num_extras - (len(included_unwatched) - len(children)), use_relevant
 
 
 # computes and returns the weight of all links between set parents and set children
