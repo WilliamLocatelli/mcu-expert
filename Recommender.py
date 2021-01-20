@@ -90,13 +90,12 @@ def get_graphs_checked():
 
 # find the n best other movies to watch if you've watched the watched and want to watch the children
 # parameters:
-#           watched:    list of films which have already been watched
-#           children:   list of films which they want to watch
+#           watched:    set of films which have already been watched
+#           children:   set of films which they want to watch
 #           num_extras: the number of additional films to be included
-#           rule:       the heuristic to be used to select additional films
-# returns: a list of movies - the set of movies which has the highest weight
+# returns: a list of movies, including all the movies in watched and children plus the up to n recommended films
 def find_best_subgraph(watched, children, num_extras):
-    nodes = list(children.copy())
+    nodes = children.copy()
     included_unwatched = children.copy()
     num_to_check = num_extras
     use_relevant = False
@@ -111,14 +110,14 @@ def find_best_subgraph(watched, children, num_extras):
 
     # add parents to nodes. they couldn't be added before because we didn't want their parents to also get added.
     for parent in watched:
-        nodes.append(parent)
+        nodes.add(parent)
     # included is all the movies we know we are going to include
     included = list(watched | included_unwatched)
     # excluded is the candidate movies we are considering for inclusion
     excluded = []
     # if there are less extra films than the total requested films, return all the films.
     if len(nodes) <= num_extras + len(children) + len(watched):
-        return nodes
+        return list(nodes)
     else:
         for movie in nodes:
             if movie not in included:
@@ -133,7 +132,7 @@ def find_best_subgraph(watched, children, num_extras):
 
 # generates a watch order, excluding movies which have already been watched
 # parameters:
-#           watched: list of movies which have already been watched
+#           watched: set of movies which have already been watched
 #           subgraph: list of the all the movies in the watch list
 # return format: string
 def watch_order(watched, subgraph):
@@ -166,6 +165,7 @@ def most_recent_movies(excluded, included, num):
 #           included: films which should be included in every graph
 #           children: the films people want to watch - a subset of included
 #           n:        the size of each final graph should equal len(included) + n
+#           relevant: if True, compute subgraph weight based on edges from parents to children
 def brute_force_subgraph_helper(excluded, included, n, children, relevant=False):
     global GRAPHS_CHECKED
     best_graphs = []
@@ -261,43 +261,41 @@ def tie_breaker(best_graphs, excluded, children, parents):
 # NOTE: THIS FUNCTION MODIFIES THE PARAMETER NODES
 # generates subgraph containing all ancestors of every node in nodes
 # parameters:
-#       nodes: the nodes whose ancestors we want to find
+#       nodes: set of nodes whose ancestors we want to find
 #       watched: the films we've already watched. use to block the pipe so that those films' ancestors aren't scanned
 def prev_tree(nodes, watched):
     nodes_copy = nodes.copy()
     for movie in nodes_copy:
         for prev in movie.prevs:
             if prev[1] > 4 and prev[0] not in watched and prev[0] not in nodes:
-                nodes.append(prev[0])
+                nodes.add(prev[0])
                 prev_tree(nodes, watched)
 
 
-# NOTE: THIS FUNCTION MODIFIES THE PARAMETERS NODES AND CHILDREN
-# Generates a limited ancestor tree, containing only more recent ancestors
-# ancestors are broken up into generations. All ancestors from every generation up to n ancestors
+# NOTE: THIS FUNCTION MODIFIES THE PARAMETERS NODES AND INCLUDED_UNWATCHED
+# Generates a limited ancestor tree, containing only more recent ancestors.
+# Ancestors are broken up into generations. All ancestors from every generation up to n ancestors
 # will be returned in nodes, while all ancestors from every generation except the most ancient will
-# be returned in children.
-#
+# be returned in included_unwatched.
 # The final tier which reaches or surpasses n will be included; in other words, the final size of nodes
-# will always be greater than or equal to n + children, while the final size of children will always be
-# less than or equal to n + (the original size of) children.
+# will always be greater than or equal to n + children, while the final size of included_unwatched will
+# always be less than or equal to n + children.
 # Parameters:
 #   nodes: all unwatched nodes in the graph
 #   watched: films which have already been watched
 #   children: films which were requested
-#   n: number of ancestors to add to nodes before stopping
+#   num_extras: number of ancestors to add to nodes before stopping
+#   included_unwatched: every unwatched film, requested or otherwise, which is guaranteed to be included in the result
 # Returns a tuple containing:
 #   The number of additional films in nodes which should be added to children using some other algorithm.
 #   True iff the subgraph weight should be calculated based on most_relevant
 def limited_prev_tree(nodes, watched, children, num_extras, included_unwatched):
-    # Use sets to simplify updating
-    nodes_set = set(nodes)
     use_relevant = False
     # Get ancestors of these nodes
-    ancestors = next_tier(nodes_set)
+    ancestors = next_tier(nodes)
     unwatched_ancestors = ancestors - watched
-    nodes_set.update(unwatched_ancestors)  # put unwatched ancestors into nodes
-    n = len(nodes_set) - len(children)  # n is the number of additional movies we have added so far
+    nodes.update(unwatched_ancestors)  # put unwatched ancestors into nodes
+    n = len(nodes) - len(children)  # n is the number of additional movies we have added so far
     if n > num_extras:
         use_relevant = True
     else:
@@ -306,11 +304,9 @@ def limited_prev_tree(nodes, watched, children, num_extras, included_unwatched):
             included_unwatched.update(unwatched_ancestors)
             ancestors = next_tier(unwatched_ancestors) - children  # get new ancestors
             unwatched_ancestors = ancestors - watched
-            nodes_set.update(unwatched_ancestors)  # Dump unwatched ancestors into nodes
-            n = len(nodes_set) - len(children)
+            nodes.update(unwatched_ancestors)  # Dump unwatched ancestors into nodes
+            n = len(nodes) - len(children)
     # put sets back into lists
-    nodes.clear()
-    nodes.extend(list(nodes_set))
     return num_extras - (len(included_unwatched) - len(children)), use_relevant
 
 
@@ -326,7 +322,7 @@ def subgraph_weight(parents, children):
     return weight
 
 
-# returns the most recent ancestors of a list of movies. If RULE == Most Recent,
+# returns the most recent ancestors of a set of movies. If RULE == Most Recent,
 # trims off any ancestors of other ancestors and returns them in discarded_predecessors.
 def next_tier(movies):
     # step 1: find all nodes which are immediately relevant
