@@ -96,7 +96,7 @@ def get_graphs_checked():
 #           rule:       the heuristic to be used to select additional films
 # returns: a list of movies - the set of movies which has the highest weight
 def find_best_subgraph(watched, children, num_extras):
-    nodes = children.copy()
+    nodes = list(children.copy())
     included_unwatched = children.copy()
     num_to_check = num_extras
     use_relevant = False
@@ -113,7 +113,7 @@ def find_best_subgraph(watched, children, num_extras):
     for parent in watched:
         nodes.append(parent)
     # included is all the movies we know we are going to include
-    included = watched + included_unwatched
+    included = list(watched | included_unwatched)
     # excluded is the candidate movies we are considering for inclusion
     excluded = []
     # if there are less extra films than the total requested films, return all the films.
@@ -184,7 +184,7 @@ def brute_force_subgraph_helper(excluded, included, n, children, relevant=False)
         best_graph_next_level = []
         best_graph_next_level += brute_force_subgraph_helper(excluded_copy, included_copy, n - 1, children, relevant)
         if relevant:
-            weight = subgraph_weight(list(set(best_graph_next_level[0]) - set(children)), children)
+            weight = subgraph_weight(list(set(best_graph_next_level[0]) - children), children)
         else:
             weight = subgraph_weight(best_graph_next_level[0], best_graph_next_level[0])
         if weight > max_weight:
@@ -220,7 +220,7 @@ def tie_breaker(best_graphs, excluded, children, parents):
         i = 0
         best_graphs_no_parents = []
         while i < len(best_graphs):
-            best_graphs_no_parents.append(list(set(best_graphs[i]) - set(parents)))
+            best_graphs_no_parents.append(list(set(best_graphs[i]) - parents))
             i += 1
         i = 0
         while i < len(best_graphs):
@@ -292,11 +292,10 @@ def prev_tree(nodes, watched):
 def limited_prev_tree(nodes, watched, children, num_extras, included_unwatched):
     # Use sets to simplify updating
     nodes_set = set(nodes)
-    included_unwatched_set = set(included_unwatched)
     use_relevant = False
     # Get ancestors of these nodes
-    ancestors = next_tier(nodes)
-    unwatched_ancestors = list(set(ancestors) - set(watched))
+    ancestors = next_tier(nodes_set)
+    unwatched_ancestors = ancestors - watched
     nodes_set.update(unwatched_ancestors)  # put unwatched ancestors into nodes
     n = len(nodes_set) - len(children)  # n is the number of additional movies we have added so far
     if n > num_extras:
@@ -304,16 +303,14 @@ def limited_prev_tree(nodes, watched, children, num_extras, included_unwatched):
     else:
         while len(ancestors) > 0 and n < num_extras:  # if n == num_extras, we won't enter the loop
             # Dump unwatched ancestors into included unwatched
-            included_unwatched_set.update(set(unwatched_ancestors))
-            ancestors = list(set(next_tier(unwatched_ancestors)) - set(children))  # get new ancestors
-            unwatched_ancestors = list(set(ancestors) - set(watched))
+            included_unwatched.update(unwatched_ancestors)
+            ancestors = next_tier(unwatched_ancestors) - children  # get new ancestors
+            unwatched_ancestors = ancestors - watched
             nodes_set.update(unwatched_ancestors)  # Dump unwatched ancestors into nodes
             n = len(nodes_set) - len(children)
     # put sets back into lists
     nodes.clear()
     nodes.extend(list(nodes_set))
-    included_unwatched.clear()
-    included_unwatched.extend(list(included_unwatched_set))
     return num_extras - (len(included_unwatched) - len(children)), use_relevant
 
 
@@ -333,11 +330,11 @@ def subgraph_weight(parents, children):
 # trims off any ancestors of other ancestors and returns them in discarded_predecessors.
 def next_tier(movies):
     # step 1: find all nodes which are immediately relevant
-    direct_predecessors = []
+    direct_predecessors = set()
     for movie in movies:
         for prev in movie.prevs:
             if prev[0] not in direct_predecessors and prev[1] > 4:
-                direct_predecessors.append(prev[0])
+                direct_predecessors.add(prev[0])
     return direct_predecessors
 
 

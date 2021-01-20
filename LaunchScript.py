@@ -21,14 +21,14 @@ def get_objects_and_find_best_subgraph(watched, children, num_extras, rule, coun
     movies = Rec.get_movies()
     if count_rule == "Whatever It Takes":
         num_extras = len(movies)
-    watched_movies = []
-    child_movies = []
+    watched_movies = set()
+    child_movies = set()
     for movie in watched:
         if movie in movies.keys():
-            watched_movies.append(movies[movie])
+            watched_movies.add(movies[movie])
     for movie in children:
         if movie in movies.keys():
-            child_movies.append(movies[movie])
+            child_movies.add(movies[movie])
     result = Rec.find_best_subgraph(watched_movies, child_movies, num_extras)
     return Rec.watch_order(watched_movies, result)
 
