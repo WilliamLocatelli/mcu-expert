@@ -125,7 +125,11 @@ def find_best_subgraph(watched, children, num_extras):
     if RULE == "Recent":
         best_graphs = [most_recent_movies(excluded, included, num_to_check)]
     else:
-        graphs_and_weights = brute_force_subgraph_helper(excluded, included, num_to_check, included_unwatched, relevant=use_relevant)
+        if use_relevant:
+            initial_weight = subgraph_weight(watched, children)
+        else:
+            initial_weight = subgraph_weight(included, included)
+        graphs_and_weights = brute_force_subgraph_helper(excluded, included, num_to_check, included_unwatched, initial_weight, relevant=use_relevant)
         best_graphs = []
         for graph, weight in graphs_and_weights:
             best_graphs.append(graph)
@@ -171,26 +175,26 @@ def most_recent_movies(excluded, included, num):
 #           children: the films people want to watch - a subset of included
 #           n:        the size of each final graph should equal len(included) + n
 #           relevant: if True, compute subgraph weight based on edges from parents to children
-def brute_force_subgraph_helper(excluded, included, n, children, relevant=False):
+def brute_force_subgraph_helper(excluded, included, n, children, parent_weight, relevant=False):
     global GRAPHS_CHECKED
     best_graphs = []
     if n == 0:
         GRAPHS_CHECKED += 1
         subgraph = included.copy()
-        if relevant:
-            weight = subgraph_weight(list(set(subgraph) - children), children)
-        else:
-            weight = subgraph_weight(subgraph, subgraph)
-        return [(subgraph, weight)]
+        return [(subgraph, parent_weight)]
     max_weight = 0
     # best_graph = included
     excluded_copy = excluded.copy()
     included_copy = included.copy()
     while len(excluded_copy) > n - 1:
         movie = excluded_copy[0]
+        if relevant:
+            current_weight = subgraph_weight([movie], children) + parent_weight
+        else:
+            current_weight = subgraph_weight([movie], included_copy) + subgraph_weight(included_copy, [movie]) + parent_weight
         included_copy.append(movie)
         excluded_copy.remove(movie)
-        best_graph_next_level = brute_force_subgraph_helper(excluded_copy, included_copy, n - 1, children, relevant)
+        best_graph_next_level = brute_force_subgraph_helper(excluded_copy, included_copy, n - 1, children, current_weight, relevant)
         graph, weight = best_graph_next_level[0]
         if weight > max_weight:
             max_weight = weight

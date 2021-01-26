@@ -20,7 +20,8 @@ def test_all_films():
     are_same = True
     for i in range(10000):
         rule = rules[math.floor(random() * 3)]
-        #rule = "Relevant"
+        #rule = rules[math.floor(random() * 2) + 1]
+        # rule = "Relevant"
         #if i % 2 == 0:
         #    rule = "Recent"
         Rec.set_rule(rule)
@@ -58,8 +59,10 @@ def test_all_films():
             print("Rule 1 was " + Rec.RULE)
             print("Rule 2 was " + Rec2.RULE)
             print("watched = " + get_names(watched1) + ", children = " + get_names(children1) + ", num_extras = " + str(num_extras))
-            print("Graph 1 was " + get_names(graph1))
-            print("Graph 2 was " + get_names(graph2))
+            extras1 = filter_graphs(graph1, watched1, children1)
+            extras2 = filter_graphs(graph2, watched2, children2)
+            print("Graph 1 was " + get_names(extras1))
+            print("Graph 2 was " + get_names(extras2))
             break
         else:
             for movie1 in graph1:
@@ -72,13 +75,22 @@ def test_all_films():
                 print("Rule 1 was " + Rec.RULE)
                 print("Rule 2 was " + Rec2.RULE)
                 print("watched = " + get_names(watched1) + ", children = " + get_names(children1) + ", num_extras = " + str(num_extras))
-                print("Graph 1 was " + get_names(graph1))
-                print("Graph 2 was " + get_names(graph2))
+                extras1 = filter_graphs(graph1, watched1, children1)
+                extras2 = filter_graphs(graph2, watched2, children2)
+                print("Graph 1 was " + get_names(extras1))
+                print("Graph 2 was " + get_names(extras2))
                 break
         if i % 500 == 0:
             print(i)
     if are_same:
         print("Succeeded")
+
+def filter_graphs(graph, watched_films, children_films):
+    result = []
+    for film in graph:
+        if film not in watched_films and film not in children_films:
+            result.append(film)
+    return result
 
 '''num_watched = 2
 num_children = 2
