@@ -40,12 +40,12 @@ Rec.import_weighted_from_csv()
 Rec.import_data_from_csv()
 
 # check for the edge case in which the process times out due to heroku's restrictions
-if (data['parents'][0] == "" and len(data['children']) == 1 and 10 < int(data['count']) < 14 and
+'''if (data['parents'][0] == "" and len(data['children']) == 1 and 10 < int(data['count']) < 14 and
         data['rule'] == "Interconnected" and data['count_rule'] == "Count" and
         data['children'][0] == "Spider-Man: Far From Home"):
     print("{'films': [], 'msg': 'This request is too computationally expensive. This can be fixed by adding a movie" +
           " you want to see, increasing/decreasing the number of requested films, or changing the heuristic.'}")
-else:
-    films = get_objects_and_find_best_subgraph(data['parents'], data['children'], int(data['count']), data['rule'],
+else:'''
+films = get_objects_and_find_best_subgraph(data['parents'], data['children'], int(data['count']), data['rule'],
                                                data['count_rule'])
-    print("{'films': " + str(films) + ", 'msg': []}")
+print("{'films': " + str(films) + ", 'msg': []}")

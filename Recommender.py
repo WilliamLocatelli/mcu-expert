@@ -125,7 +125,12 @@ def find_best_subgraph(watched, children, num_extras):
     if RULE == "Recent":
         best_graphs = [most_recent_movies(excluded, included, num_to_check)]
     else:
-        best_graphs = brute_force_subgraph_helper(excluded, included, num_to_check, included_unwatched, relevant=use_relevant)
+        graphs_and_weights = brute_force_subgraph_helper(excluded, included, num_to_check, included_unwatched, relevant=use_relevant)
+        best_graphs = []
+        for graph, weight in graphs_and_weights:
+            best_graphs.append(graph)
+
+    #print(best_graphs)
     result = tie_breaker(best_graphs, excluded, included_unwatched, watched)
     return result
 
@@ -172,7 +177,11 @@ def brute_force_subgraph_helper(excluded, included, n, children, relevant=False)
     if n == 0:
         GRAPHS_CHECKED += 1
         subgraph = included.copy()
-        return [subgraph]
+        if relevant:
+            weight = subgraph_weight(list(set(subgraph) - children), children)
+        else:
+            weight = subgraph_weight(subgraph, subgraph)
+        return [(subgraph, weight)]
     max_weight = 0
     # best_graph = included
     excluded_copy = excluded.copy()
@@ -181,12 +190,8 @@ def brute_force_subgraph_helper(excluded, included, n, children, relevant=False)
         movie = excluded_copy[0]
         included_copy.append(movie)
         excluded_copy.remove(movie)
-        best_graph_next_level = []
-        best_graph_next_level += brute_force_subgraph_helper(excluded_copy, included_copy, n - 1, children, relevant)
-        if relevant:
-            weight = subgraph_weight(list(set(best_graph_next_level[0]) - children), children)
-        else:
-            weight = subgraph_weight(best_graph_next_level[0], best_graph_next_level[0])
+        best_graph_next_level = brute_force_subgraph_helper(excluded_copy, included_copy, n - 1, children, relevant)
+        graph, weight = best_graph_next_level[0]
         if weight > max_weight:
             max_weight = weight
             best_graphs = best_graph_next_level.copy()
@@ -281,11 +286,11 @@ def prev_tree(nodes, watched):
 # will always be greater than or equal to n + children, while the final size of included_unwatched will
 # always be less than or equal to n + children.
 # Parameters:
-#   nodes: all unwatched nodes in the graph
-#   watched: films which have already been watched
-#   children: films which were requested
+#   nodes: set of all unwatched nodes in the graph
+#   watched: set of films which have already been watched
+#   children: set of films which were requested
+#   included_unwatched: set of every unwatched film which is guaranteed to be included in output
 #   num_extras: number of ancestors to add to nodes before stopping
-#   included_unwatched: every unwatched film, requested or otherwise, which is guaranteed to be included in the result
 # Returns a tuple containing:
 #   The number of additional films in nodes which should be added to children using some other algorithm.
 #   True iff the subgraph weight should be calculated based on most_relevant

@@ -26,10 +26,10 @@ def test_all_films():
         Rec.set_rule(rule)
         Rec2.set_rule(rule)
         films = all_films.copy()
-        watched1 = []
-        children1 = []
-        watched2 = []
-        children2 = []
+        watched1 = set()
+        children1 = set()
+        watched2 = set()
+        children2 = set()
         num_watched = math.floor(random() * len(all_films) / 3)
         num_children = 1 + math.floor(random() * len(all_films) / 3)
         num_extras = math.floor(random() * len(all_films) / 3)
@@ -38,14 +38,14 @@ def test_all_films():
         # num_extras = 2
         for num in range(num_watched):
             n = math.floor(random() * len(films))
-            watched1.append(Rec.MOVIES[films[n]])
-            watched2.append(Rec2.MOVIES[films[n]])
+            watched1.add(Rec.MOVIES[films[n]])
+            watched2.add(Rec2.MOVIES[films[n]])
             films.remove(films[n])
 
         for num in range(num_children):
             n = math.floor(random() * len(films))
-            children1.append(Rec.MOVIES[films[n]])
-            children2.append(Rec2.MOVIES[films[n]])
+            children1.add(Rec.MOVIES[films[n]])
+            children2.add(Rec2.MOVIES[films[n]])
             films.remove(films[n])
 
         graph1 = Rec.find_best_subgraph(watched1, children1, num_extras)
@@ -75,7 +75,8 @@ def test_all_films():
                 print("Graph 1 was " + get_names(graph1))
                 print("Graph 2 was " + get_names(graph2))
                 break
-
+        if i % 500 == 0:
+            print(i)
     if are_same:
         print("Succeeded")
 
@@ -92,18 +93,18 @@ for num in range(num_children):
     films.remove(films[n])'''
 
 def test_specific_example(num_extras, watched, children):
-    watched1 = []
-    children1 = []
-    watched2 = []
-    children2 = []
+    watched1 = set()
+    children1 = set()
+    watched2 = set()
+    children2 = set()
     for name in watched:
-        watched1.append(Rec.MOVIES[name])
+        watched1.add(Rec.MOVIES[name])
     for name in children:
-        children1.append(Rec.MOVIES[name])
+        children1.add(Rec.MOVIES[name])
     for name in watched:
-        watched2.append(Rec2.MOVIES[name])
+        watched2.add(Rec2.MOVIES[name])
     for name in children:
-        children2.append(Rec2.MOVIES[name])
+        children2.add(Rec2.MOVIES[name])
     Rec.set_rule("Relevant")
     graph1 = Rec.find_best_subgraph(watched1, children1, num_extras)
     Rec2.set_rule("Relevant")
@@ -111,15 +112,17 @@ def test_specific_example(num_extras, watched, children):
     print("graph 1 is " + get_names(graph1))
     print("graph 2 is " + get_names(graph2))
 
+
 Rec.import_weighted_from_csv()
 Rec.import_data_from_csv()
 Rec2.import_weighted_from_csv()
 Rec2.import_data_from_csv()
 
-watched = ['Iron Man 2', 'Iron Man', 'Avengers: Age of Ultron', 'Captain America: The Winter Soldier', 'The Avengers', 'Ant-Man', 'Guardians of the Galaxy']
-children = ['Doctor Strange', 'Black Panther', 'Iron Man 3']
+watched = ['Ant-Man', 'Captain Marvel', 'Guardians of the Galaxy']
+children = ['Iron Man 2', 'Black Panther', 'Spider-Man: Homecoming', 'Captain America: The Winter Soldier']
 
-extras = 5
+extras = 7
+
 # test_specific_example(extras, watched, children)
 
 test_all_films()
