@@ -9,7 +9,7 @@
     let wantToSee = null;
     let numToSearch = 0;
     let rule = null;
-    const NUM_FILMS = 23;
+    const NUM_FILMS = 24;
 
     window.addEventListener("load", LoadData);
 
@@ -50,7 +50,7 @@
             .then(populateScreen)
             .catch(console.error);*/
         // make movies selectable
-        let movies = document.querySelectorAll("#movies p");
+        let movies = document.querySelectorAll(".movies p");
         for (let i = 0; i < movies.length; i++) {
             movies[i].addEventListener("click", selectElement);
         }
@@ -82,7 +82,7 @@
         this.classList.toggle("selected");
         // Figure out what page we're on
         let header = document.querySelector("#instructions h2").textContent;
-        if (header === "Step 1: Select the movies you've already seen") {
+        if (header === "Step 1: Select the movies and shows you've already seen") {
             this.classList.toggle("seen");
         } else {
             this.classList.toggle("wantToSee");
@@ -98,7 +98,7 @@
         // Update prev/next buttons & instructions
         updatePrevNext(screen2, screen3, reset, backto1);
         document.getElementById("previous").textContent = "Previous";
-        document.querySelector("#instructions h2").textContent = "Step 2. Select the movies you're interested in seeing";
+        document.querySelector("#instructions h2").textContent = "Step 2. Select the movies and shows you're interested in seeing";
         document.querySelector("#instructions .subheading").textContent = "You'll be recommended movies to watch before you watch these.";
         // Mark movies already seen
         seenBefore = document.querySelectorAll(".selected");
@@ -127,7 +127,7 @@
         // Make sure at least one movie is selected
         wantToSee = document.querySelectorAll(".selected");
         if (wantToSee.length === 0) {
-            document.querySelector("#instructions .subheading").textContent = "Must select at least one movie you want to see.";
+            document.querySelector("#instructions .subheading").textContent = "Must select at least one movie or show you want to see.";
             return;
         }
         document.querySelector("#instructions .subheading").classList.add("hidden");
@@ -146,7 +146,7 @@
             seenBefore[i].classList.add("seen");
         }
         // disable clicking on movies
-        let allMovies = document.querySelectorAll("#movies p");
+        let allMovies = document.querySelectorAll(".movies p");
         for (let i = 0; i < allMovies.length; i++) {
             allMovies[i].classList.add("disabled");
         }
@@ -242,98 +242,15 @@
         document.getElementById("previous").addEventListener("click", backto3);
     }
 
-    /*
-     * Generates a sentence telling the user what their recommended films are.
-     */
-    function generateSentence(recommendedFilms, requestedFilms) {
-        let text;
-        let rule = document.querySelector('input[name=heuristic]:checked');
-        let count = parseInt(document.getElementById("count").value);
-        if (recommendedFilms.length < count) {
-            if (count === 1) {
-                text = "You requested 1 film, but there "
-            } else {
-                text = "You requested " + count + " films, but there";
-            }
-            if (recommendedFilms.length === 0) {
-                text += " are no films to watch before";
-            } else if (recommendedFilms.length === 1) {
-                text += " is only 1 film to watch before";
-            } else {
-                text += " are only " + recommendedFilms.length + " films to watch before";
-            }
-            if (requestedFilms.length === 1) {
-                text += " watching ";
-            } else {
-                text += "/between watching ";
-            }
-            text += listFilms(requestedFilms);
-            if (recommendedFilms.length === 1) {
-                text += ". That film is " + listFilms(recommendedFilms);
-            } else if (recommendedFilms.length > 1) {
-                text += ". Those films are " + listFilms(recommendedFilms);
-            }
-        } else {
-            // Case where there are no recommended films
-            if (recommendedFilms.length === 0) {
-                text = "There are no other films you should watch ";
-                if (requestedFilms.length === 1) {
-                    text += " before watching " + listFilms(requestedFilms);
-                } else {
-                    text += " before/between watching " + listFilms(requestedFilms);
-                }
-            } else if (rule.value === "Interconnected") {
-                text = "In order to have the most interconnected viewing experience possible while only watching " + recommendedFilms.length;
-                if (recommendedFilms.length === 1) {
-                    text += " additional film";
-                } else {
-                    text += " additional films";
-                }
-                text += ", you should watch " + listFilms(recommendedFilms);
-                if (requestedFilms.length === 1) {
-                    text += " before watching " + listFilms(requestedFilms);
-                } else {
-                    text += " before/between watching " + listFilms(requestedFilms);
-                }
-            } else if (rule.value === "Relevant") {
-                if (recommendedFilms.length === 1) {
-                    text = "The most relevant film to " + listFilms(requestedFilms) + " is " + listFilms(recommendedFilms);
-                } else {
-                    text = "The " + recommendedFilms.length + " most relevant films to " + listFilms(requestedFilms) + " are " + listFilms(recommendedFilms);
-                }
-            } else if (rule.value === "Recent") {
-                text = "When " + listFilms(requestedFilms) + " came out, the ";
-                if (recommendedFilms.length === 1) {
-                    text += "most recent film featuring characters/plotlines in ";
-                } else {
-                    text += recommendedFilms.length + " most recent films featuring characters/plotlines in ";
-                }
-                if (requestedFilms.length === 1) {
-                    text += "this movie ";
-                } else {
-                    text += "these movies ";
-                }
-                if (recommendedFilms.length === 1) {
-                    text += " was " + listFilms(recommendedFilms);
-                } else {
-                    text += " were " + listFilms(recommendedFilms);
-                }
-            }
-        }
-        text += ".";
-        return text;
-    }
-
-
     //-----------------------------------------Back Button Functions-----------------------------------------\\
     /*
      * Transitions from screen 2 to screen 1 by updating previous/next buttons, coloring/disabling movies,
      * and changing instructions.
      */
     function backto1() {
-        document.querySelector("#instructions h2").textContent = "Step 1: Select the movies you've already seen";
+        document.querySelector("#instructions h2").textContent = "Step 1: Select the movies and shows you've already seen";
         document.querySelector("#instructions .subheading").textContent = "If you don't remember the " +
-            "movie and wouldn't mind watching it again, don't select it.";
+            "movie or show and wouldn't mind watching it again, don't select it.";
         wantToSee = document.querySelectorAll(".selected");
         for (let i = 0; i < wantToSee.length; i++) {
             wantToSee[i].classList.remove("selected");
@@ -356,7 +273,7 @@
     function backto2() {
         updatePrevNext(submit, screen3, backto2, backto1)
         document.getElementById("next").textContent = "Next";
-        let allMovies = document.querySelectorAll("#movies p");
+        let allMovies = document.querySelectorAll(".movies p");
         for (let i = 0; i < allMovies.length; i++) {
             allMovies[i].classList.remove("disabled");
             //allMovies[i].classList.remove("wantToSee");
@@ -369,7 +286,7 @@
             seenBefore[i].classList.add("disabled");
         }
 
-        document.querySelector("#instructions h2").textContent = "Step 2. Select the movies you're interested in seeing";
+        document.querySelector("#instructions h2").textContent = "Step 2. Select the movies and shows you're interested in seeing";
         document.querySelector("#instructions .subheading").textContent = "You'll be recommended movies to watch before you watch these.";
         document.querySelector("#instructions .subheading").classList.remove("hidden");
         document.getElementById("options").classList.add("hidden");
@@ -404,7 +321,7 @@
         wantToSee = null;
         numToSearch = 0;
         rule = null;
-        let allMovies = document.querySelectorAll("#movies p");
+        let allMovies = document.querySelectorAll(".movies p");
 
         for (let i = 0; i < allMovies.length; i++) {
             allMovies[i].classList.remove("selected");
@@ -511,5 +428,87 @@
         if (newPrev !== null) {
             prev.addEventListener("click", newPrev);
         }
+    }
+
+    /*
+     * Generates a sentence telling the user what their recommended films are.
+     */
+    function generateSentence(recommendedFilms, requestedFilms) {
+        let text;
+        let rule = document.querySelector('input[name=heuristic]:checked');
+        let count = parseInt(document.getElementById("count").value);
+        if (recommendedFilms.length < count) {
+            if (count === 1) {
+                text = "You requested 1 film, but there "
+            } else {
+                text = "You requested " + count + " films, but there";
+            }
+            if (recommendedFilms.length === 0) {
+                text += " are no films to watch before";
+            } else if (recommendedFilms.length === 1) {
+                text += " is only 1 film to watch before";
+            } else {
+                text += " are only " + recommendedFilms.length + " films to watch before";
+            }
+            if (requestedFilms.length === 1) {
+                text += " watching ";
+            } else {
+                text += "/between watching ";
+            }
+            text += listFilms(requestedFilms);
+            if (recommendedFilms.length === 1) {
+                text += ". That film is " + listFilms(recommendedFilms);
+            } else if (recommendedFilms.length > 1) {
+                text += ". Those films are " + listFilms(recommendedFilms);
+            }
+        } else {
+            // Case where there are no recommended films
+            if (recommendedFilms.length === 0) {
+                text = "There are no other films you should watch ";
+                if (requestedFilms.length === 1) {
+                    text += " before watching " + listFilms(requestedFilms);
+                } else {
+                    text += " before/between watching " + listFilms(requestedFilms);
+                }
+            } else if (rule.value === "Interconnected") {
+                text = "In order to have the most interconnected viewing experience possible while only watching " + recommendedFilms.length;
+                if (recommendedFilms.length === 1) {
+                    text += " additional film";
+                } else {
+                    text += " additional films";
+                }
+                text += ", you should watch " + listFilms(recommendedFilms);
+                if (requestedFilms.length === 1) {
+                    text += " before watching " + listFilms(requestedFilms);
+                } else {
+                    text += " before/between watching " + listFilms(requestedFilms);
+                }
+            } else if (rule.value === "Relevant") {
+                if (recommendedFilms.length === 1) {
+                    text = "The most relevant film to " + listFilms(requestedFilms) + " is " + listFilms(recommendedFilms);
+                } else {
+                    text = "The " + recommendedFilms.length + " most relevant films to " + listFilms(requestedFilms) + " are " + listFilms(recommendedFilms);
+                }
+            } else if (rule.value === "Recent") {
+                text = "When " + listFilms(requestedFilms) + " came out, the ";
+                if (recommendedFilms.length === 1) {
+                    text += "most recent film featuring characters/plotlines in ";
+                } else {
+                    text += recommendedFilms.length + " most recent films featuring characters/plotlines in ";
+                }
+                if (requestedFilms.length === 1) {
+                    text += "this movie ";
+                } else {
+                    text += "these movies ";
+                }
+                if (recommendedFilms.length === 1) {
+                    text += " was " + listFilms(recommendedFilms);
+                } else {
+                    text += " were " + listFilms(recommendedFilms);
+                }
+            }
+        }
+        text += ".";
+        return text;
     }
 })();

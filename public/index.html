@@ -21,8 +21,8 @@ pick the movies.
     <div class="container-fluid">
         <div id="main" class="row">
             <div id="instructions" class="col-sm-9 col-md-3">
-                <h2>Step 1: Select the movies you've already seen</h2>
-                <h3 class="subheading">If you don't remember the movie and wouldn't mind watching it again, don't select it.</h3>
+                <h2>Step 1: Select the movies and shows you've already seen</h2>
+                <h3 class="subheading">If you don't remember the movie or show and wouldn't mind watching it again, don't select it.</h3>
                 <div id="options" class="hidden">
                     <h3>How many additional movies are you willing to watch?</h3>
                     <div>
@@ -30,7 +30,7 @@ pick the movies.
                             <input type="radio" id="select_num" name="count_rule" value="Count" class = "hidden" checked>
                             <label for="select_num"><input type="number" id="count" min=1 max=22 value=3><br></label>
                         </div>
-                        <input type="range" id="count-slider" min=1 max=22 value=3><br>
+                        <input type="range" id="count-slider" min=1 max=23 value=3><br>
                         <div class="hidden">
                             <input type="radio" id="whatever" name="count_rule" value="Whatever It Takes">
                             <label for="whatever">Whatever It Takes</label>
@@ -57,45 +57,54 @@ pick the movies.
                 <button id="previous" disabled>Reset</button>
                 <button id="next">Next</button>
             </div>
-            <div id="movies" class="col-sm-12 col-md">
-                <div>
-                    <p id="iron-man">Iron Man</p>
-                    <p id="iron-man-2">Iron Man 2</p>
-                    <p id="iron-man-3">Iron Man 3</p>
+            <div class="col-sm-12 col-md">
+                <h2>Movies</h2>
+                <div class="movies" >
+                    <div>
+                        <p id="iron-man">Iron Man</p>
+                        <p id="iron-man-2">Iron Man 2</p>
+                        <p id="iron-man-3">Iron Man 3</p>
+                    </div>
+                    <div>
+                        <p id="thor">Thor</p>
+                        <p id="thor:-the-dark-world">Thor: The Dark World</p>
+                        <p id="thor:-ragnarok">Thor: Ragnarok</p>
+                    </div>
+                    <div>
+                        <p id="captain-america:-the-first-avenger">Captain America: The First Avenger</p>
+                        <p id="captain-america:-the-winter-soldier">Captain America: The Winter Soldier</p>
+                        <p id="captain-america:-civil-war">Captain America: Civil War</p>
+                    </div>
+                    <div>
+                        <p id="the-incredible-hulk">The Incredible Hulk</p>
+                        <p id="guardians-of-the-galaxy">Guardians of the Galaxy</p>
+                        <p id="guardians-of-the-galaxy-vol.-2">Guardians of the Galaxy Vol. 2</p>
+                    </div>
+                    <div>
+                        <p id="the-avengers">The Avengers</p>
+                        <p id="avengers:-age-of-ultron">Avengers: Age of Ultron</p>
+                        <p id="avengers:-infinity-war">Avengers: Infinity War</p>
+                        <p id="avengers:-endgame">Avengers: Endgame</p>
+                    </div>
+                    <div class="end">
+                        <p id="ant-man">Ant-Man</p>
+                        <p id="ant-man-and-the-wasp">Ant-Man and the Wasp</p>
+                        <p id="doctor-strange">Doctor Strange</p>
+                    </div>
+                    <div class="end">
+                        <p id="spider-man:-homecoming">Spider-Man: Homecoming</p>
+                        <p id="spider-man:-far-from-home">Spider-Man: Far From Home</p>
+                    </div>
+                    <div class="end">
+                        <p id="black-panther">Black Panther</p>
+                        <p id="captain-marvel">Captain Marvel</p>
+                    </div>
                 </div>
-                <div>
-                    <p id="thor">Thor</p>
-                    <p id="thor:-the-dark-world">Thor: The Dark World</p>
-                    <p id="thor:-ragnarok">Thor: Ragnarok</p>
-                </div>
-                <div>
-                    <p id="captain-america:-the-first-avenger">Captain America: The First Avenger</p>
-                    <p id="captain-america:-the-winter-soldier">Captain America: The Winter Soldier</p>
-                    <p id="captain-america:-civil-war">Captain America: Civil War</p>
-                </div>
-                <div>
-                    <p id="the-incredible-hulk">The Incredible Hulk</p>
-                    <p id="guardians-of-the-galaxy">Guardians of the Galaxy</p>
-                    <p id="guardians-of-the-galaxy-vol.-2">Guardians of the Galaxy Vol. 2</p>
-                </div>
-                <div>
-                    <p id="the-avengers">The Avengers</p>
-                    <p id="avengers:-age-of-ultron">Avengers: Age of Ultron</p>
-                    <p id="avengers:-infinity-war">Avengers: Infinity War</p>
-                    <p id="avengers:-endgame">Avengers: Endgame</p>
-                </div>
-                <div class="end">
-                    <p id="ant-man">Ant-Man</p>
-                    <p id="ant-man-and-the-wasp">Ant-Man and the Wasp</p>
-                    <p id="doctor-strange">Doctor Strange</p>
-                </div>
-                <div class="end">
-                    <p id="spider-man:-homecoming">Spider-Man: Homecoming</p>
-                    <p id="spider-man:-far-from-home">Spider-Man: Far From Home</p>
-                </div>
-                <div class="end">
-                    <p id="black-panther">Black Panther</p>
-                    <p id="captain-marvel">Captain Marvel</p>
+                <h2>Disney+ Series</h2>
+                <div class="movies">
+                    <div>
+                        <p id="wandavision">WandaVision</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -112,7 +121,7 @@ pick the movies.
                     allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         </div>
     </div>
-    <footer>©2020 William Locatelli ◦ <a href="FAQ.html">FAQ</a> ◦ <a href="https://github.com/WilliamLocatelli/mcu-expert">Github</a>
+    <footer>©2021 William Locatelli ◦ <a href="FAQ.html">FAQ</a> ◦ <a href="https://github.com/WilliamLocatelli/mcu-expert">Github</a>
         ◦ <a href="https://www.linkedin.com/in/william-locatelli/">LinkedIn</a>
     </footer>
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

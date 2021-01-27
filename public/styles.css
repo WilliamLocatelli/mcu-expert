@@ -47,7 +47,7 @@ h1 {
     font-weight: bold;
 }
 
-#movies div {
+.movies div {
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
@@ -106,14 +106,14 @@ h3 {
     color: red;
 }
 
-#movies {
+.movies {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
 }
 
-#movies p {
+.movies p {
     width: 120px;
     height: 80px;
     padding: 15px;
@@ -125,11 +125,11 @@ h3 {
     font-size: small;
 }
 
-#movies p:hover {
+.movies p:hover {
     background-color: lightblue;
 }
 
-#movies p.seen:hover {
+.movies p.seen:hover {
     background-color: #97becc;
 }
 
@@ -141,25 +141,25 @@ h3 {
     display: none;
 }
 
-/*#movies p.selected {
+/*.movies p.selected {
     background-color: lightgreen;
     /*outline: 2px solid black;*//*
 }*/
 
-#movies p.wantToSee:hover {
+.movies p.wantToSee:hover {
     background-color: rgba(50,120,60,0.51);
 }
 
-#movies p.disabled {
+.movies p.disabled {
     pointer-events: none;
 }
 
-#movies p.wantToSee {
+.movies p.wantToSee {
     /*background-color: #ffba69;*/
     background-color: lightgreen;
 }
 
-#movies p.seen {
+.movies p.seen {
     color: rgba(99,99,99,0.65);
     border-color: rgba(99,99,99,0.65);
 }
@@ -168,7 +168,7 @@ h3 {
     white-space: pre-line;
 }
 
-#movies p.recommended {
+.movies p.recommended {
     background-color: #fffe6a;
 }
 
