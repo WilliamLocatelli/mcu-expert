@@ -5,6 +5,7 @@ It is designed to be used for selecting movies from the Marvel Cinematic Univers
 but could be used for other applications with a few minor tweaks.
 """
 import csv
+from math import comb
 RULE = "Recent"
 COUNT_RULE = "Count"
 MOVIES = {}
@@ -129,6 +130,7 @@ def find_best_subgraph(watched, children, num_extras):
             initial_weight = subgraph_weight(watched, children)
         else:
             initial_weight = subgraph_weight(included, included)
+        num_to_check = ensure_small(excluded, included, num_to_check)
         graphs_and_weights = brute_force_subgraph_helper(excluded, included, num_to_check, included_unwatched, initial_weight, relevant=use_relevant)
         best_graphs = []
         for graph, weight in graphs_and_weights:
@@ -153,6 +155,18 @@ def watch_order(watched, subgraph):
 
 
 ##############################################  HELPER FUNCTIONS  ##############################################
+
+def ensure_small(excluded, included, n):
+    excluded_copy = excluded.copy()
+    size = comb(len(excluded), n)
+    if size > 500000:
+        for movie in excluded_copy:
+            if "Avengers" in movie.name:
+                excluded.remove(movie)
+                included.append(movie)
+                n = n-1
+    return n
+
 
 # Returns a list containing included plus the num most recent movies in excluded.
 def most_recent_movies(excluded, included, num):
