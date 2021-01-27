@@ -3,6 +3,7 @@ Copyright 2020 William Locatelli.
 Styles the main page and other pages for the Marvel Movie Wizard Picker.
  */
 body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     display: flex;
     flex-direction: column;
     margin: auto;
