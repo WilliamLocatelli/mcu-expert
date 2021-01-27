@@ -5,7 +5,7 @@ It is designed to be used for selecting movies from the Marvel Cinematic Univers
 but could be used for other applications with a few minor tweaks.
 """
 import csv
-from math import *
+import math
 RULE = "Recent"
 COUNT_RULE = "Count"
 MOVIES = {}
@@ -158,7 +158,8 @@ def watch_order(watched, subgraph):
 
 def ensure_small(excluded, included, n):
     excluded_copy = excluded.copy()
-    size = comb(len(excluded), n)
+    f = math.factorial
+    size = f(len(excluded)) // f(n) // f(len(excluded)-n)
     if size > 500000:
         for movie in excluded_copy:
             if "Avengers" in movie.name:
