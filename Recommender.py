@@ -5,7 +5,7 @@ It is designed to be used for selecting movies from the Marvel Cinematic Univers
 but could be used for other applications with a few minor tweaks.
 """
 import csv
-from math import comb
+from math import *
 RULE = "Recent"
 COUNT_RULE = "Count"
 MOVIES = {}
