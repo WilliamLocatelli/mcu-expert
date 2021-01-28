@@ -48,6 +48,10 @@ h1 {
     font-weight: bold;
 }
 
+h1 a, h1 a:hover {
+    color: black;
+}
+
 .movies div {
     display: flex;
     flex-direction: column;
