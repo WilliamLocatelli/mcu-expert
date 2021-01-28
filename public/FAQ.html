@@ -22,10 +22,6 @@ The FAQ page for the Marvel Movie Picker Helper Wizard App.
         When you watch the movies you've been wanting to see, you probably will want to have seen a few other movies
         first so you have proper context for the movies you're watching. This app will give you recommendations for
         which other movies to watch first.</p>
-    <!--<h4>Why did I get fewer movies than I requested?</h4>
-    <p>The algorithms recommend you movies to watch before you watch your selected movies. You will never be recommended
-    movies released after your newest selected movie, which can result in fewer recommendations
-    than you requested.</p>-->
     <h4>What does MCU stand for?</h4>
     <p>The MCU is the Marvel Cinematic Universe, which is the setting of every film made by Marvel Studios, and
         the upcoming Disney+ shows made by Marvel Studios, and many now-cancelled television shows made by Marvel
@@ -33,11 +29,6 @@ The FAQ page for the Marvel Movie Picker Helper Wizard App.
     <h4>Why are Marvel movies like the X-Men films, Fantastic Four, Deadpool, Venom, etc left out?</h4>
     <p>Those movies contain Marvel characters, but they were not made by Marvel Studios, and they do not take place
         in the Marvel Cinematic Universe.</p>
-    <!--<h4>Why should I trust you? This app is obviously very subjective and I'm probably a bigger MCU fan than you!</h4>
-    <p>If you're a bigger MCU fan than me, you aren't the target audience for this app because you've already seen
-        all of the movies many times. And if your friends want to know which movies they should watch, they'll just ask you,
-        so you don't need to worry about them getting bad info from this site! However, for anyone who doesn't have you as
-        a friend, this site will hopefully be more useful than having no resource at all.</p>-->
     <h3>What Does Each Algorithm Do?</h3>
     <p>The algorithms are currently undergoing revision - these FAQs will be updated when the revisions are complete.</p>
     <h4>Most Interconnected</h4>
@@ -62,29 +53,14 @@ The FAQ page for the Marvel Movie Picker Helper Wizard App.
         nothing in these movies is relevant to <em>Black Panther</em>, so the Most Recent option will skip those and
         instead recommend you <em>Avengers: Age of Ultron</em>, <em>Ant-Man</em>, and <em>Captain America: Civil War</em>.
     </p>
-    <!--<h4>What does Whatever It Takes do?</h4>
-    <p>Whatever It Takes will give you the "default" movies for the algorithm you selected.</p>
-    <p>If you selected Most Relevant, you will be recommended all the movies immediately relevant to your selected
-        movies and nothing else.</p>
-
-    <p>When Most Interconnected or Most Recent is selected, Whatever It Takes is treated exactly the same as if you had
-        requested an unlimited number of movies, which means that both of these options will give the same results.</p>-->
-    <!--<p>If you selected Most Recent, it will give you all the movies which your movies directly continue from, but no
-        movies that those additional movies continue from. For example, if you request the most recent movies to
-        <em>Avengers: Infinity War</em>, you will receive <em>Guardians Of The Galaxy Vol. 2</em>,
-        <em>Spider-Man: Homecoming</em>, <em>Thor: Ragnarok</em>, and <em>Black Panther</em>. You will not receive
-        <em>Captain America: Civil War</em>, as <em>Spider-Man: Homecoming</em> and <em>Black Panther</em> both
-        continue stories from <em>Captain America: Civil War</em>. Another way of explaining this would be to say
-        you get the most recent movies which could be watched in any order.</p>-->
     <h3>How does the code work?</h3>
     <p>The set of films is modeled as a weighted directed acyclic graph, where each vertex represents a film. Connections
         between the films are represented as edges between the vertices, with stronger connections having higher weights.
         The way the films are selected from this graph is dependent on which algorithm you choose.
     </p>
     <h4>How are the weights chosen?</h4>
-    <p>The weights are based on a highly subjective scale, which is based on my highly subjective evaluation
-        of the relevance of each film to each other film. In order to try to reduce the subjectivity of the weights, I
-        standardized them as best as I could. For the full set of weight rules, click <a href="Weights.html">here</a>.
+    <p>The weights, which represent the relevance of each film to each other film, have been standardized in order
+        to minimize subjectivity. For the full set of weight rules, click <a href="Weights.html">here</a>.
     </p>
     <h4>How are ties broken?</h4>
     <p>Within the algorithm, ties are generally broken by the little microconnections between movies, which are given a
@@ -98,11 +74,11 @@ The FAQ page for the Marvel Movie Picker Helper Wizard App.
         <li>Which movies are connected to the most other movies, including movies you aren't going to be recommended?</li>
     </ol>
     <h4>Does this project use Artificial Intelligence (AI)?</h4>
-    <p>Artifical Intelligence is very poorly defined. In what is known as the <a href="https://en.wikipedia.org/wiki/AI_effect">
-        AI effect</a>, as soon as a task becomes achievable by computers, people decide that task doesn't count as AI
-        anymore. The task of telling someone what movies they should watch certainly sounds to me like something you
-        would only expect a human to be able to do. But I don't think the programming strategies I used for this project
-        would be considered AI by most programmers.</p>
+    <p>Artifical Intelligence is poorly defined. In what is known as the <a href="https://en.wikipedia.org/wiki/AI_effect">
+        AI effect</a>, as soon as a task becomes achievable by computers, the ability to perform that task is no longer
+        perceived as requiring intelligence. The task of telling someone what movies they should watch might sound like
+        something you would only expect a human to be able to do, but the programming strategies used for this project
+        would not be considered AI by most programmers.</p>
     <footer>
         <p><a href="/"><em>Return to Main Page</em></a></p>
         <p>©2021 William Locatelli.</p>
