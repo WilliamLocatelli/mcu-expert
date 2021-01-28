@@ -14,71 +14,73 @@ The FAQ page for the Marvel Movie Picker Helper Wizard App.
 <body>
     <h1><a href="/">Which Marvel Movies Should I Watch?</a></h1>
     <h2 class="subheading">For casual viewers who don't want to watch every movie.</h2>
-    <h2>Frequently Asked Questions</h2>
-    <h3>General</h3>
-    <h4>What is the point of this app?</h4>
-    <p>There are 23 movies and counting in the Marvel Cinematic Universe. You may have have seen a few of them, and
-        there may be a few you want to see. (If you want to watch all 23 movies, this app is pointless for you!!)
-        When you watch the movies you've been wanting to see, you probably will want to have seen a few other movies
-        first so you have proper context for the movies you're watching. This app will give you recommendations for
-        which other movies to watch first.</p>
-    <h4>What does MCU stand for?</h4>
-    <p>The MCU is the Marvel Cinematic Universe, which is the setting of every film made by Marvel Studios, and
-        the upcoming Disney+ shows made by Marvel Studios, and many now-cancelled television shows made by Marvel
-        Television. For more on this, see <a href="http://en.Wikipedia.org/wiki/Marvel_Cinematic_Universe">Wikipedia</a>.</p>
-    <h4>Why are Marvel movies like the X-Men films, Fantastic Four, Deadpool, Venom, etc left out?</h4>
-    <p>Those movies contain Marvel characters, but they were not made by Marvel Studios, and they do not take place
-        in the Marvel Cinematic Universe.</p>
-    <h3>What Does Each Algorithm Do?</h3>
-    <p>The algorithms are currently undergoing revision - these FAQs will be updated when the revisions are complete.</p>
-    <h4>Most Interconnected</h4>
-    <p>Selecting the Most Interconnected option will get you a set of movies which have characters, plotlines, etc that
-        are all highly interconnected with the movies you've seen, the movies you want to watch, and each other. Note:
-        if the movies you want to watch are not highly interconnected with many other movies, you will likely end up
-        being recommended movies which are highly interconnected with each other, and only somewhat related to the
-        movies you've been wanting to watch.
-    </p>
-    <h4>Most Relevant</h4>
-    <p>Selecting the Most Relevant option will get you a set of movies which have characters, plotlines, etc that
-        are most relevant to the movies you want to watch. These movies may not be very related to each other; they are
-        only guaranteed to be relevant to your selected movies. (Note: If you request more movies than the number of
-        relevant movies to your selections, you will still be served the full number of movies you selected. The extra
-        movies will be movies which are very interconnected with the movies relevant to your selected movies.)
-    </p>
-    <h4>Most Recent</h4>
-    <p>Selecting the Most Recent option does not simply recommend you the movies released most recently to your selected
-        movies. It gets rid of any movies that don't include characters, plotlines, etc that are present in your
-        selected movies. For example, the 3 most recently released movies before <em>Black Panther</em> are
-        <em>Guardians of The Galaxy Vol. 2</em>, <em>Spider-Man: Homecoming</em>, and <em>Thor: Ragnarok</em>. But
-        nothing in these movies is relevant to <em>Black Panther</em>, so the Most Recent option will skip those and
-        instead recommend you <em>Avengers: Age of Ultron</em>, <em>Ant-Man</em>, and <em>Captain America: Civil War</em>.
-    </p>
-    <h3>How does the code work?</h3>
-    <p>The set of films is modeled as a weighted directed acyclic graph, where each vertex represents a film. Connections
-        between the films are represented as edges between the vertices, with stronger connections having higher weights.
-        The way the films are selected from this graph is dependent on which algorithm you choose.
-    </p>
-    <h4>How are the weights chosen?</h4>
-    <p>The weights, which represent the relevance of each film to each other film, have been standardized in order
-        to minimize subjectivity. For the full set of weight rules, click <a href="Weights.html">here</a>.
-    </p>
-    <h4>How are ties broken?</h4>
-    <p>Within the algorithm, ties are generally broken by the little microconnections between movies, which are given a
-        weight of 1 for this purpose. However, sometimes 2 or 3 sets of movies end up being equally good based on the
-        metrics used here. These ties are broken by a series of 3 metrics, each of which only comes into play if the
-        previous metric fails to break the tie:
-    <ol>
-        <li>Which set of movies has the highest weight if we ignore the movies you've already seen?</li>
-        <li>Which movies have the highest Rotten Tomatoes scores? (As this is designed for more casual viewers,
-        if 2 sets of movies are equally relevant, you might as well pick the movies considered the best.)</li>
-        <li>Which movies are connected to the most other movies, including movies you aren't going to be recommended?</li>
-    </ol>
-    <h4>Does this project use Artificial Intelligence (AI)?</h4>
-    <p>Artifical Intelligence is poorly defined. In what is known as the <a href="https://en.wikipedia.org/wiki/AI_effect">
-        AI effect</a>, as soon as a task becomes achievable by computers, the ability to perform that task is no longer
-        perceived as requiring intelligence. The task of telling someone what movies they should watch might sound like
-        something you would only expect a human to be able to do, but the programming strategies used for this project
-        would not be considered AI by most programmers.</p>
+    <main>
+        <h2>Frequently Asked Questions</h2>
+        <h3>General</h3>
+        <h4>What is the point of this app?</h4>
+        <p>There are 23 movies and counting in the Marvel Cinematic Universe. You may have have seen a few of them, and
+            there may be a few you want to see.
+            When you watch the movies you've been wanting to see, you probably will want to have seen a few other movies
+            first so you have proper context for the movies you're watching. This app will give you recommendations for
+            which other movies to watch first.</p>
+        <h4>What does MCU stand for?</h4>
+        <p>The MCU is the Marvel Cinematic Universe, which is the setting of every film made by Marvel Studios, and
+            the upcoming Disney+ shows made by Marvel Studios, and many now-cancelled television shows made by Marvel
+            Television. For more on this, see <a href="http://en.Wikipedia.org/wiki/Marvel_Cinematic_Universe">Wikipedia</a>.</p>
+        <h4>Why are Marvel movies like the X-Men films, Fantastic Four, Deadpool, Venom, etc left out?</h4>
+        <p>Those movies contain Marvel characters, but they were not made by Marvel Studios, and they do not take place
+            in the Marvel Cinematic Universe.</p>
+        <h3>What Does Each Algorithm Do?</h3>
+        <p>The algorithms are currently undergoing revision - these FAQs will be updated when the revisions are complete.</p>
+        <h4>Most Interconnected</h4>
+        <p>Selecting the Most Interconnected option will get you a set of movies which have characters, plotlines, etc that
+            are all highly interconnected with the movies you've seen, the movies you want to watch, and each other. Note:
+            if the movies you want to watch are not highly interconnected with many other movies, you will likely end up
+            being recommended movies which are highly interconnected with each other, and only somewhat related to the
+            movies you've been wanting to watch.
+        </p>
+        <h4>Most Relevant</h4>
+        <p>Selecting the Most Relevant option will get you a set of movies which have characters, plotlines, etc that
+            are most relevant to the movies you want to watch. These movies may not be very related to each other; they are
+            only guaranteed to be relevant to your selected movies. (Note: If you request more movies than the number of
+            relevant movies to your selections, you will still be served the full number of movies you selected. The extra
+            movies will be movies which are very interconnected with the movies relevant to your selected movies.)
+        </p>
+        <h4>Most Recent</h4>
+        <p>Selecting the Most Recent option does not simply recommend you the movies released most recently to your selected
+            movies. It gets rid of any movies that don't include characters, plotlines, etc that are present in your
+            selected movies. For example, the 3 most recently released movies before <em>Black Panther</em> are
+            <em>Guardians of The Galaxy Vol. 2</em>, <em>Spider-Man: Homecoming</em>, and <em>Thor: Ragnarok</em>. But
+            nothing in these movies is relevant to <em>Black Panther</em>, so the Most Recent option will skip those and
+            instead recommend you <em>Avengers: Age of Ultron</em>, <em>Ant-Man</em>, and <em>Captain America: Civil War</em>.
+        </p>
+        <h3>How does the code work?</h3>
+        <p>The set of films is modeled as a weighted directed acyclic graph, where each vertex represents a film. Connections
+            between the films are represented as edges between the vertices, with stronger connections having higher weights.
+            The way the films are selected from this graph is dependent on which algorithm you choose.
+        </p>
+        <h4>How are the weights chosen?</h4>
+        <p>The weights, which represent the relevance of each film to each other film, have been standardized in order
+            to minimize subjectivity. For the full set of weight rules, click <a href="Weights.html">here</a>.
+        </p>
+        <h4>How are ties broken?</h4>
+        <p>Within the algorithm, ties are generally broken by the little microconnections between movies, which are given a
+            weight of 1 for this purpose. However, sometimes 2 or 3 sets of movies end up being equally good based on the
+            metrics used here. These ties are broken by a series of 3 metrics, each of which only comes into play if the
+            previous metric fails to break the tie:
+        <ol>
+            <li>Which set of movies has the highest weight if we ignore the movies you've already seen?</li>
+            <li>Which movies have the highest Rotten Tomatoes scores? (As this is designed for more casual viewers,
+            if 2 sets of movies are equally relevant, you might as well pick the movies considered the best.)</li>
+            <li>Which movies are connected to the most other movies, including movies you aren't going to be recommended?</li>
+        </ol>
+        <h4>Does this project use Artificial Intelligence (AI)?</h4>
+        <p>Artifical Intelligence is poorly defined. In what is known as the <a href="https://en.wikipedia.org/wiki/AI_effect">
+            AI effect</a>, as soon as a task becomes achievable by computers, the ability to perform that task is no longer
+            perceived as requiring intelligence. The task of telling someone what movies they should watch might sound like
+            something you would only expect a human to be able to do, but the programming strategies used for this project
+            would not be considered AI by most programmers.</p>
+    </main>
     <footer>
         <p><a href="/"><em>Return to Main Page</em></a></p>
         <p>©2021 William Locatelli.</p>
