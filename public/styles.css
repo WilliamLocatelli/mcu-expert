@@ -181,6 +181,10 @@ h3 {
     font-style: italic;
 }
 
+.movies div.row-class {
+    flex-direction: row;
+}
+
 .youtube-inner-container {
     position: relative;
     overflow: hidden;
