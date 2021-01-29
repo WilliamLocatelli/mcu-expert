@@ -55,6 +55,7 @@ In step 1, edges of weight 1 are always treated as if they do not exist.
 ### Tier-based algorithms
 **The Tier-based algorithms are being phased out in favor of more practically useful algorithms. This description will
 be updated when that process is complete.**
+
 2 of the 3 algorithms find candidates in a tier-based manner. All candidates in every tier except the outermost tier
 will always be included. For example, if the user asks for 10 recommendations, and there are 5 movies in tier 1 and 4
 in tier 2, all 5 movies in tier 1 and all 4 movies in tier 2 will be included, in addition to some 1 movie from tier 3.
