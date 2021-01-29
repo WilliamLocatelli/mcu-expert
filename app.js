@@ -75,7 +75,7 @@ app.get('/main/', async function(req, res) {
  */
 app.post('/results/', async function (req, res) {
     try {
-        let count = parseFloat(JSON.parse(req.body.options).count)
+        let count = parseFloat(JSON.parse(req.body.options).count);
         if (count < 1) {
             res.status(400).json({"error": "Cannot select a negative number of films"})
         } else if (isNaN(count) || !Number.isInteger(count)) {
@@ -84,7 +84,6 @@ app.post('/results/', async function (req, res) {
             const python = spawn('python', [path.join(__dirname, 'LaunchScript.py'), req.body.options]);
             let dataToSend = '["no data"]\n';
             python.stdout.on('data', (data) => {
-                console.log('Pipe data from python script ...');
                 dataToSend = data.toString();
             });
             python.stderr.on('data', (data) => {
@@ -93,12 +92,16 @@ app.post('/results/', async function (req, res) {
             python.on('close', (code) => {
                 console.log(`child process close all stdio with code ${code}`);
                 // send data to frontend
+                let data = JSON.parse(dataToSend.substring(0, dataToSend.length - 1).replace(/'/g, '"'));
+                let message = generateSentence(req.body.options, data["films"]);
+                let result = concatenateResult(data["films"], message);
                 res.text;
-                res.send(dataToSend.substring(0, dataToSend.length - 1));
+                res.send(result);
             });
         }
 
     } catch(err) {
+        console.error(err);
         res.status(500).json({'error': 'Internal server error'});
     }
 });
@@ -112,6 +115,127 @@ async function getDBConnection() {
     driver: sqlite3.Database
   });
   return db;
+}
+
+/*
+ * Puts films and message into a single stringified JSON object
+ */
+function concatenateResult(films, message) {
+    let result = "{\'films\': [\'" + films[0] + "\'";
+    for (let i = 1; i < films.length; i++) {
+        result += ",\'" + films[i] + "\'";
+    }
+    result += "], \'msg\': \'";
+    result += message;
+    result += "\'}";
+    return result;
+}
+
+/*
+ * Generates a sentence telling the user what their recommended films are.
+ */
+function generateSentence(options, films) {
+    options = JSON.parse(options);
+    let rule = options['rule'];
+    let requestedFilms = options["children"];
+    let text;
+    let unwatchedFilms = films.filter(x => !options["parents"].includes(x));
+    let recommendedFilms = unwatchedFilms.filter(x => !options["children"].includes(x));
+    let count = parseInt(options["count"]);
+    if (recommendedFilms.length < count) {
+        if (count === 1) {
+            text = "You requested 1 film, but there "
+        } else {
+            text = "You requested " + count + " films, but there";
+        }
+        if (recommendedFilms.length === 0) {
+            text += " are no films to watch before";
+        } else if (recommendedFilms.length === 1) {
+            text += " is only 1 film to watch before";
+        } else {
+            text += " are only " + recommendedFilms.length + " films to watch before";
+        }
+        if (requestedFilms.length === 1) {
+            text += " watching ";
+        } else {
+            text += "/between watching ";
+        }
+        text += listFilms(requestedFilms);
+        if (recommendedFilms.length === 1) {
+            text += ". That film is " + listFilms(recommendedFilms);
+        } else if (recommendedFilms.length > 1) {
+            text += ". Those films are " + listFilms(recommendedFilms);
+        }
+    } else {
+        // Case where there are no recommended films
+        if (recommendedFilms.length === 0) {
+            text = "There are no other films you should watch ";
+            if (requestedFilms.length === 1) {
+                text += " before watching " + listFilms(requestedFilms);
+            } else {
+                text += " before/between watching " + listFilms(requestedFilms);
+            }
+        } else if (rule === "Interconnected") {
+            text = "In order to have the most interconnected viewing experience possible while only watching " + recommendedFilms.length;
+            if (recommendedFilms.length === 1) {
+                text += " additional film";
+            } else {
+                text += " additional films";
+            }
+            text += ", you should watch " + listFilms(recommendedFilms);
+            if (requestedFilms.length === 1) {
+                text += " before watching " + listFilms(requestedFilms);
+            } else {
+                text += " before/between watching " + listFilms(requestedFilms);
+            }
+        } else if (rule === "Relevant") {
+            if (recommendedFilms.length === 1) {
+                text = "The most relevant film to " + listFilms(requestedFilms) + " is " + listFilms(recommendedFilms);
+            } else {
+                text = "The " + recommendedFilms.length + " most relevant films to " + listFilms(requestedFilms) + " are " + listFilms(recommendedFilms);
+            }
+        } else if (rule === "Recent") {
+            text = "When " + listFilms(requestedFilms) + " came out, the ";
+            if (recommendedFilms.length === 1) {
+                text += "most recent film featuring characters/plotlines in ";
+            } else {
+                text += recommendedFilms.length + " most recent films featuring characters/plotlines in ";
+            }
+            if (requestedFilms.length === 1) {
+                text += "this movie ";
+            } else {
+                text += "these movies ";
+            }
+            if (recommendedFilms.length === 1) {
+                text += " was " + listFilms(recommendedFilms);
+            } else {
+                text += " were " + listFilms(recommendedFilms);
+            }
+        }
+    }
+    text += ".";
+    return text;
+}
+
+/*
+ * Returns a string which lists the films in list.
+ * list - array containing the titles of all films to list
+ * returns: a string of the format "<film name>" for single-item lists, "<film name> and <film name>" for 2-item
+ *          lists, and "<film name>, <film name>, and <film name>" for lists containing 3+ items.
+ */
+function listFilms(list) {
+    if (list.length === 1) {
+        return "<cite>" + list[0] + "</cite>";
+    } else if (list.length === 2) {
+        return "<cite>" + list[0] + "</cite> and <cite>" + list[1] + "</cite>";
+    } else {
+        let result = "";
+        for (let i = 0; i < list.length - 1; i++) {
+            result += "<cite>" + list[i] + "</cite>, ";
+        }
+        result += "and <cite>" + list[list.length - 1] + "</cite>";
+        return result;
+    }
 }
 
 app.get('*', function(req, res){

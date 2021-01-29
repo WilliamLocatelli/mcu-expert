@@ -200,8 +200,6 @@
             document.getElementById("error").textContent = data['msg'];
             document.getElementById("error").classList.remove("hidden");
         }
-        let recommendedFilms = [];
-        let requestedFilms = [];
         let recs = document.getElementById("recs");
         let order = document.getElementById("watch-order");
         order.innerHTML = "";
@@ -217,11 +215,9 @@
                 }
             }
             if (requested) {
-                requestedFilms.push(movie);
                 //result.textContent += " (Your selection)";
                 result.classList.add("requested");
             } else {
-                recommendedFilms.push(movie);
                 movieObj.classList.add("recommended");
                 //result.textContent += " (Our recommended film)";
             }
@@ -231,7 +227,7 @@
         }
         // generate text output
 
-        recs.innerHTML = generateSentence(recommendedFilms, requestedFilms);
+        recs.innerHTML = data["msg"];
 
         // update instructions box
         document.querySelector("#instructions h2").textContent = "Done! Scroll down for results.";
@@ -377,26 +373,6 @@
         document.getElementById("error").classList.remove("hidden");
     }
 
-    /*
-     * Returns a string which lists the films in list.
-     * list - array containing the titles of all films to list
-     * returns: a string of the format "<film name>" for single-item lists, "<film name> and <film name>" for 2-item
-     *          lists, and "<film name>, <film name>, and <film name>" for lists containing 3+ items.
-     */
-    function listFilms(list) {
-        if (list.length === 1) {
-            return "<cite>" + list[0] + "</cite>";
-        } else if (list.length === 2) {
-            return "<cite>" + list[0] + "</cite> and <cite>" + list[1] + "</cite>";
-        } else {
-            let result = "";
-            for (let i = 0; i < list.length - 1; i++) {
-                result += "<cite>" + list[i] + "</cite>, ";
-            }
-            result += "and <cite>" + list[list.length - 1] + "</cite>";
-            return result;
-        }
-    }
 
     /*
      * Converts a list of paragraphs containing movie titles into a JSON-formatted string, like '["Movie 1", "Movie 2"]'
@@ -430,85 +406,4 @@
         }
     }
 
-    /*
-     * Generates a sentence telling the user what their recommended films are.
-     */
-    function generateSentence(recommendedFilms, requestedFilms) {
-        let text;
-        let rule = document.querySelector('input[name=heuristic]:checked');
-        let count = parseInt(document.getElementById("count").value);
-        if (recommendedFilms.length < count) {
-            if (count === 1) {
-                text = "You requested 1 film, but there "
-            } else {
-                text = "You requested " + count + " films, but there";
-            }
-            if (recommendedFilms.length === 0) {
-                text += " are no films to watch before";
-            } else if (recommendedFilms.length === 1) {
-                text += " is only 1 film to watch before";
-            } else {
-                text += " are only " + recommendedFilms.length + " films to watch before";
-            }
-            if (requestedFilms.length === 1) {
-                text += " watching ";
-            } else {
-                text += "/between watching ";
-            }
-            text += listFilms(requestedFilms);
-            if (recommendedFilms.length === 1) {
-                text += ". That film is " + listFilms(recommendedFilms);
-            } else if (recommendedFilms.length > 1) {
-                text += ". Those films are " + listFilms(recommendedFilms);
-            }
-        } else {
-            // Case where there are no recommended films
-            if (recommendedFilms.length === 0) {
-                text = "There are no other films you should watch ";
-                if (requestedFilms.length === 1) {
-                    text += " before watching " + listFilms(requestedFilms);
-                } else {
-                    text += " before/between watching " + listFilms(requestedFilms);
-                }
-            } else if (rule.value === "Interconnected") {
-                text = "In order to have the most interconnected viewing experience possible while only watching " + recommendedFilms.length;
-                if (recommendedFilms.length === 1) {
-                    text += " additional film";
-                } else {
-                    text += " additional films";
-                }
-                text += ", you should watch " + listFilms(recommendedFilms);
-                if (requestedFilms.length === 1) {
-                    text += " before watching " + listFilms(requestedFilms);
-                } else {
-                    text += " before/between watching " + listFilms(requestedFilms);
-                }
-            } else if (rule.value === "Relevant") {
-                if (recommendedFilms.length === 1) {
-                    text = "The most relevant film to " + listFilms(requestedFilms) + " is " + listFilms(recommendedFilms);
-                } else {
-                    text = "The " + recommendedFilms.length + " most relevant films to " + listFilms(requestedFilms) + " are " + listFilms(recommendedFilms);
-                }
-            } else if (rule.value === "Recent") {
-                text = "When " + listFilms(requestedFilms) + " came out, the ";
-                if (recommendedFilms.length === 1) {
-                    text += "most recent film featuring characters/plotlines in ";
-                } else {
-                    text += recommendedFilms.length + " most recent films featuring characters/plotlines in ";
-                }
-                if (requestedFilms.length === 1) {
-                    text += "this movie ";
-                } else {
-                    text += "these movies ";
-                }
-                if (recommendedFilms.length === 1) {
-                    text += " was " + listFilms(recommendedFilms);
-                } else {
-                    text += " were " + listFilms(recommendedFilms);
-                }
-            }
-        }
-        text += ".";
-        return text;
-    }
 })();

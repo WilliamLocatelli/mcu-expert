@@ -156,6 +156,9 @@ def watch_order(watched, subgraph):
 
 ##############################################  HELPER FUNCTIONS  ##############################################
 
+# ensures there are no more than 500,000 possible combinations of the given films
+# modifies excluded, included, and n, adding Avengers movies from excluded to included if there are too many
+# combinations
 def ensure_small(excluded, included, n):
     excluded_copy = excluded.copy()
     f = math.factorial
