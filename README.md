@@ -62,16 +62,6 @@ in tier 2, all 5 movies in tier 1 and all 4 movies in tier 2 will be included, i
 #### Most Relevant
 The "most relevant" ancestors of a movie are defined as such: the movies which are directly connected to this movie
 in some way.
-
-#### Most Recent
-The "most recent" ancestors of a movie consist of the movies which are directly connected to this movie AND for which
-there are no intermediate movies that also connect to this movie.
-
-Thus, all ancestors in the 1st "most recent" tier of a movie will also be in that movie's 1st "most relevant" tier.
-However, some movies in the "most relevant" tier might not be in the "most recent" tier.
- * Example: _Age of Ultron_'s "most relevant" tier would include both _The Winter Soldier_ and _The Avengers_. However,
- since _Winter Soldier_ takes place between _The Avengers_ and _Age of Ultron_, _The Avengers_ would be excluded from
- _Age of Ultron_'s "most recent" tier.
  
 #### Second tier
 Sometimes, the user may request more movie recommendations than exist in the first tier. In this case, all movies in
@@ -84,3 +74,7 @@ recommend. The same applies for third tier, fourth tier, etc.
 ### Most Interconnected
 
 This algorithm simply generates a tree of all ancestors of this movie.
+
+### Most Recent
+The "most recent" algorithm uses the same tree used in the "most interconnected" algorithm and returns the n most recent
+films from that tree.
