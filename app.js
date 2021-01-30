@@ -121,13 +121,13 @@ async function getDBConnection() {
  * Puts films and message into a single stringified JSON object
  */
 function concatenateResult(films, message) {
-    let result = "{\'films\': [\'" + films[0] + "\'";
+    let result = "{\"films\": [\"" + films[0] + "\"";
     for (let i = 1; i < films.length; i++) {
-        result += ",\'" + films[i] + "\'";
+        result += ",\"" + films[i] + "\"";
     }
-    result += "], \'msg\': \'";
+    result += "], \"msg\": \"";
     result += message;
-    result += "\'}";
+    result += "\"}";
     return result;
 }
 

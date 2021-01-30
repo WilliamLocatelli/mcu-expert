@@ -194,7 +194,7 @@
             lastRecs[i].classList.remove("recommended");
         }
         // must replace ' with " or else JSON won't parse
-        let data = JSON.parse(response.replace(/'/g, '"'));
+        let data = JSON.parse(response);
         let films = data['films'];
         if (films.length === 0) {
             document.getElementById("error").textContent = data['msg'];
