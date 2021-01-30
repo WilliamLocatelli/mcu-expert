@@ -118,7 +118,7 @@ def find_best_subgraph(watched, children, num_extras):
     excluded = []
     # if there are less extra films than the total requested films, return all the films.
     if len(nodes) <= num_extras + len(children) + len(watched):
-        return list(nodes)
+        return {"films": list(nodes)}
     else:
         for movie in nodes:
             if movie not in included:
@@ -137,7 +137,8 @@ def find_best_subgraph(watched, children, num_extras):
             best_graphs.append(graph)
 
     #print(best_graphs)
-    result = tie_breaker(best_graphs, excluded, included_unwatched, watched)
+    final_graph = tie_breaker(best_graphs, excluded, included_unwatched, watched)
+    result = {"films": final_graph}
     return result
 
 
@@ -145,13 +146,20 @@ def find_best_subgraph(watched, children, num_extras):
 # parameters:
 #           watched: set of movies which have already been watched
 #           subgraph: list of the all the movies in the watch list
-# return format: string
 def watch_order(watched, subgraph):
     order = []
-    for movie in MOVIES:
-        if MOVIES[movie] in subgraph and not MOVIES[movie] in watched:
+    for movie in MOVIES.values():
+        if movie in subgraph and movie not in watched:
             order.append(movie)
     return order
+
+
+# Returns a list containing the names of the Movie objects in the list, in the same order
+def names(film_list):
+    result = []
+    for film in film_list:
+        result.append(film.name)
+    return result
 
 
 ##############################################  HELPER FUNCTIONS  ##############################################

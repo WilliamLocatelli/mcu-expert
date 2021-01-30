@@ -30,7 +30,8 @@ def get_objects_and_find_best_subgraph(watched, children, num_extras, rule, coun
         if movie in movies.keys():
             child_movies.add(movies[movie])
     result = Rec.find_best_subgraph(watched_movies, child_movies, num_extras)
-    return Rec.watch_order(watched_movies, result)
+    watch_order = Rec.watch_order(watched_movies, result["films"])
+    return Rec.names(watch_order)
 
 
 data = json.loads(sys.argv[1])
